@@ -1,0 +1,2 @@
+C:/Users/muham/OneDrive/Desktop/Jouanapp-master/android/app/.cxx/RelWithDebInfo/66s4f4vt/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/muham/OneDrive/Desktop/Jouanapp-master/android/app/.cxx/RelWithDebInfo/66s4f4vt/armeabi-v7a/CMakeFiles/rebuild_cache.dir

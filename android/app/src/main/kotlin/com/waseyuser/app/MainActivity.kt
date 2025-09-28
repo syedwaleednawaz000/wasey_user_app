@@ -1,0 +1,6 @@
+package com.waseyuser.app
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}

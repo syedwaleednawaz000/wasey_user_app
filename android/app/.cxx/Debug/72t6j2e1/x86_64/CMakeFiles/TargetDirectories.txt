@@ -1,0 +1,2 @@
+C:/Users/Dell/Desktop/jounapp/jounapp/android/app/.cxx/Debug/72t6j2e1/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Dell/Desktop/jounapp/jounapp/android/app/.cxx/Debug/72t6j2e1/x86_64/CMakeFiles/rebuild_cache.dir

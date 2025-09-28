@@ -1,0 +1,2 @@
+C:/Users/Dell/Desktop/jounapp/jounapp/android/app/.cxx/RelWithDebInfo/p6375r21/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Dell/Desktop/jounapp/jounapp/android/app/.cxx/RelWithDebInfo/p6375r21/armeabi-v7a/CMakeFiles/rebuild_cache.dir

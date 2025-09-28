@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "244302597623",
+    "project_id": "wasey-6462d",
+    "storage_bucket": "wasey-6462d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244302597623:android:b0e9e0a8e49beb76a432f2",
+        "android_client_info": {
+          "package_name": "com.waseyuser.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1MYFwj3Mbd8bqAMXxcOWSbUy6e6Rt9fM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,2 @@
+D:/flutter-projects/mostafa/jounapp/android/app/.cxx/Debug/514p23o5/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/flutter-projects/mostafa/jounapp/android/app/.cxx/Debug/514p23o5/armeabi-v7a/CMakeFiles/rebuild_cache.dir

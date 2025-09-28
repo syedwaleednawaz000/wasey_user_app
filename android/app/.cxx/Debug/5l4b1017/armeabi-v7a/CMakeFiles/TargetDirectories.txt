@@ -1,0 +1,2 @@
+D:/Malak Projects/jounapp/android/app/.cxx/Debug/5l4b1017/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/Malak Projects/jounapp/android/app/.cxx/Debug/5l4b1017/armeabi-v7a/CMakeFiles/rebuild_cache.dir
