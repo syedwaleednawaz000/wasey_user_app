@@ -6,7 +6,7 @@ import 'package:sixam_mart/util/images.dart';
 
 class AppConstants {
   static const String appName = 'Wasey';
-  static const double appVersion = 2.5;
+  static const double appVersion = 0.1;
 
   ///Flutter Version: 3.24.5
 
