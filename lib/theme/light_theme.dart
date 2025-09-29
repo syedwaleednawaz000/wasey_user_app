@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
-ThemeData light({Color color = const Color(0xFF039D55)}) => ThemeData(
+
+// Light Theme
+ThemeData light(
+    {Color color = const Color(0xFF10B981)}) => ThemeData(
   fontFamily: AppConstants.fontFamily,
   primaryColor: color,
-  secondaryHeaderColor: const Color(0xFF1ED7AA),
-  disabledColor: const Color(0xFFBABFC4),
+  secondaryHeaderColor: const Color(0xFF06B6D4),
+  disabledColor: const Color(0xFF9CA3AF),
   brightness: Brightness.light,
-  hintColor: const Color(0xFF9F9F9F),
+  hintColor: const Color(0xFF6B7280),
   cardColor: Colors.white,
-  shadowColor: Colors.black.withValues(alpha: 0.03),
+  shadowColor: Colors.black.withOpacity(0.05),
   textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: color)),
-  colorScheme: ColorScheme.light(primary: color, secondary: color).copyWith(
-      surface: const Color(0xFFFCFCFC)).copyWith(error: const Color(0xFFE84D4F)),
+  colorScheme: ColorScheme.light(
+    primary: color,
+    secondary: const Color(0xFF06B6D4),
+    surface: const Color(0xFFF9FAFB),
+    error: const Color(0xFFEF4444),
+  ),
   popupMenuTheme: const PopupMenuThemeData(color: Colors.white, surfaceTintColor: Colors.white),
   dialogTheme: const DialogThemeData(surfaceTintColor: Colors.white),
   floatingActionButtonTheme: FloatingActionButtonThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(500))),
@@ -20,6 +27,6 @@ ThemeData light({Color color = const Color(0xFF039D55)}) => ThemeData(
     surfaceTintColor: Colors.white, height: 60,
     padding: EdgeInsets.symmetric(vertical: 5),
   ),
-  dividerTheme: const DividerThemeData(thickness: 0.2, color: Color(0xFFA0A4A8)),
+  dividerTheme: const DividerThemeData(thickness: 0.5, color: Color(0xFFE5E7EB)),
   tabBarTheme: const TabBarThemeData(dividerColor: Colors.transparent),
 );
