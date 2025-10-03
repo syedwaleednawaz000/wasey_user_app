@@ -13,13 +13,13 @@ class AppConstants {
   static const String fontFamily = 'IBMPlexSansArabic';
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
-  static const String webHostedUrl = 'http://waseyapp.com';
+  static const String webHostedUrl = 'https://waseyapp.com';
   // static const String webHostedUrl = 'https://panel.jouanapp.com';
-  static const String variationsBaseUrl = 'http://waseyapp.com/storage/app/public/product/variation/';
+  static const String baseUrl = 'https://waseyapp.com';
+  // static const String baseUrl = 'https://panel.jouanapp.com';
+  static const String variationsBaseUrl = 'https://waseyapp.com/storage/app/public/product/variation/';
   static const bool useReactWebsite = false;
 
-  static const String baseUrl = 'http://waseyapp.com';
-  // static const String baseUrl = 'https://panel.jouanapp.com';
   static const String categoryUri = '/api/v1/categories';
   static const String bannerUri = '/api/v1/banners';
   static const String storeItemUri = '/api/v1/items/latest';

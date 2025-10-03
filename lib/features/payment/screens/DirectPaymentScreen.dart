@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:sixam_mart/features/checkout/screens/order_successful_screen.dart';
 import 'package:sixam_mart/features/checkout/widgets/payment_failed_dialog.dart';
 import 'package:flutter/services.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 
 
 class DirectPaymentScreen extends StatefulWidget {
@@ -149,7 +150,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> {
 }
 
 
-      final url = Uri.parse("http://waseyapp.com/payment/paytabs/pay");
+      final url = Uri.parse("${AppConstants.baseUrl}/payment/paytabs/pay");
       // final url = Uri.parse("https://panel.jouanapp.com/payment/paytabs/pay");
       final response = await http.post(
         url,
