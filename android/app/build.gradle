@@ -20,7 +20,7 @@ if (flutterVersionCode == null) {
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.0.2'
+    flutterVersionName = '1.0.0'
 }
 
 def keystoreProperties = new Properties()
@@ -50,8 +50,8 @@ android {
         applicationId "com.waseyuser.app"
         minSdkVersion 23
         targetSdkVersion 35
-        versionCode 20
-        versionName "2.1.8"
+        versionCode 1
+        versionName "1.0.0"
         multiDexEnabled true
         
     }
