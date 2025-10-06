@@ -1574,11 +1574,11 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             buttonText: 'place_order'.tr,
             onPressed: checkoutController.acceptTerms
                 ? () {
-                    print("deliverycharges=====");
-                    print(checkoutController.currentSelectedDeliveryChargesData
-                        .value!.deliveryChargesMin
-                        .toString());
-                    print(deliveryCharge.toString());
+                    // print("deliverycharges=====");
+                    // print(checkoutController.currentSelectedDeliveryChargesData
+                    //     .value!.deliveryChargesMin
+                    //     .toString());
+                    // print(deliveryCharge.toString());
                     bool isAvailable = true;
                     DateTime scheduleStartDate = DateTime.now();
                     DateTime scheduleEndDate = DateTime.now();

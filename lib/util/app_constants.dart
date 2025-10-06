@@ -14,8 +14,10 @@ class AppConstants {
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
   static const String webHostedUrl = 'https://waseyapp.com';
+  // static const String webHostedUrl = 'https://latest.waseyapp.com';
   // static const String webHostedUrl = 'https://panel.jouanapp.com';
   static const String baseUrl = 'https://waseyapp.com';
+  // static const String baseUrl = 'https://latest.waseyapp.com';
   // static const String baseUrl = 'https://panel.jouanapp.com';
   static const String variationsBaseUrl = 'https://waseyapp.com/storage/app/public/product/variation/';
   static const bool useReactWebsite = false;
@@ -292,15 +294,15 @@ class AppConstants {
 
   static List<LanguageModel> languages = [
     LanguageModel(
-        imageUrl: Images.arabic,
-        languageName: 'عربى',
-        countryCode: 'SA',
-        languageCode: 'ar'),
-    LanguageModel(
         imageUrl: Images.english,
         languageName: 'English',
         countryCode: 'US',
         languageCode: 'en'),
+    LanguageModel(
+        imageUrl: Images.arabic,
+        languageName: 'عربى',
+        countryCode: 'SA',
+        languageCode: 'ar'),
     // LanguageModel(
     //     imageUrl: Images.spanish,
     //     languageName: 'Spanish',
