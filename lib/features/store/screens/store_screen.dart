@@ -402,12 +402,12 @@ class _StoreScreenState extends State<StoreScreen> {
                                                 : Alignment.topRight,
                                             child: Text(
                                               ((store.open == 1) &&
-                                                      (store.active!))
+                                                      (store.active == 1))
                                                   ? 'status_open'.tr
                                                   : "status_closed".tr,
                                               style: TextStyle(
                                                 color: ((store.open == 1) &&
-                                                        (store.active!))
+                                                        (store.active == 1))
                                                     ? Colors.green
                                                     : Colors.red,
                                                 fontSize: 11,
@@ -784,7 +784,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                         storeController
                                                                 .isStoreOpenNow(
                                                                     store
-                                                                        .active!,
+                                                                        .active,
                                                                     store
                                                                         .schedules)
                                                             ? const SizedBox()

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -152,7 +153,8 @@ class SplashController extends GetxController implements GetxService {
     if (response.statusCode == 200) {
       _data = response.body;
       _configModel = ConfigModel.fromJson(response.body);
-      if (_configModel!.module != null) {
+      // log("config boyd response ${jsonDecode(response.body)}");
+      if (_configModel != null && _configModel!.module != null) {
         setModule(_configModel!.module);
       } else if (GetPlatform.isWeb || (loadModuleData && _module != null)) {
         setModule(
@@ -231,8 +233,15 @@ class SplashController extends GetxController implements GetxService {
   }
 
   void setCacheConfigModule(ModuleModel? cacheModule) {
-    _configModel!.moduleConfig!.module =
-        Module.fromJson(_data!['module_config'][cacheModule!.moduleType]);
+    if (_configModel != null && 
+        _configModel!.moduleConfig != null && 
+        _data != null && 
+        cacheModule != null &&
+        _data!['module_config'] != null &&
+        _data!['module_config'][cacheModule.moduleType] != null) {
+      _configModel!.moduleConfig!.module =
+          Module.fromJson(_data!['module_config'][cacheModule.moduleType]);
+    }
   }
 
   bool? showIntro() {
@@ -251,7 +260,11 @@ class SplashController extends GetxController implements GetxService {
     _module = module;
     splashServiceInterface.setModule(module);
     if (module != null) {
-      if (_configModel != null) {
+      if (_configModel != null && 
+          _configModel!.moduleConfig != null && 
+          _data != null &&
+          _data!['module_config'] != null &&
+          _data!['module_config'][module.moduleType] != null) {
         _configModel!.moduleConfig!.module =
             Module.fromJson(_data!['module_config'][module.moduleType]);
       }
@@ -273,6 +286,13 @@ class SplashController extends GetxController implements GetxService {
   }
 
   Module getModuleConfig(String? moduleType) {
+    if (_data == null || 
+        _data!['module_config'] == null || 
+        moduleType == null ||
+        _data!['module_config'][moduleType] == null) {
+      throw Exception('Module configuration not found for type: $moduleType');
+    }
+    
     Module module = Module.fromJson(_data!['module_config'][moduleType]);
     moduleType == 'food'
         ? module.newVariation = true
@@ -306,19 +326,30 @@ class SplashController extends GetxController implements GetxService {
   }
 
   Future<void> _showInterestPage() async {
-    if (!Get.find<ProfileController>()
-            .userInfoModel!
+    final profileController = Get.find<ProfileController>();
+    final splashController = Get.find<SplashController>();
+    
+    if (profileController.userInfoModel != null &&
+        profileController.userInfoModel!.selectedModuleForInterest != null &&
+        splashController.module != null &&
+        !profileController.userInfoModel!
             .selectedModuleForInterest!
-            .contains(Get.find<SplashController>().module!.id) &&
-        (Get.find<SplashController>().module!.moduleType == 'food' ||
-            Get.find<SplashController>().module!.moduleType == 'grocery' ||
-            Get.find<SplashController>().module!.moduleType == 'ecommerce')) {
+            .contains(splashController.module!.id) &&
+        (splashController.module!.moduleType == 'food' ||
+            splashController.module!.moduleType == 'grocery' ||
+            splashController.module!.moduleType == 'ecommerce')) {
       await Get.toNamed(RouteHelper.getInterestRoute());
     }
   }
 
   void switchModule(int index, bool fromPhone) async {
     log("inside SplashController switchModule method");
+    
+    if (_moduleList == null || index < 0 || index >= _moduleList!.length) {
+      log("Error: Module list is null or index is out of bounds");
+      return;
+    }
+    
     log("Modules list is here: ${_moduleList![index].id}");
 
     if (_module == null || _module!.id != _moduleList![index].id) {

@@ -34,7 +34,7 @@ class StoreCardWidget extends StatelessWidget {
     double? discount = store!.discount != null ? store!.discount!.discount : 0;
     String? discountType =
         store!.discount != null ? store!.discount!.discountType : 'percent';
-    bool isAvailable = store!.open == 1 && store!.active!;
+    bool isAvailable = store!.open == 1 && store!.active == 1;
     return OnHover(
       isItem: true,
       child: TextHover(builder: (hovered) {

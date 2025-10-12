@@ -150,7 +150,7 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
                                                   storeController
                                                       .isStoreOpenNow(
                                                           storeController
-                                                              .store!.active!,
+                                                              .store!.active,
                                                           storeController.store!
                                                               .schedules) &&
                                                   (Get.find<SplashController>()

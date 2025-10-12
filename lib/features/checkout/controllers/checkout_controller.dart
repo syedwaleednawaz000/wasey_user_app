@@ -476,11 +476,11 @@ class CheckoutController extends GetxController implements GetxService {
     update();
   }
 
-  bool isStoreClosed(bool today, bool active, List<Schedules>? schedules) {
+  bool isStoreClosed(bool today, int? active, List<Schedules>? schedules) {
     return Get.find<StoreController>().isStoreClosed(today, active, schedules);
   }
 
-  bool isStoreOpenNow(bool active, List<Schedules>? schedules) {
+  bool isStoreOpenNow(int? active, List<Schedules>? schedules) {
     return Get.find<StoreController>().isStoreOpenNow(active, schedules);
   }
 

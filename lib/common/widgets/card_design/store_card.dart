@@ -43,7 +43,7 @@ class StoreCard extends StatelessWidget {
             'right';
     String currencySymbol =
         Get.find<SplashController>().configModel!.currencySymbol!;
-    bool isAvailable = store.open == 1 && store.active!;
+    bool isAvailable = store.open == 1 && store.active == 1;
 
     return Stack(children: [
       Container(

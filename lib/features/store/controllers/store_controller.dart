@@ -736,8 +736,8 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
-  bool isStoreClosed(bool today, bool active, List<Schedules>? schedules) {
-    if (!active) {
+  bool isStoreClosed(bool today, int? active, List<Schedules>? schedules) {
+    if (active != 1) {
       return true;
     }
     DateTime date = DateTime.now();
@@ -756,7 +756,7 @@ class StoreController extends GetxController implements GetxService {
     return true;
   }
 
-  bool isStoreOpenNow(bool active, List<Schedules>? schedules) {
+  bool isStoreOpenNow(int? active, List<Schedules>? schedules) {
     if (isStoreClosed(true, active, schedules)) {
       return false;
     }
@@ -774,7 +774,7 @@ class StoreController extends GetxController implements GetxService {
     return false;
   }
 
-  bool isOpenNow(Store store) => store.open == 1 && store.active!;
+  bool isOpenNow(Store store) => store.open == 1 && store.active == 1;
 
   double? getDiscount(Store store) =>
       store.discount != null ? store.discount!.discount : 0;

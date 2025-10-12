@@ -78,7 +78,7 @@ class ItemWidget extends StatelessWidget {
       discount = store!.discount != null ? store!.discount!.discount : 0;
       discountType =
           store!.discount != null ? store!.discount!.discountType : 'percent';
-      isAvailable = store!.open == 1 && store!.active!;
+      isAvailable = store!.open == 1 && store!.active == 1;
     } else {
       discount = (item!.storeDiscount == 0 || isCampaign)
           ? item!.discount

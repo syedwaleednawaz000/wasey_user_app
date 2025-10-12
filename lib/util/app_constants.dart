@@ -19,7 +19,7 @@ class AppConstants {
   static const String baseUrl = 'https://waseyapp.com';
   // static const String baseUrl = 'https://latest.waseyapp.com';
   // static const String baseUrl = 'https://panel.jouanapp.com';
-  static const String variationsBaseUrl = 'https://waseyapp.com/storage/app/public/product/variation/';
+  static const String variationsBaseUrl = '${baseUrl}/storage/app/public/product/variation/';
   static const bool useReactWebsite = false;
 
   static const String categoryUri = '/api/v1/categories';

@@ -87,7 +87,7 @@ class SearchService implements SearchServiceInterface {
     }
     if(isAvailableStore || isDiscountedStore) {
       if(isAvailableStore) {
-        searchStoreList.removeWhere((store) => store.open == 0 || !store.active!);
+        searchStoreList.removeWhere((store) => store.open == 0 || store.active != 1);
       }
       if(isDiscountedStore) {
         searchStoreList.removeWhere((store) => store.discount == null);

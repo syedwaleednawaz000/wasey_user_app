@@ -57,7 +57,7 @@ class Store {
   double? maximumShippingCharge;
   double? perKmShippingCharge;
   int? open;
-  bool? active;
+  int? active;
   String? deliveryTime;
   List<int>? categoryIds;
   int? veg;

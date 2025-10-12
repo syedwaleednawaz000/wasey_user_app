@@ -23,7 +23,7 @@ class VisitAgainCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isAvailable = store.open == 1 && store.active!;
+    bool isAvailable = store.open == 1 && store.active == 1;
 
     return GestureDetector(
       onTap: () {

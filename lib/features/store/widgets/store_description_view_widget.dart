@@ -23,7 +23,7 @@ class StoreDescriptionViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isAvailable = Get.find<StoreController>()
-        .isStoreOpenNow(store!.active!, store!.schedules);
+        .isStoreOpenNow(store!.active, store!.schedules);
     Color? textColor =
         ResponsiveHelper.isDesktop(context) ? Colors.white : null;
     // Module? moduleData;
