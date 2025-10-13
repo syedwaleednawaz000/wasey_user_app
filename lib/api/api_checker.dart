@@ -13,7 +13,11 @@ class ApiChecker {
       });
     }else {
       if(response.statusText != 'The guest id field is required.') {
-        showCustomSnackBar(response.statusText, getXSnackBar: getXSnackBar);
+        if(Get.currentRoute.contains('splash')){
+
+        }else{
+          showCustomSnackBar("${response.statusText}", getXSnackBar: getXSnackBar);
+        }
       }
     }
   }
