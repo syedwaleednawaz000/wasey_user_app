@@ -17,7 +17,7 @@ class NoteAndPrescriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('additional_note'.tr, style: STCMedium),
+      Text('note_for_restaurant'.tr, style: STCMedium),
       const SizedBox(height: Dimensions.paddingSizeSmall),
       CustomTextField(
         controller: checkoutController.noteController,

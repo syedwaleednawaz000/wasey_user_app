@@ -348,8 +348,8 @@ class DeliverySection extends StatelessWidget {
                         const SizedBox(height: Dimensions.paddingSizeLarge),
                         !isDesktop
                             ? CustomTextField(
-                                labelText: 'street_number'.tr,
-                                titleText: 'write_street_number'.tr,
+                                labelText: 'note_for_driver'.tr,
+                                titleText: 'write_note_for_driver'.tr,
                                 inputType: TextInputType.streetAddress,
                                 focusNode: checkoutController.streetNode,
                                 nextFocus: checkoutController.houseNode,
@@ -364,8 +364,8 @@ class DeliverySection extends StatelessWidget {
                           isDesktop
                               ? Expanded(
                                   child: CustomTextField(
-                                    titleText: 'write_street_number'.tr,
-                                    labelText: 'street_number'.tr,
+                                    titleText: 'write_note_for_driver'.tr,
+                                    labelText: 'note_for_driver'.tr,
                                     inputType: TextInputType.streetAddress,
                                     focusNode: checkoutController.streetNode,
                                     nextFocus: checkoutController.houseNode,
