@@ -86,6 +86,7 @@ import '../features/market/bindings/market_binding.dart';
 import '../features/market/domain/models/market_store_model.dart';
 import '../features/market/screens/market_screen.dart';
 import '../features/market/screens/store_details_screen.dart';
+import '../features/menu/screens/menu_screen.dart';
 
 class RouteHelper {
   static const String initial = '/';
@@ -158,9 +159,11 @@ class RouteHelper {
 // Add this:
   static const String market = '/market'; // Define market route
   static const String storeDetails = '/store-details'; // Already defined
+  static const String menuScreen = '/menu-screen';
 
   // ... your existing getRoute methods ...
   static String getMarketRoute() => market;
+  static String getMenuRoute() => menuScreen;
   static String getStoreDetailsRoute(String id) => '$storeDetails?id=$id'; // Already defined
 
 
@@ -397,6 +400,8 @@ class RouteHelper {
       );
     }),
     GetPage(name: interest, page: () => const InterestScreen()),
+    GetPage(name: menuScreen, page: () => getRoute(const MenuScreen())),
+
     GetPage(name: main, page: () => getRoute(DashboardScreen(
       pageIndex: Get.parameters['page'] == 'home' ? 0 : Get.parameters['page'] == 'market' ? 1
           : Get.parameters['page'] == 'cart' ? 2 : Get.parameters['page'] == 'order' ? 3 : Get.parameters['page'] == 'menu' ? 4 : 0,

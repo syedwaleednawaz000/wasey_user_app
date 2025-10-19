@@ -114,7 +114,8 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen> {
                         if (widget.fromMenu) {
                           Navigator.pop(context);
                         } else {
-                          Get.offNamed(RouteHelper.getOnBoardingRoute());
+                          // Get.offNamed(RouteHelper.getOnBoardingRoute());
+                          Get.offNamed(RouteHelper.getSignInRoute(RouteHelper.signIn));
                         }
                       } else {
                         showCustomSnackBar('select_a_language'.tr);

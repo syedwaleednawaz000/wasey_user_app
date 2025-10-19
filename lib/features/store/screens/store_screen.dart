@@ -120,8 +120,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return
-      (widget.isNewSuperMarket && (!ResponsiveHelper.isDesktop(context)))
+    return (widget.isNewSuperMarket && (!ResponsiveHelper.isDesktop(context)))
         ? GetBuilder<StoreController>(builder: (storeController) {
             Store? store;
             if (storeController.store != null) {
@@ -129,406 +128,400 @@ class _StoreScreenState extends State<StoreScreen> {
             }
             bool ltr = Get.find<LocalizationController>().isLtr;
             return Scaffold(
-                backgroundColor: Theme.of(context).cardColor,
-                extendBodyBehindAppBar: true,
-                appBar: AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  automaticallyImplyLeading: false,
-                  leading: const SizedBox.shrink(),
-                  leadingWidth: 0,
-                  titleSpacing: 0,
-                  title: SizedBox(
-                    height: 40,
-                    child: Row(
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          child: InkWell(
-                            onTap: () => Get.back(),
-                            child: Container(
-                              // height: 50,
-                              // width: 50,
-                              margin: const EdgeInsets.symmetric(horizontal: 6),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Theme.of(context).cardColor),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.chevron_left,
-                                color: Theme.of(context).primaryColorDark,
-                              ),
+              backgroundColor: Theme.of(context).cardColor,
+              extendBodyBehindAppBar: true,
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                leading: const SizedBox.shrink(),
+                leadingWidth: 0,
+                titleSpacing: 0,
+                title: SizedBox(
+                  height: 40,
+                  child: Row(
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: InkWell(
+                          onTap: () => Get.back(),
+                          child: Container(
+                            // height: 50,
+                            // width: 50,
+                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Theme.of(context).cardColor),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.chevron_left,
+                              color: Theme.of(context).primaryColorDark,
                             ),
                           ),
                         ),
-                        // ... inside your Row or wherever this Flexible widget is ...
-                        Flexible(
-                          flex: 6,
-                          child: GestureDetector(
-                            onTap: () {
-                              // Ensure 'store' and 'store.id' are not null before navigating
-                              if (store != null && store!.id != null) {
-                                Get.toNamed(RouteHelper.getSearchStoreItemRoute(
-                                    store!.id!));
-                              } else {
-                                // Handle the case where store or store.id is null, maybe show a message
-                                print(
-                                    "Error: Store ID is null, cannot navigate to search.");
-                                // Get.snackbar("Error", "Could not initiate search. Store details missing.");
-                              }
-                            },
-                            child: AbsorbPointer(
-                              // Makes sure the TextFormField doesn't try to handle taps
-                              child: TextFormField(
-                                enabled: false,
-                                // Disables the TextFormField for input
-                                decoration: InputDecoration(
-                                  hintText: "🔍︎  ${'search_products'.tr}",
-                                  hintStyle: TextStyle(
-                                    color: Theme.of(context).disabledColor,
-                                    fontSize: 14,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  fillColor: Theme.of(context).cardColor,
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical:
-                                        10, // Added some vertical padding to better center hint text
-                                  ),
-                                  // To make it look more like a button if `enabled: false` changes its appearance too much:
-                                  disabledBorder: OutlineInputBorder(
-                                    // Define how it looks when disabled
-                                    borderRadius: BorderRadius.circular(30),
-                                    borderSide:
-                                        BorderSide.none, // Keep no border
-                                  ),
+                      ),
+                      // ... inside your Row or wherever this Flexible widget is ...
+                      Flexible(
+                        flex: 6,
+                        child: GestureDetector(
+                          onTap: () {
+                            // Ensure 'store' and 'store.id' are not null before navigating
+                            if (store != null && store!.id != null) {
+                              Get.toNamed(RouteHelper.getSearchStoreItemRoute(
+                                  store!.id!));
+                            } else {
+                              // Handle the case where store or store.id is null, maybe show a message
+                              print(
+                                  "Error: Store ID is null, cannot navigate to search.");
+                              // Get.snackbar("Error", "Could not initiate search. Store details missing.");
+                            }
+                          },
+                          child: AbsorbPointer(
+                            // Makes sure the TextFormField doesn't try to handle taps
+                            child: TextFormField(
+                              enabled: false,
+                              // Disables the TextFormField for input
+                              decoration: InputDecoration(
+                                hintText: "🔍︎  ${'search_products'.tr}",
+                                hintStyle: TextStyle(
+                                  color: Theme.of(context).disabledColor,
+                                  fontSize: 14,
                                 ),
-                                // style: TextStyle(color: Colors.transparent), // Optional: hides the caret if it still appears
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide.none,
+                                ),
+                                fillColor: Theme.of(context).cardColor,
+                                filled: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical:
+                                      10, // Added some vertical padding to better center hint text
+                                ),
+                                // To make it look more like a button if `enabled: false` changes its appearance too much:
+                                disabledBorder: OutlineInputBorder(
+                                  // Define how it looks when disabled
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide.none, // Keep no border
+                                ),
                               ),
+                              // style: TextStyle(color: Colors.transparent), // Optional: hides the caret if it still appears
                             ),
                           ),
                         ),
+                      ),
 
-                        GetBuilder<StoreController>(builder: (storeController) {
-                          return AppConstants.webHostedUrl.isNotEmpty
-                              ? Flexible(
-                                  flex: 1,
-                                  child: InkWell(
-                                      onTap: () {
-                                        storeController.shareStore();
-                                      },
-                                      child: Container(
-                                          height: 40,
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 6),
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color:
-                                                  Theme.of(context).cardColor),
-                                          alignment: Alignment.center,
-                                          child: const Icon(
-                                            Icons.share,
-                                            size: 17,
-                                          ))))
-                              : const SizedBox.shrink();
-                        })
-                      ],
-                    ),
+                      GetBuilder<StoreController>(builder: (storeController) {
+                        return AppConstants.webHostedUrl.isNotEmpty
+                            ? Flexible(
+                                flex: 1,
+                                child: InkWell(
+                                    onTap: () {
+                                      storeController.shareStore();
+                                    },
+                                    child: Container(
+                                        height: 40,
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 6),
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Theme.of(context).cardColor),
+                                        alignment: Alignment.center,
+                                        child: const Icon(
+                                          Icons.share,
+                                          size: 17,
+                                        ))))
+                            : const SizedBox.shrink();
+                      })
+                    ],
                   ),
                 ),
-                body: (storeController.store != null &&
-                        storeController.store!.name != null)
-                    ? SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              color: Theme.of(context).cardColor,
-                              height: 420,
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    color: Theme.of(context)
-                                        .disabledColor
-                                        .withOpacity(.2),
-                                    child: CustomImage(
-                                      fit: BoxFit.cover,
-                                      height: 250,
-                                      width: double.infinity,
-                                      image: store?.coverPhotoFullUrl ?? '',
-                                    ),
+              ),
+              body: (storeController.store != null &&
+                      storeController.store!.name != null)
+                  ? SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Container(
+                            color: Theme.of(context).cardColor,
+                            height: 420,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  color: Theme.of(context)
+                                      .disabledColor
+                                      .withOpacity(.2),
+                                  child: CustomImage(
+                                    fit: BoxFit.cover,
+                                    height: 250,
+                                    width: double.infinity,
+                                    image: store?.coverPhotoFullUrl ?? '',
                                   ),
-                                  Positioned(
-                                    bottom: 10,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 210,
-                                      margin: const EdgeInsets.only(
-                                        left: 8,
-                                        right: 8,
-                                      ),
-                                      padding: const EdgeInsets.all(
-                                        Dimensions.paddingSizeSmall,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .cardColor, //Colors.red,
-                                        borderRadius: BorderRadius.circular(
-                                            Dimensions.radiusDefault),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            // Shadow color with some opacity
-                                            spreadRadius: 1,
-                                            // How far the shadow spreads before blurring
-                                            blurRadius: 5,
-                                            // How blurry the shadow is
-                                            offset: const Offset(0,
-                                                3), // changes position of shadow (x, y)
-                                            // Offset(0, 3) will move it 3 pixels down
-                                            // This will create a shadow primarily at the bottom
-                                            // and slightly on the sides due to blur.
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
-                                                child: CustomImage(
-                                                  image:
-                                                      store!.logoFullUrl ?? '',
-                                                  height: 40,
-                                                  width: 40,
-                                                ),
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    height: 210,
+                                    margin: const EdgeInsets.only(
+                                      left: 8,
+                                      right: 8,
+                                    ),
+                                    padding: const EdgeInsets.all(
+                                      Dimensions.paddingSizeSmall,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .cardColor, //Colors.red,
+                                      borderRadius: BorderRadius.circular(
+                                          Dimensions.radiusDefault),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.3),
+                                          // Shadow color with some opacity
+                                          spreadRadius: 1,
+                                          // How far the shadow spreads before blurring
+                                          blurRadius: 5,
+                                          // How blurry the shadow is
+                                          offset: const Offset(0,
+                                              3), // changes position of shadow (x, y)
+                                          // Offset(0, 3) will move it 3 pixels down
+                                          // This will create a shadow primarily at the bottom
+                                          // and slightly on the sides due to blur.
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              child: CustomImage(
+                                                image: store!.logoFullUrl ?? '',
+                                                height: 40,
+                                                width: 40,
                                               ),
-                                              GetBuilder<FavouriteController>(
-                                                  builder:
-                                                      (favouriteController) {
-                                                bool isWished =
-                                                    favouriteController
-                                                        .wishStoreIdList
-                                                        .contains(store!.id);
-                                                return InkWell(
-                                                  onTap: () {
-                                                    if (AuthHelper
-                                                        .isLoggedIn()) {
-                                                      isWished
-                                                          ? favouriteController
-                                                              .removeFromFavouriteList(
-                                                                  store!.id,
-                                                                  true)
-                                                          : favouriteController
-                                                              .addToFavouriteList(
-                                                                  null,
-                                                                  store?.id,
-                                                                  true);
-                                                    } else {
-                                                      showCustomSnackBar(
-                                                          'you_are_not_logged_in'
-                                                              .tr);
-                                                    }
-                                                  },
-                                                  child: Icon(
+                                            ),
+                                            GetBuilder<FavouriteController>(
+                                                builder: (favouriteController) {
+                                              bool isWished =
+                                                  favouriteController
+                                                      .wishStoreIdList
+                                                      .contains(store!.id);
+                                              return InkWell(
+                                                onTap: () {
+                                                  if (AuthHelper.isLoggedIn()) {
                                                     isWished
-                                                        ? Icons.favorite
-                                                        : Icons.favorite_border,
-                                                    size: 24,
-                                                    color: isWished
-                                                        ? Theme.of(context)
-                                                            .primaryColor
-                                                        : Theme.of(context)
-                                                            .disabledColor,
-                                                  ),
-                                                );
-                                              }),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                store.name ?? '',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                              InkWell(
-                                                onTap: (){
-                                                  Get.to(StoreCategoriesScreen(store: store));
+                                                        ? favouriteController
+                                                            .removeFromFavouriteList(
+                                                                store!.id, true)
+                                                        : favouriteController
+                                                            .addToFavouriteList(
+                                                                null,
+                                                                store?.id,
+                                                                true);
+                                                  } else {
+                                                    showCustomSnackBar(
+                                                        'you_are_not_logged_in'
+                                                            .tr);
+                                                  }
                                                 },
                                                 child: Icon(
-                                                  ltr
-                                                      ? Icons
-                                                          .arrow_forward_ios_outlined
-                                                      : Icons
-                                                          .arrow_back_ios_new_outlined,
+                                                  isWished
+                                                      ? Icons.favorite
+                                                      : Icons.favorite_border,
+                                                  size: 24,
+                                                  color: isWished
+                                                      ? Theme.of(context)
+                                                          .primaryColor
+                                                      : Theme.of(context)
+                                                          .disabledColor,
+                                                ),
+                                              );
+                                            }),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              store.name ?? '',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                            InkWell(
+                                              onTap: () {
+                                                Get.to(StoreCategoriesScreen(
+                                                    store: store));
+                                              },
+                                              child: Icon(
+                                                ltr
+                                                    ? Icons
+                                                        .arrow_forward_ios_outlined
+                                                    : Icons
+                                                        .arrow_back_ios_new_outlined,
+                                                size: 18,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Align(
+                                          alignment: ltr
+                                              ? Alignment.topLeft
+                                              : Alignment.topRight,
+                                          child: Text(
+                                            store.address ??
+                                                "status_not_applicable".tr,
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w300,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Align(
+                                          alignment: ltr
+                                              ? Alignment.topLeft
+                                              : Alignment.topRight,
+                                          child: Text(
+                                            ((store.open == 1) &&
+                                                    (store.active == 1))
+                                                ? 'status_open'.tr
+                                                : "status_closed".tr,
+                                            style: TextStyle(
+                                              color: ((store.open == 1) &&
+                                                      (store.active == 1))
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ),
+                                        Divider(
+                                          color: Theme.of(context).dividerColor,
+                                          thickness: .15,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                const Icon(
+                                                  Icons.delivery_dining,
                                                   size: 18,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 3),
-                                          Align(
-                                            alignment: ltr
-                                                ? Alignment.topLeft
-                                                : Alignment.topRight,
-                                            child: Text(
-                                              store.address ??
-                                                  "status_not_applicable".tr,
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w300,
-                                                color: Colors.black54,
-                                              ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  store.deliveryTime ??
+                                                      "status_not_applicable"
+                                                          .tr,
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                  ),
+                                                )
+                                              ],
                                             ),
-                                          ),
-                                          const SizedBox(height: 3),
-                                          Align(
-                                            alignment: ltr
-                                                ? Alignment.topLeft
-                                                : Alignment.topRight,
-                                            child: Text(
-                                              ((store.open == 1) &&
-                                                      (store.active == 1))
-                                                  ? 'status_open'.tr
-                                                  : "status_closed".tr,
-                                              style: TextStyle(
-                                                color: ((store.open == 1) &&
-                                                        (store.active == 1))
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                fontSize: 11,
-                                              ),
+                                            Column(
+                                              children: [
+                                                const Icon(
+                                                  Icons
+                                                      .access_time_filled_outlined,
+                                                  size: 18,
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  store.storeOpeningTime ??
+                                                      "status_not_applicable"
+                                                          .tr,
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                  ),
+                                                )
+                                              ],
                                             ),
-                                          ),
-                                          Divider(
-                                            color:
-                                                Theme.of(context).dividerColor,
-                                            thickness: .15,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              Column(
-                                                children: [
-                                                  const Icon(
-                                                    Icons.delivery_dining,
-                                                    size: 18,
+                                            Column(
+                                              children: [
+                                                const Icon(
+                                                  Icons.star,
+                                                  size: 18,
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  (store.avgRating
+                                                          .toString()) ??
+                                                      "status_not_applicable"
+                                                          .tr,
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
                                                   ),
-                                                  const SizedBox(height: 6),
-                                                  Text(
-                                                    store.deliveryTime ??
-                                                        "status_not_applicable"
-                                                            .tr,
-                                                    style: const TextStyle(
-                                                      fontSize: 11,
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  const Icon(
-                                                    Icons
-                                                        .access_time_filled_outlined,
-                                                    size: 18,
+                                                ),
+                                                Text(
+                                                  "(${store.ratingCount.toString()})" ??
+                                                      "status_not_applicable"
+                                                          .tr,
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
                                                   ),
-                                                  const SizedBox(height: 6),
-                                                  Text(
-                                                    store.storeOpeningTime ??
-                                                        "status_not_applicable"
-                                                            .tr,
-                                                    style: const TextStyle(
-                                                      fontSize: 11,
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  const Icon(
-                                                    Icons.star,
-                                                    size: 18,
-                                                  ),
-                                                  const SizedBox(height: 6),
-                                                  Text(
-                                                    (store.avgRating
-                                                            .toString()) ??
-                                                        "status_not_applicable"
-                                                            .tr,
-                                                    style: const TextStyle(
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    "(${store.ratingCount.toString()})" ??
-                                                        "status_not_applicable"
-                                                            .tr,
-                                                    style: const TextStyle(
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        )
+                                      ],
                                     ),
-                                  )
-                                ],
-                              ),
+                                  ),
+                                )
+                              ],
                             ),
-                            Container(
-                              color: Theme.of(context).cardColor,
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 6),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Align(
-                                      alignment: ltr
-                                          ? Alignment.topLeft
-                                          : Alignment.topRight,
-                                      child: Text(
-                                        "available_categories".tr,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          // fontSize: 15
-                                        ),
+                          ),
+                          Container(
+                            color: Theme.of(context).cardColor,
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 6),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: Align(
+                                    alignment: ltr
+                                        ? Alignment.topLeft
+                                        : Alignment.topRight,
+                                    child: Text(
+                                      "available_categories".tr,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        // fontSize: 15
                                       ),
                                     ),
                                   ),
-                                  StoreCategoriesGrid(store: store),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    : const SizedBox(),
-                bottomNavigationBar:
-            GetBuilder<CartController>(builder: (cartController) {
-              return cartController.cartList.isNotEmpty &&
-                  !ResponsiveHelper.isDesktop(context)
-                  ? const BottomCartWidget()
-                  : const SizedBox();
-            }),
+                                ),
+                                StoreCategoriesGrid(store: store),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  : const SizedBox(),
+              bottomNavigationBar:
+                  GetBuilder<CartController>(builder: (cartController) {
+                return cartController.cartList.isNotEmpty &&
+                        !ResponsiveHelper.isDesktop(context)
+                    ? const BottomCartWidget()
+                    : const SizedBox();
+              }),
             );
           })
         : Scaffold(
@@ -1794,9 +1787,11 @@ class _StoreScreenState extends State<StoreScreen> {
                                                       context)
                                                   ? InkWell(
                                                       onTap: () => Get.toNamed(
-                                                          RouteHelper
-                                                              .getSearchStoreItemRoute(
-                                                                  store!.id)),
+                                                        RouteHelper
+                                                            .getSearchStoreItemRoute(
+                                                          store!.id,
+                                                        ),
+                                                      ),
                                                       child: Container(
                                                         decoration:
                                                             BoxDecoration(

@@ -1,6 +1,7 @@
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sixam_mart/common/widgets/item_view.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/cart/widgets/extra_packaging_widget.dart';
 import 'package:sixam_mart/features/cart/widgets/not_available_bottom_sheet_widget.dart';
@@ -37,6 +38,7 @@ import 'package:sixam_mart/features/store/screens/store_screen.dart';
 
 class CartScreen extends StatefulWidget {
   final bool fromNav;
+
   const CartScreen({super.key, required this.fromNav});
 
   @override
@@ -482,9 +484,15 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   ResponsiveHelper.isDesktop(context)
                       ? const SizedBox.shrink()
-                      : CheckoutButton(
-                          cartController: cartController,
-                          availableList: cartController.availableList),
+                      : Padding(
+                          padding: widget.fromNav
+                              ? const EdgeInsets.only(bottom: 70.0)
+                              : EdgeInsets.zero,
+                          child: CheckoutButton(
+                            cartController: cartController,
+                            availableList: cartController.availableList,
+                          ),
+                        ),
                 ])
               : const NoDataScreen(isCart: true, text: '', showFooter: true);
         });
@@ -634,6 +642,7 @@ class _CartScreenState extends State<CartScreen> {
                     ],
                   ),
                 ),
+
           ResponsiveHelper.isDesktop(context)
               ? const SizedBox()
               : const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -817,6 +826,7 @@ class _CartScreenState extends State<CartScreen> {
 class CheckoutButton extends StatelessWidget {
   final CartController cartController;
   final List<bool> availableList;
+
   const CheckoutButton(
       {super.key, required this.cartController, required this.availableList});
 
@@ -870,8 +880,9 @@ class CheckoutButton extends StatelessWidget {
                     ]),
                     const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                     LinearProgressIndicator(
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withAlpha((0.2 * 255).toInt()),
+                      backgroundColor: Theme.of(context)
+                          .primaryColor
+                          .withAlpha((0.2 * 255).toInt()),
                       value: percentage,
                     ),
                   ])
@@ -1030,7 +1041,8 @@ class CheckoutButton extends StatelessWidget {
                     if (!cartController.cartList.first.item!.scheduleOrder! &&
                         availableList.contains(false)) {
                       showCustomSnackBar('one_or_more_product_unavailable'.tr);
-                    } /*else if(AuthHelper.isGuestLoggedIn() && !Get.find<SplashController>().configModel!.guestCheckoutStatus!) {
+                    }
+                    /*else if(AuthHelper.isGuestLoggedIn() && !Get.find<SplashController>().configModel!.guestCheckoutStatus!) {
                     showCustomSnackBar('currently_your_zone_have_no_permission_to_place_any_order'.tr);
                   }*/
                     else {

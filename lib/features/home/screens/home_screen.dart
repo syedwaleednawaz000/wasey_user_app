@@ -19,6 +19,7 @@ import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
 import 'package:sixam_mart/features/flash_sale/controllers/flash_sale_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
+import 'package:sixam_mart/features/menu/screens/menu_screen.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
@@ -47,6 +48,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/home/widgets/module_view.dart';
 import 'package:sixam_mart/features/parcel/screens/parcel_category_screen.dart';
+
+import '../../dashboard/widgets/bottom_nav_item_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -100,8 +103,6 @@ class HomeScreen extends StatefulWidget {
     }
     await Get.find<SplashController>().getModules();
     // await Get.find<SplashController>().getStoredModule();
-
-
 
     if (Get.find<SplashController>().module == null &&
         Get.find<SplashController>().configModel!.module == null) {
@@ -198,7 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
     print("Module setting to 1////////////////////////////////////////");
     await sharedPreferences.setString(
         AppConstants.moduleId, AppConstants.restaurantModuleId);
-    print("Module settled to ${sharedPreferences.getString(AppConstants.moduleId)}////////////////////////////////////////");
+    print(
+        "Module settled to ${sharedPreferences.getString(AppConstants.moduleId)}////////////////////////////////////////");
   }
 
   @override
@@ -250,8 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // splashController.switchModule(1, true);
         Get.find<HomeController>().setModuleRestaurant();
       }
-      bool showMobileModule =
-      !ResponsiveHelper.isDesktop(context) &&
+      bool showMobileModule = !ResponsiveHelper.isDesktop(context) &&
           splashController.module == null &&
           splashController.configModel!.module == null;
 
@@ -394,6 +395,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                     //                 .color),
                                     //       )
                                     //     : const SizedBox(),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Get.to(const MenuScreen());
+                                      },
+                                      child: SizedBox(
+                                        width: 45,
+                                        // color: Colors.red,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.menu,
+                                            ),
+                                            Text(
+                                              "menu".tr,
+                                              style: STCRegular.copyWith(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium!
+                                                    .color!,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                     SizedBox(
                                         width: (splashController.module !=
                                                     null &&
@@ -471,40 +500,48 @@ class _HomeScreenState extends State<HomeScreen> {
                                         }),
                                       ),
                                     )),
-                                    InkWell(
-                                      child: GetBuilder<NotificationController>(
-                                          builder: (notificationController) {
-                                        return Stack(children: [
-                                          Icon(CupertinoIcons.bell,
-                                              size: 25,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .color),
-                                          notificationController.hasNotification
-                                              ? Positioned(
-                                                  top: 0,
-                                                  right: 0,
-                                                  child: Container(
-                                                    height: 10,
-                                                    width: 10,
-                                                    decoration: BoxDecoration(
-                                                      color: Theme.of(context)
-                                                          .primaryColor,
-                                                      shape: BoxShape.circle,
-                                                      border: Border.all(
-                                                          width: 1,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .cardColor),
-                                                    ),
-                                                  ))
-                                              : const SizedBox(),
-                                        ]);
-                                      }),
-                                      onTap: () => Get.toNamed(
-                                          RouteHelper.getNotificationRoute()),
+                                    IconButton(
+                                      onPressed: () => Get.toNamed(
+                                        RouteHelper.getSearchStoreItemRoute(
+                                          Get.find<StoreController>().store!.id,
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.search_outlined),
                                     ),
+                                    // InkWell(
+                                    //   child: GetBuilder<NotificationController>(
+                                    //       builder: (notificationController) {
+                                    //     return Stack(children: [
+                                    //       Icon(CupertinoIcons.bell,
+                                    //           size: 25,
+                                    //           color: Theme.of(context)
+                                    //               .textTheme
+                                    //               .bodyLarge!
+                                    //               .color),
+                                    //       notificationController.hasNotification
+                                    //           ? Positioned(
+                                    //               top: 0,
+                                    //               right: 0,
+                                    //               child: Container(
+                                    //                 height: 10,
+                                    //                 width: 10,
+                                    //                 decoration: BoxDecoration(
+                                    //                   color: Theme.of(context)
+                                    //                       .primaryColor,
+                                    //                   shape: BoxShape.circle,
+                                    //                   border: Border.all(
+                                    //                       width: 1,
+                                    //                       color:
+                                    //                           Theme.of(context)
+                                    //                               .cardColor),
+                                    //                 ),
+                                    //               ))
+                                    //           : const SizedBox(),
+                                    //     ]);
+                                    //   }),
+                                    //   onTap: () => Get.toNamed(
+                                    //       RouteHelper.getNotificationRoute()),
+                                    // ),
                                   ]),
                                 )),
                                 actions: const [SizedBox()],
@@ -514,9 +551,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Center(
                                     child: SizedBox(
                                   width: Dimensions.webMaxWidth,
-                                  child:
-                                  !showMobileModule ?
-                                  Column(
+                                  child: !showMobileModule
+                                      ? Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
