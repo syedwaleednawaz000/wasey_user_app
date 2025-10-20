@@ -7,6 +7,10 @@ import 'package:sixam_mart/util/images.dart';
 class AppConstants {
   static const String appName = 'Wasey';
   static const double appVersion = 0.1;
+  static const String appAddress = "71 St, Kafr Manda, Israel";
+  static const String appAdminPhone = "+972537279686";
+  static const String appAdminEmail = "admin@waseyapp.com";
+
 
   ///Flutter Version: 3.24.5
 

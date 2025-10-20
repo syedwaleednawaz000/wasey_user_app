@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
@@ -13,33 +16,57 @@ import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 
+import '../../store/controllers/store_controller.dart';
+
 class CartController extends GetxController implements GetxService {
   final CartServiceInterface cartServiceInterface;
 
   CartController({required this.cartServiceInterface});
 
+  // --- START: NEW PROPERTIES TO ADD ---
+
+  // Holds the final list of suggested items. Your UI will listen to this.
+  List<Item> _suggestedItems = [];
+
+  List<Item> get suggestedItems => _suggestedItems;
+
+  // Loading state specifically for the suggested items.
+  bool _isSuggestLoading = false;
+
+  bool get isSuggestLoading => _isSuggestLoading;
+
+  // --- END: NEW PROPERTIES TO ADD ---
+
   List<CartModel> _cartList = [];
+
   List<CartModel> get cartList => _cartList;
 
   double _subTotal = 0;
+
   double get subTotal => _subTotal;
 
   double _itemPrice = 0;
+
   double get itemPrice => _itemPrice;
 
   double _itemDiscountPrice = 0;
+
   double get itemDiscountPrice => _itemDiscountPrice;
 
   double _addOns = 0;
+
   double get addOns => _addOns;
 
   double _variationPrice = 0;
+
   double get variationPrice => _variationPrice;
 
   List<List<AddOns>> _addOnsList = [];
+
   List<List<AddOns>> get addOnsList => _addOnsList;
 
   List<bool> _availableList = [];
+
   List<bool> get availableList => _availableList;
 
   List<String> notAvailableList = [
@@ -50,25 +77,98 @@ class CartController extends GetxController implements GetxService {
     'Notify me when it’s back'
   ];
   bool _addCutlery = false;
+
   bool get addCutlery => _addCutlery;
 
   int _notAvailableIndex = -1;
+
   int get notAvailableIndex => _notAvailableIndex;
 
   int _currentIndex = 0;
+
   int get currentIndex => _currentIndex;
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   bool _needExtraPackage = true;
+
   bool get needExtraPackage => _needExtraPackage;
 
   bool _isExpanded = true;
+
   bool get isExpanded => _isExpanded;
 
   int? _directAddCartItemIndex = -1;
+
   int? get directAddCartItemIndex => _directAddCartItemIndex;
+
+  // --- START: NEW FUNCTION TO ADD ---
+  /// Fetches and populates the list of suggested items based on the items currently in the cart.
+  Future<void> getSuggestedItems() async {
+    // 1. Set loading state to true and clear the previous list.
+    print("inside getSuggestedItems");
+    log("inside getSuggestedItems");
+    _isSuggestLoading = true;
+    _suggestedItems = [];
+    // update(); // Notify UI to show a loading indicator.
+
+    print("inside getSuggestedItems");
+    log("inside getSuggestedItems");
+
+    try {
+      // 2. Get references to controllers once.
+      final StoreController storeController = Get.find<StoreController>();
+
+        log("inside try block");
+
+      // 3. Ensure the store's item data is available. If not, fetch it first.
+      // This part is crucial for making the logic robust.
+      if (cartList.isNotEmpty) {
+        if (kDebugMode) {
+          print("cartlist is not empty");
+        }
+        // 4. Now, perform the logic with the (hopefully) available data.
+        final storeItemModel = storeController.storeItemModel;
+        for (final cartItem in cartList) {
+          print("inside for loop cartlist with item: ${cartItem.item?.name ?? ''}");
+
+          final Set<Item> addedItems = <Item>{};
+
+          if (cartItem.item != null && cartItem.item!.storeId != null) {
+            // We assume getCartStoreSuggestedItemList fetches the required storeItemModel.
+            // If it's not already fetched, this call should trigger it.
+            await storeController.getStoreItemList(
+                cartItem.item?.storeId, 1, "all", true);
+            if (storeItemModel != null && storeItemModel.categories != null) {
+              final categories = storeItemModel.categories;
+              print("inside for loop storeModel with category: ${categories!.length ?? ''}");
+
+              for (final category in categories) {
+                // If the category is found and has items, add them.
+                if (category != null && category.items != null) {
+                  print("inside for loop if category with name: ${category.name ?? ''}");
+                  // whereType<Item>() safely filters out any potential nulls.
+                  addedItems.addAll(category.items!.whereType<Item>());
+                }
+              }
+            }
+          }
+          _suggestedItems.addAll(addedItems);
+        }
+      }
+    } catch (e) {
+      // You can add error handling if you wish.
+      print('Error fetching suggested items: $e');
+    } finally {
+      // 5. Set loading state to false and update the UI.
+      _isSuggestLoading = false;
+      update(); // Notify UI to show the list of items or an empty message.
+    }
+  }
+
+  // --- END: NEW FUNCTION TO ADD ---
 
   void setDirectlyAddToCartIndex(int? index) {
     _directAddCartItemIndex = index;

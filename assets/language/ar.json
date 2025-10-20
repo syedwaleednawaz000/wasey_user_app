@@ -1,6 +1,20 @@
 {
 
-
+  "support": "الدعم",
+  "live_chat_with_admin": "دردشة مباشرة مع الإدارة",
+  "email_admin": "إرسال بريد إلكتروني للإدارة",
+  "call_support": "اتصال بالدعم",
+  "compose_email": "كتابة بريد إلكتروني",
+  "email_open_app_message": "هذا سيفتح تطبيق البريد الإلكتروني لكتابة رسالة إلى ",
+  "make_a_call": "إجراء مكالمة",
+  "call_support_message": "هذا سيجري مكالمة هاتفية للدعم على ",
+  "cancel": "إلغاء",
+  "proceed": "متابعة",
+  "call": "اتصال",
+  "could_not_launch": "تعذر الإطلاق",
+  "could_not_make_call": "تعذر إجراء المكالمة.",
+  "could_not_open_email": "تعذر فتح تطبيق البريد الإلكتروني.",
+  "our_address": "عنواننا",
   "delivery_zone": "منطقة التوصيل",
 "delivery_zone_help": "اختر منطقتك لمعرفة سعر التوصيل المناسب",
 "central_zone": "كفر مندا ",

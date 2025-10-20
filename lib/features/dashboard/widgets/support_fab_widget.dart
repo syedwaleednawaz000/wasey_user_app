@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart' as FlutterToast;
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../helper/route_helper.dart';
+import '../../splash/controllers/splash_controller.dart';
 
 class SupportFabWidget extends StatelessWidget {
   const SupportFabWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const String supportPhoneNumber = '+972537279686';
-    const String supportEmail = 'admin@waseyapp.com';
-    const String appAddress = "71 St, Kafr Manda, Israel";
+    String? supportPhoneNumber =
+        Get.find<SplashController>().configModel!.phone ?? "";
+    String? supportEmail =
+        Get.find<SplashController>().configModel!.email ?? "";
+    String? appAddress =
+        Get.find<SplashController>().configModel!.address ?? "";
     // Helper function to launch URLs
     Future<void> _launchUrl(Uri url, {bool isMail = false}) async {
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
         Get.snackbar(
-          'Could Not Launch',
-          isMail ? 'Could not open email app.' : 'Could not make a call.',
+          'could_not_launch'.tr,
+          isMail ? 'could_not_open_email'.tr : 'could_not_make_call'.tr,
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -40,7 +42,6 @@ class SupportFabWidget extends StatelessWidget {
       buttonSize: const Size(56.0, 56.0),
       childrenButtonSize: const Size(60.0, 60.0),
       spaceBetweenChildren: 8.0,
-
       elevation: 10,
       children: [
         // Live Chat Button
@@ -48,18 +49,13 @@ class SupportFabWidget extends StatelessWidget {
           child: const Icon(Icons.chat_bubble_outline),
           backgroundColor: Colors.green,
           foregroundColor: Colors.white,
-          label: 'Live Chat with Admin',
+          label: 'live_chat_with_admin'.tr,
           labelStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: Colors.white,
               ),
           labelBackgroundColor: Colors.green,
           onTap: () {
-            // TODO: Navigate to your live chat screen here
-            Get.snackbar(
-              'Coming Soon',
-              'Live chat functionality will be implemented here.',
-              snackPosition: SnackPosition.BOTTOM,
-            );
+            Get.toNamed(RouteHelper.getConversationRoute());
           },
         ),
 
@@ -68,7 +64,7 @@ class SupportFabWidget extends StatelessWidget {
           child: const Icon(Icons.email_outlined),
           backgroundColor: Colors.orange,
           foregroundColor: Colors.white,
-          label: 'Email Admin',
+          label: 'email_admin'.tr,
           labelStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: Colors.white,
               ),
@@ -82,18 +78,17 @@ class SupportFabWidget extends StatelessWidget {
             );
             Get.dialog(
               AlertDialog(
-                title: const Text('Compose Email'),
-                content: Text(
-                    'This will open your email app to compose a message to $supportEmail.'),
+                title: Text('compose_email'.tr),
+                content: Text("${'email_open_app_message'.tr} $supportEmail."),
                 actions: [
                   TextButton(
-                      onPressed: () => Get.back(), child: const Text('Cancel')),
+                      onPressed: () => Get.back(), child: Text('cancel'.tr)),
                   TextButton(
                     onPressed: () {
                       Get.back();
                       _launchUrl(emailLaunchUri, isMail: true);
                     },
-                    child: const Text('Proceed'),
+                    child: Text('proceed'.tr),
                   ),
                 ],
               ),
@@ -106,7 +101,7 @@ class SupportFabWidget extends StatelessWidget {
           child: const Icon(Icons.call_outlined),
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
-          label: 'Call Support',
+          label: 'call_support'.tr,
           labelStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: Colors.white,
               ),
@@ -116,18 +111,17 @@ class SupportFabWidget extends StatelessWidget {
                 Uri(scheme: 'tel', path: supportPhoneNumber);
             Get.dialog(
               AlertDialog(
-                title: const Text('Make a Call'),
-                content: Text(
-                    'This will make a phone call to support at $supportPhoneNumber.'),
+                title: Text('make_a_call'.tr),
+                content: Text("${'call_support_message'.tr} $supportPhoneNumber."),
                 actions: [
                   TextButton(
-                      onPressed: () => Get.back(), child: const Text('Cancel')),
+                      onPressed: () => Get.back(), child:  Text('cancel'.tr)),
                   TextButton(
                     onPressed: () {
                       Get.back();
                       _launchUrl(phoneLaunchUri);
                     },
-                    child: const Text('Call'),
+                    child: Text('call'.tr),
                   ),
                 ],
               ),
@@ -150,7 +144,7 @@ class SupportFabWidget extends StatelessWidget {
             // This button is disabled, so tapping does nothing.
             // You can show a snackbar if you want.
             Get.snackbar(
-              'Our Address',
+              'our_address'.tr,
               appAddress,
               snackPosition: SnackPosition.BOTTOM,
             );

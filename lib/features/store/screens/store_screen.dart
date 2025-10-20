@@ -1838,7 +1838,6 @@ class _StoreScreenState extends State<StoreScreen> {
                                           const SizedBox(
                                               height:
                                                   Dimensions.paddingSizeSmall),
-//
                                         ],
                                       ),
                                     ))),

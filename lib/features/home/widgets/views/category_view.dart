@@ -495,29 +495,21 @@ class FoodCategoryView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: screenWidth * 0.48, // كافٍ لصفّين بصور + نص
-          child: categoryController.categoryList != null
-              ? GridView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.zero,
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: categoryController.categoryList!.length > 10
-                      ? 10
-                      : categoryController.categoryList!.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // صفّين رأسيًا
-                    mainAxisSpacing: 5,
-                    crossAxisSpacing: 4,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemBuilder: (context, index) {
-                    final isSeeAll = index == 9 &&
-                        categoryController.categoryList!.length > 10;
-
-                    return SizedBox(
-                      width: screenWidth / 4,
-                      child: InkWell(
+        categoryController.categoryList != null
+            ? SizedBox(
+                // color: Colors.red,
+                height: 120,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: categoryController.categoryList!.length > 10
+                        ? 10
+                        : categoryController.categoryList!.length,
+                    itemBuilder: (context, index) {
+                      final isSeeAll = index == 9 &&
+                          categoryController.categoryList!.length > 10;
+                      return InkWell(
                         onTap: () {
                           if (isSeeAll) {
                             Get.toNamed(RouteHelper.getCategoryRoute());
@@ -528,83 +520,197 @@ class FoodCategoryView extends StatelessWidget {
                             ));
                           }
                         },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            isSeeAll
-                                ? Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Container(
-                                        height: screenWidth * 0.14,
-                                        width: screenWidth * 0.14,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Theme.of(context)
-                                              .primaryColor
-                                              .withOpacity(0.1),
-                                          border: Border.all(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            width: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              isSeeAll
+                                  ? Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          height: screenWidth * 0.14,
+                                          width: screenWidth * 0.14,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Theme.of(context)
+                                                .primaryColor
+                                                .withOpacity(0.1),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              width: 2,
+                                            ),
                                           ),
                                         ),
+                                        Text(
+                                          'المزيد',
+                                          style: STCBold.copyWith(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        // border: Border.all(
+                                        //   color: Theme.of(context).primaryColor,
+                                        //   width: 2,
+                                        // ),
                                       ),
-                                      Text(
-                                        'المزيد',
-                                        style: STCBold.copyWith(
-                                          color: Theme.of(context).primaryColor,
-                                          fontSize: 13,
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: CustomImage(
+                                          image:
+                                              '${categoryController.categoryList![index].imageFullUrl}',
+                                          height: screenWidth * 0.17,
+                                          width: screenWidth * 0.17,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                    ],
-                                  )
-                                : Container(
-                                    padding: const EdgeInsets.all(2),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      // border: Border.all(
-                                      //   color: Theme.of(context).primaryColor,
-                                      //   width: 2,
-                                      // ),
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: CustomImage(
-                                        image:
-                                            '${categoryController.categoryList![index].imageFullUrl}',
-                                        height: screenWidth * 0.17,
-                                        width: screenWidth * 0.17,
-                                        fit: BoxFit.cover,
-                                      ),
+                              const SizedBox(height: 2),
+                              if (!isSeeAll)
+                                Flexible(
+                                  child: Text(
+                                    categoryController
+                                            .categoryList![index].name ??
+                                        '',
+                                    style: STCBold.copyWith(
+                                      fontSize: 13,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .color,
                                     ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
                                   ),
-                            const SizedBox(height: 2),
-                            if (!isSeeAll)
-                              Flexible(
-                                child: Text(
-                                  categoryController
-                                          .categoryList![index].name ??
-                                      '',
-                                  style: STCBold.copyWith(
-                                    fontSize: 13,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium!
-                                        .color,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  })
-              : FoodCategoryShimmer(categoryController: categoryController),
-        ),
+                      );
+                    }))
+            : FoodCategoryShimmer(categoryController: categoryController),
+
+        // SizedBox(
+        //   height: screenWidth * 0.48, // كافٍ لصفّين بصور + نص
+        //   child: categoryController.categoryList != null
+        //       ? GridView.builder(
+        //           scrollDirection: Axis.horizontal,
+        //           padding: EdgeInsets.zero,
+        //           physics: const BouncingScrollPhysics(),
+        //           itemCount: categoryController.categoryList!.length > 10
+        //               ? 10
+        //               : categoryController.categoryList!.length,
+        //           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        //             crossAxisCount: 2, // صفّين رأسيًا
+        //             mainAxisSpacing: 5,
+        //             crossAxisSpacing: 4,
+        //             childAspectRatio: 0.9,
+        //           ),
+        //           itemBuilder: (context, index) {
+        //             final isSeeAll = index == 9 &&
+        //                 categoryController.categoryList!.length > 10;
+        //
+        //             return SizedBox(
+        //               width: screenWidth / 4,
+        //               child: InkWell(
+        //                 onTap: () {
+        //                   if (isSeeAll) {
+        //                     Get.toNamed(RouteHelper.getCategoryRoute());
+        //                   } else {
+        //                     Get.toNamed(RouteHelper.getCategoryItemRoute(
+        //                       categoryController.categoryList![index].id,
+        //                       categoryController.categoryList![index].name!,
+        //                     ));
+        //                   }
+        //                 },
+        //                 child: Column(
+        //                   mainAxisAlignment: MainAxisAlignment.center,
+        //                   children: [
+        //                     isSeeAll
+        //                         ? Stack(
+        //                             alignment: Alignment.center,
+        //                             children: [
+        //                               Container(
+        //                                 height: screenWidth * 0.14,
+        //                                 width: screenWidth * 0.14,
+        //                                 decoration: BoxDecoration(
+        //                                   shape: BoxShape.circle,
+        //                                   color: Theme.of(context)
+        //                                       .primaryColor
+        //                                       .withOpacity(0.1),
+        //                                   border: Border.all(
+        //                                     color:
+        //                                         Theme.of(context).primaryColor,
+        //                                     width: 2,
+        //                                   ),
+        //                                 ),
+        //                               ),
+        //                               Text(
+        //                                 'المزيد',
+        //                                 style: STCBold.copyWith(
+        //                                   color: Theme.of(context).primaryColor,
+        //                                   fontSize: 13,
+        //                                 ),
+        //                               ),
+        //                             ],
+        //                           )
+        //                         : Container(
+        //                             padding: const EdgeInsets.all(2),
+        //                             decoration: const BoxDecoration(
+        //                               shape: BoxShape.circle,
+        //                               // border: Border.all(
+        //                               //   color: Theme.of(context).primaryColor,
+        //                               //   width: 2,
+        //                               // ),
+        //                             ),
+        //                             child: ClipRRect(
+        //                               borderRadius: BorderRadius.circular(100),
+        //                               child: CustomImage(
+        //                                 image:
+        //                                     '${categoryController.categoryList![index].imageFullUrl}',
+        //                                 height: screenWidth * 0.17,
+        //                                 width: screenWidth * 0.17,
+        //                                 fit: BoxFit.cover,
+        //                               ),
+        //                             ),
+        //                           ),
+        //                     const SizedBox(height: 2),
+        //                     if (!isSeeAll)
+        //                       Flexible(
+        //                         child: Text(
+        //                           categoryController
+        //                                   .categoryList![index].name ??
+        //                               '',
+        //                           style: STCBold.copyWith(
+        //                             fontSize: 13,
+        //                             color: Theme.of(context)
+        //                                 .textTheme
+        //                                 .bodyMedium!
+        //                                 .color,
+        //                           ),
+        //                           maxLines: 2,
+        //                           overflow: TextOverflow.ellipsis,
+        //                           textAlign: TextAlign.center,
+        //                         ),
+        //                       ),
+        //                   ],
+        //                 ),
+        //               ),
+        //             );
+        //           })
+        //       : FoodCategoryShimmer(categoryController: categoryController),
+        // ),
       ],
     );
   }

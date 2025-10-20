@@ -203,7 +203,7 @@ class DashboardScreenState extends State<DashboardScreen> {
             key: _scaffoldKey,
             // --- ADD THIS FLOATING ACTION BUTTON ---
             floatingActionButton: Padding(
-              padding: const EdgeInsets.only(bottom: 100.0),
+              padding: EdgeInsets.only(bottom: _pageIndex == 3 ? 150 : 100.0),
               child: const SupportFabWidget(),
             ),
             // -------------------------------------
@@ -398,7 +398,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                         //     width: size.width *
                                                         //         0.2),
                                                         BottomNavItemWidget(
-                                                          title: 'cart'.tr,
+                                                          title: 'my_cart'.tr,
                                                           selectedIcon: Images
                                                               .shoppingCart,
                                                           unSelectedIcon: Images
@@ -406,7 +406,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                           isSelected:
                                                               _pageIndex == 3,
                                                           isParcel: isParcel,
-                                                          isNotParcel: !isParcel,
+                                                          isNotParcel:
+                                                              !isParcel,
                                                           onTap: () {
                                                             if (isParcel) {
                                                               showModalBottomSheet(
