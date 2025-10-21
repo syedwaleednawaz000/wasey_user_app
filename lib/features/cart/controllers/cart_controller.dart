@@ -16,6 +16,7 @@ import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 
+import '../../category/controllers/category_controller.dart';
 import '../../store/controllers/store_controller.dart';
 
 class CartController extends GetxController implements GetxService {
@@ -121,7 +122,7 @@ class CartController extends GetxController implements GetxService {
       // 2. Get references to controllers once.
       final StoreController storeController = Get.find<StoreController>();
 
-        log("inside try block");
+      log("inside try block");
 
       // 3. Ensure the store's item data is available. If not, fetch it first.
       // This part is crucial for making the logic robust.
@@ -132,23 +133,34 @@ class CartController extends GetxController implements GetxService {
         // 4. Now, perform the logic with the (hopefully) available data.
         final storeItemModel = storeController.storeItemModel;
         for (final cartItem in cartList) {
-          print("inside for loop cartlist with item: ${cartItem.item?.name ?? ''}");
+          print(
+              "inside for loop cartlist with store ${cartItem.item!.storeName} item: ${cartItem.item?.name ?? ''}");
 
           final Set<Item> addedItems = <Item>{};
 
           if (cartItem.item != null && cartItem.item!.storeId != null) {
             // We assume getCartStoreSuggestedItemList fetches the required storeItemModel.
             // If it's not already fetched, this call should trigger it.
+
+            // if (Get.find<CategoryController>().categoryList == null) {
+            //   Get.find<CategoryController>().getCategoryList(true);
+            // }
             await storeController.getStoreItemList(
-                cartItem.item?.storeId, 1, "all", true);
+              cartItem.item?.storeId,
+              0,
+              "all",
+              false,
+            );
             if (storeItemModel != null && storeItemModel.categories != null) {
               final categories = storeItemModel.categories;
-              print("inside for loop storeModel with category: ${categories!.length ?? ''}");
+              print(
+                  "inside for loop storeModel with category: ${categories!.length ?? ''}");
 
               for (final category in categories) {
                 // If the category is found and has items, add them.
                 if (category != null && category.items != null) {
-                  print("inside for loop if category with name: ${category.name ?? ''}");
+                  print(
+                      "inside for loop if category with name: ${category.name ?? ''}");
                   // whereType<Item>() safely filters out any potential nulls.
                   addedItems.addAll(category.items!.whereType<Item>());
                 }

@@ -64,15 +64,13 @@ class _CartScreenState extends State<CartScreen> {
     if (Get.find<CartController>().cartList.isEmpty) {
       await Get.find<CartController>().getCartDataOnline();
     }
+
     // Now, call the new function in the controller to handle suggested items.
     // This call will manage its own loading state internally.
     Get.find<StoreController>().getRestaurantRecommendedItemList(
-        Get.find<CartController>().cartList.first.item?.storeId ?? Get.find<StoreController>().store!.id, false);
-    if (Get.find<CartController>().cartList.isNotEmpty) {
-      print("cart list is not empty");
-      await Get.find<CartController>().getSuggestedItems();
-    }
-
+        Get.find<CartController>().cartList.first.item?.storeId ??
+            Get.find<StoreController>().store!.id,
+        false);
 
     if (Get.find<CartController>().cartList.isNotEmpty) {
       if (kDebugMode) {
@@ -97,6 +95,11 @@ class _CartScreenState extends State<CartScreen> {
           fromCart: true);
       Get.find<CartController>().calculationCart();
       showReferAndEarnSnackBar();
+      print("cart list is not empty");
+      if (widget.fromNav) {
+        print("inside fromNav if");
+        await Get.find<CartController>().getSuggestedItems();
+      }
     }
   }
 
@@ -620,24 +623,28 @@ class _CartScreenState extends State<CartScreen> {
                       cartController.isSuggestLoading
                           ? const Center(child: CircularProgressIndicator())
                           : cartController.suggestedItems.isNotEmpty
-                          ? SizedBox(
-                        // color: Colors.red,
-                        height: 200,
-                        // Give it a fixed height for horizontal scrolling
-                        child: StoreItemView(
-                          categoryId: '0',
-                          isStore: false,
-                          // isFoodOrGrocery: false,
-                          stores: null,
-                          items: cartController.suggestedItems,
-                          inStorePage: false,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: Dimensions.paddingSizeSmall,
-                            vertical: Dimensions.paddingSizeSmall,
-                          ),
-                        ),
-                      )
-                          : Center(child: Text('no_suggestions_available'.tr))
+                              ? SizedBox(
+                                  // color: Colors.red,
+                                  height: 200,
+                                  // Give it a fixed height for horizontal scrolling
+                                  child: StoreItemView(
+                                    categoryId: '0',
+                                    isStore: false,
+                                    // isFoodOrGrocery: false,
+                                    stores: null,
+                                    items: cartController.suggestedItems,
+                                    inStorePage: false,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: Dimensions.paddingSizeSmall,
+                                      vertical: Dimensions.paddingSizeSmall,
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    'no_suggestions_available'.tr,
+                                  ),
+                                ),
                       // InkWell(
                       //   onTap: () {
                       //     if (ResponsiveHelper.isDesktop(context)) {

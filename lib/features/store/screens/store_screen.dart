@@ -97,10 +97,11 @@ class _StoreScreenState extends State<StoreScreen> {
     Get.find<StoreController>().getRestaurantRecommendedItemList(
         widget.store!.id ?? Get.find<StoreController>().store!.id, false);
     Get.find<StoreController>().getStoreItemList(
-        widget.store!.id ?? Get.find<StoreController>().store!.id,
-        1,
-        'all',
-        false);
+      widget.store!.id ?? Get.find<StoreController>().store!.id,
+      1,
+      'all',
+      false,
+    );
 
     scrollController.addListener(() {
       if (scrollController.position.userScrollDirection ==
