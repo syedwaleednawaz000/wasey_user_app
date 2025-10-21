@@ -109,13 +109,11 @@ class CartController extends GetxController implements GetxService {
   /// Fetches and populates the list of suggested items based on the items currently in the cart.
   Future<void> getSuggestedItems() async {
     // 1. Set loading state to true and clear the previous list.
-    print("inside getSuggestedItems");
     log("inside getSuggestedItems");
     _isSuggestLoading = true;
     _suggestedItems = [];
     // update(); // Notify UI to show a loading indicator.
 
-    print("inside getSuggestedItems");
     log("inside getSuggestedItems");
 
     try {
@@ -128,12 +126,12 @@ class CartController extends GetxController implements GetxService {
       // This part is crucial for making the logic robust.
       if (cartList.isNotEmpty) {
         if (kDebugMode) {
-          print("cartlist is not empty");
+          log("cartlist is not empty");
         }
         // 4. Now, perform the logic with the (hopefully) available data.
         final storeItemModel = storeController.storeItemModel;
         for (final cartItem in cartList) {
-          print(
+          log(
               "inside for loop cartlist with store ${cartItem.item!.storeName} item: ${cartItem.item?.name ?? ''}");
 
           final Set<Item> addedItems = <Item>{};
@@ -153,14 +151,12 @@ class CartController extends GetxController implements GetxService {
             );
             if (storeItemModel != null && storeItemModel.categories != null) {
               final categories = storeItemModel.categories;
-              print(
-                  "inside for loop storeModel with category: ${categories!.length ?? ''}");
+              log("inside for loop storeModel with category: ${categories!.length ?? ''}");
 
               for (final category in categories) {
                 // If the category is found and has items, add them.
                 if (category != null && category.items != null) {
-                  print(
-                      "inside for loop if category with name: ${category.name ?? ''}");
+                  log("inside for loop if category with name: ${category.name ?? ''}");
                   // whereType<Item>() safely filters out any potential nulls.
                   addedItems.addAll(category.items!.whereType<Item>());
                 }
@@ -172,14 +168,13 @@ class CartController extends GetxController implements GetxService {
       }
     } catch (e) {
       // You can add error handling if you wish.
-      print('Error fetching suggested items: $e');
+      log('Error fetching suggested items: $e');
     } finally {
       // 5. Set loading state to false and update the UI.
       _isSuggestLoading = false;
       update(); // Notify UI to show the list of items or an empty message.
     }
   }
-
   // --- END: NEW FUNCTION TO ADD ---
 
   void setDirectlyAddToCartIndex(int? index) {

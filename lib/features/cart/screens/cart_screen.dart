@@ -100,6 +100,9 @@ class _CartScreenState extends State<CartScreen> {
         print("inside fromNav if");
         await Get.find<CartController>().getSuggestedItems();
       }
+      if (Get.find<CartController>().suggestedItems.isEmpty) {
+        await Get.find<CartController>().getSuggestedItems();
+      }
     }
   }
 
