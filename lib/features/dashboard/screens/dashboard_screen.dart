@@ -204,313 +204,311 @@ class DashboardScreenState extends State<DashboardScreen> {
             bottom: true,
             child: Scaffold(
               key: _scaffoldKey,
+              floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
               floatingActionButton: Padding(
                 padding: EdgeInsets.only(bottom: _pageIndex == 3 ? 150 : 100.0),
                 child: const SupportFabWidget(),
               ),
 
-              body: Padding(
-                padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-                child: ExpandableBottomSheet(
-                  background: Stack(children: [
-                    PageView.builder(
-                      controller: _pageController,
-                      itemCount: _screens.length,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return _screens[index];
-                      },
-                    ),
-                    ResponsiveHelper.isDesktop(context) || keyboardVisible
-                        ? const SizedBox()
-                        : Align(
-                            alignment: Alignment.bottomCenter,
-                            child: GetBuilder<SplashController>(
-                                builder: (splashController) {
-                              bool isParcel = splashController.module != null &&
-                                  splashController
-                                      .configModel!.moduleConfig!.module!.isParcel!;
-
-                              _screens = [
-                                const HomeScreen(),
-                                // isParcel
-                                //     ? const AddressScreen(fromDashboard: true)
-                                //     : const FavouriteScreen(),
-                                const MarketScreen(),
-                                const SizedBox(),
-                                const CartScreen(fromNav: true),
-                                const OrderScreen(),
-                                // const MenuScreen()
-                              ];
-                              return Container(
-                                width: size.width,
-                                height: GetPlatform.isIOS ? 80 : 70,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(Dimensions.radiusLarge)),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 5,
-                                      spreadRadius: 1,
-                                    )
-                                  ],
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Center(
-                                        heightFactor: 0.6,
-                                        child: ResponsiveHelper.isDesktop(context)
-                                            ? const SizedBox.shrink()
-                                            : (widget.fromSplash &&
-                                                    Get.find<LocationController>()
-                                                        .showLocationSuggestion &&
-                                                    active)
-                                                ? const SizedBox.shrink()
-                                                : (orderController
-                                                            .showBottomSheet &&
-                                                        orderController
-                                                                .runningOrderModel !=
-                                                            null &&
-                                                        orderController
-                                                            .runningOrderModel!
-                                                            .orders!
-                                                            .isNotEmpty &&
-                                                        _isLogin)
-                                                    ? const SizedBox.shrink()
-                                                    : SizedBox()
-                                        // Container(
-                                        //                 width: 60,
-                                        //                 height: 60,
-                                        //                 decoration: BoxDecoration(
-                                        //                   border: Border.all(
-                                        //                       color: Theme.of(context)
-                                        //                           .cardColor,
-                                        //                       width: 5),
-                                        //                   borderRadius:
-                                        //                       BorderRadius.circular(
-                                        //                           30),
-                                        //                   boxShadow: const [
-                                        //                     BoxShadow(
-                                        //                         color: Colors.black12,
-                                        //                         blurRadius: 5,
-                                        //                         spreadRadius: 1)
-                                        //                   ],
-                                        //                 ),
-                                        //                 child: FloatingActionButton(
-                                        //                   backgroundColor:
-                                        //                       Theme.of(context)
-                                        //                           .primaryColor,
-                                        //                   onPressed: () {
-                                        //                     if (isParcel) {
-                                        //                       showModalBottomSheet(
-                                        //                         context: context,
-                                        //                         isScrollControlled:
-                                        //                             true,
-                                        //                         backgroundColor:
-                                        //                             Colors
-                                        //                                 .transparent,
-                                        //                         builder: (con) =>
-                                        //                             ParcelBottomSheetWidget(
-                                        //                                 parcelCategoryList:
-                                        //                                     Get.find<
-                                        //                                             ParcelController>()
-                                        //                                         .parcelCategoryList),
-                                        //                       );
-                                        //                     } else {
-                                        //                       Get.toNamed(RouteHelper
-                                        //                           .getCartRoute());
-                                        //                     }
-                                        //                   },
-                                        //                   elevation: 0,
-                                        //                   child: isParcel
-                                        //                       ? Icon(
-                                        //                           CupertinoIcons.add,
-                                        //                           size: 34,
-                                        //                           color: Theme.of(
-                                        //                                   context)
-                                        //                               .cardColor)
-                                        //                       : CartWidget(
-                                        //                           color: Theme.of(
-                                        //                                   context)
-                                        //                               .cardColor,
-                                        //                           size: 22),
-                                        //                 ),
-                                        //               ),
-                                        ),
-                                    ResponsiveHelper.isDesktop(context)
-                                        ? const SizedBox()
-                                        : (widget.fromSplash &&
-                                                Get.find<LocationController>()
-                                                    .showLocationSuggestion &&
-                                                active)
-                                            ? const SizedBox()
-                                            : (orderController.showBottomSheet &&
-                                                    orderController
-                                                            .runningOrderModel !=
-                                                        null &&
-                                                    orderController
-                                                        .runningOrderModel!
-                                                        .orders!
-                                                        .isNotEmpty &&
-                                                    _isLogin)
-                                                ? const SizedBox()
-                                                : Center(
-                                                    child: SizedBox(
-                                                      width: size.width,
-                                                      height: 80,
-                                                      child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceEvenly,
-                                                          children: [
-                                                            BottomNavItemWidget(
-                                                              title:
-                                                                  'restaurant'.tr,
-                                                              selectedIcon:
-                                                                  Images.knife_fork,
-                                                              unSelectedIcon:
-                                                                  Images.knife_fork,
-                                                              isSelected:
-                                                                  _pageIndex == 0,
-                                                              onTap: () =>
-                                                                  _setPage(0),
-                                                            ),
-                                                            BottomNavItemWidget(
-                                                              title: isParcel
-                                                                  ? 'address'.tr
-                                                                  : 'market'.tr,
-                                                              selectedIcon: isParcel
-                                                                  ? Images
-                                                                      .addressSelect
-                                                                  : Images
-                                                                      .markerStore,
-                                                              unSelectedIcon: isParcel
-                                                                  ? Images
-                                                                      .addressUnselect
-                                                                  : Images
-                                                                      .favouriteUnselect,
-                                                              isSelected:
-                                                                  _pageIndex == 1,
-                                                              onTap: () =>
-                                                                  _setPage(1),
-                                                              isMarket: true,
-                                                            ),
-                                                            // Container(
-                                                            //     width: size.width *
-                                                            //         0.2),
-                                                            BottomNavItemWidget(
-                                                              title: 'my_cart'.tr,
-                                                              selectedIcon: Images
-                                                                  .shoppingCart,
-                                                              unSelectedIcon: Images
-                                                                  .shoppingBagIcon,
-                                                              isSelected:
-                                                                  _pageIndex == 3,
-                                                              isParcel: isParcel,
-                                                              isNotParcel:
-                                                                  !isParcel,
-                                                              onTap: () {
-                                                                if (isParcel) {
-                                                                  showModalBottomSheet(
-                                                                    context:
-                                                                        context,
-                                                                    isScrollControlled:
-                                                                        true,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .transparent,
-                                                                    builder: (con) =>
-                                                                        ParcelBottomSheetWidget(
-                                                                            parcelCategoryList:
-                                                                                Get.find<ParcelController>().parcelCategoryList),
-                                                                  );
-                                                                } else {
-                                                                  _setPage(3);
-
-                                                                  // Get.toNamed(RouteHelper
-                                                                  //     .getCartRoute());
-                                                                }
-                                                              },
-                                                            ),
-                                                            BottomNavItemWidget(
-                                                              title: 'orders'.tr,
-                                                              selectedIcon: Images
-                                                                  .orderSelect,
-                                                              unSelectedIcon: Images
-                                                                  .orderUnselect,
-                                                              isSelected:
-                                                                  _pageIndex == 4,
-                                                              onTap: () =>
-                                                                  _setPage(4),
-                                                            ),
-                                                            // BottomNavItemWidget(
-                                                            //   title: 'menu'.tr,
-                                                            //   selectedIcon:
-                                                            //       Images.menu,
-                                                            //   unSelectedIcon:
-                                                            //       Images.menu,
-                                                            //   isSelected:
-                                                            //       _pageIndex == 4,
-                                                            //   onTap: () =>
-                                                            //       _setPage(4),
-                                                            // ),
-                                                          ]),
-                                                    ),
-                                                  ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ),
-                  ]),
-                  persistentContentHeight: (widget.fromSplash &&
-                          Get.find<LocationController>().showLocationSuggestion &&
-                          active)
-                      ? 0
-                      : GetPlatform.isIOS
-                          ? 110
-                          : 100,
-                  onIsContractedCallback: () {
-                    if (!orderController.showOneOrder) {
-                      orderController.showOrders();
-                    }
-                  },
-                  onIsExtendedCallback: () {
-                    if (orderController.showOneOrder) {
-                      orderController.showOrders();
-                    }
-                  },
-                  enableToggle: true,
-                  expandableContent: (widget.fromSplash &&
-                          Get.find<LocationController>().showLocationSuggestion &&
-                          active &&
-                          !ResponsiveHelper.isDesktop(context))
+              body: ExpandableBottomSheet(
+                background: Stack(children: [
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: _screens.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return _screens[index];
+                    },
+                  ),
+                  ResponsiveHelper.isDesktop(context) || keyboardVisible
                       ? const SizedBox()
-                      : (ResponsiveHelper.isDesktop(context) ||
-                              !_isLogin ||
-                              orderController.runningOrderModel == null ||
-                              orderController.runningOrderModel!.orders!.isEmpty ||
-                              !orderController.showBottomSheet)
-                          ? const SizedBox()
-                          : Dismissible(
-                              key: UniqueKey(),
-                              onDismissed: (direction) {
-                                if (orderController.showBottomSheet) {
-                                  orderController.showRunningOrders();
-                                }
-                              },
-                              child: RunningOrderViewWidget(
-                                  reversOrder: reversOrder,
-                                  onOrderTap: () {
-                                    _setPage(3);
-                                    if (orderController.showBottomSheet) {
-                                      orderController.showRunningOrders();
-                                    }
-                                  }),
-                            ),
-                ),
+                      : Align(
+                          alignment: Alignment.bottomCenter,
+                          child: GetBuilder<SplashController>(
+                              builder: (splashController) {
+                            bool isParcel = splashController.module != null &&
+                                splashController
+                                    .configModel!.moduleConfig!.module!.isParcel!;
+
+                            _screens = [
+                              const HomeScreen(),
+                              // isParcel
+                              //     ? const AddressScreen(fromDashboard: true)
+                              //     : const FavouriteScreen(),
+                              const MarketScreen(),
+                              const SizedBox(),
+                              const CartScreen(fromNav: true),
+                              const OrderScreen(),
+                              // const MenuScreen()
+                            ];
+                            return Container(
+                              width: size.width,
+                              height: GetPlatform.isIOS ? 80 : 70,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor,
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(Dimensions.radiusLarge)),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 5,
+                                    spreadRadius: 1,
+                                  )
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  Center(
+                                      heightFactor: 0.6,
+                                      child: ResponsiveHelper.isDesktop(context)
+                                          ? const SizedBox.shrink()
+                                          : (widget.fromSplash &&
+                                                  Get.find<LocationController>()
+                                                      .showLocationSuggestion &&
+                                                  active)
+                                              ? const SizedBox.shrink()
+                                              : (orderController
+                                                          .showBottomSheet &&
+                                                      orderController
+                                                              .runningOrderModel !=
+                                                          null &&
+                                                      orderController
+                                                          .runningOrderModel!
+                                                          .orders!
+                                                          .isNotEmpty &&
+                                                      _isLogin)
+                                                  ? const SizedBox.shrink()
+                                                  : SizedBox()
+                                      // Container(
+                                      //                 width: 60,
+                                      //                 height: 60,
+                                      //                 decoration: BoxDecoration(
+                                      //                   border: Border.all(
+                                      //                       color: Theme.of(context)
+                                      //                           .cardColor,
+                                      //                       width: 5),
+                                      //                   borderRadius:
+                                      //                       BorderRadius.circular(
+                                      //                           30),
+                                      //                   boxShadow: const [
+                                      //                     BoxShadow(
+                                      //                         color: Colors.black12,
+                                      //                         blurRadius: 5,
+                                      //                         spreadRadius: 1)
+                                      //                   ],
+                                      //                 ),
+                                      //                 child: FloatingActionButton(
+                                      //                   backgroundColor:
+                                      //                       Theme.of(context)
+                                      //                           .primaryColor,
+                                      //                   onPressed: () {
+                                      //                     if (isParcel) {
+                                      //                       showModalBottomSheet(
+                                      //                         context: context,
+                                      //                         isScrollControlled:
+                                      //                             true,
+                                      //                         backgroundColor:
+                                      //                             Colors
+                                      //                                 .transparent,
+                                      //                         builder: (con) =>
+                                      //                             ParcelBottomSheetWidget(
+                                      //                                 parcelCategoryList:
+                                      //                                     Get.find<
+                                      //                                             ParcelController>()
+                                      //                                         .parcelCategoryList),
+                                      //                       );
+                                      //                     } else {
+                                      //                       Get.toNamed(RouteHelper
+                                      //                           .getCartRoute());
+                                      //                     }
+                                      //                   },
+                                      //                   elevation: 0,
+                                      //                   child: isParcel
+                                      //                       ? Icon(
+                                      //                           CupertinoIcons.add,
+                                      //                           size: 34,
+                                      //                           color: Theme.of(
+                                      //                                   context)
+                                      //                               .cardColor)
+                                      //                       : CartWidget(
+                                      //                           color: Theme.of(
+                                      //                                   context)
+                                      //                               .cardColor,
+                                      //                           size: 22),
+                                      //                 ),
+                                      //               ),
+                                      ),
+                                  ResponsiveHelper.isDesktop(context)
+                                      ? const SizedBox()
+                                      : (widget.fromSplash &&
+                                              Get.find<LocationController>()
+                                                  .showLocationSuggestion &&
+                                              active)
+                                          ? const SizedBox()
+                                          : (orderController.showBottomSheet &&
+                                                  orderController
+                                                          .runningOrderModel !=
+                                                      null &&
+                                                  orderController
+                                                      .runningOrderModel!
+                                                      .orders!
+                                                      .isNotEmpty &&
+                                                  _isLogin)
+                                              ? const SizedBox()
+                                              : Center(
+                                                  child: SizedBox(
+                                                    width: size.width,
+                                                    height: 80,
+                                                    child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          BottomNavItemWidget(
+                                                            title:
+                                                                'restaurant'.tr,
+                                                            selectedIcon:
+                                                                Images.knife_fork,
+                                                            unSelectedIcon:
+                                                                Images.knife_fork,
+                                                            isSelected:
+                                                                _pageIndex == 0,
+                                                            onTap: () =>
+                                                                _setPage(0),
+                                                          ),
+                                                          BottomNavItemWidget(
+                                                            title: isParcel
+                                                                ? 'address'.tr
+                                                                : 'market'.tr,
+                                                            selectedIcon: isParcel
+                                                                ? Images
+                                                                    .addressSelect
+                                                                : Images
+                                                                    .markerStore,
+                                                            unSelectedIcon: isParcel
+                                                                ? Images
+                                                                    .addressUnselect
+                                                                : Images
+                                                                    .favouriteUnselect,
+                                                            isSelected:
+                                                                _pageIndex == 1,
+                                                            onTap: () =>
+                                                                _setPage(1),
+                                                            isMarket: true,
+                                                          ),
+                                                          // Container(
+                                                          //     width: size.width *
+                                                          //         0.2),
+                                                          BottomNavItemWidget(
+                                                            title: 'my_cart_nav'.tr,
+                                                            selectedIcon: Images
+                                                                .shoppingCart,
+                                                            unSelectedIcon: Images
+                                                                .shoppingBagIcon,
+                                                            isSelected:
+                                                                _pageIndex == 3,
+                                                            isParcel: isParcel,
+                                                            isNotParcel:
+                                                                !isParcel,
+                                                            onTap: () {
+                                                              if (isParcel) {
+                                                                showModalBottomSheet(
+                                                                  context:
+                                                                      context,
+                                                                  isScrollControlled:
+                                                                      true,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  builder: (con) =>
+                                                                      ParcelBottomSheetWidget(
+                                                                          parcelCategoryList:
+                                                                              Get.find<ParcelController>().parcelCategoryList),
+                                                                );
+                                                              } else {
+                                                                _setPage(3);
+
+                                                                // Get.toNamed(RouteHelper
+                                                                //     .getCartRoute());
+                                                              }
+                                                            },
+                                                          ),
+                                                          BottomNavItemWidget(
+                                                            title: 'orders'.tr,
+                                                            selectedIcon: Images
+                                                                .orderSelect,
+                                                            unSelectedIcon: Images
+                                                                .orderUnselect,
+                                                            isSelected:
+                                                                _pageIndex == 4,
+                                                            onTap: () =>
+                                                                _setPage(4),
+                                                          ),
+                                                          // BottomNavItemWidget(
+                                                          //   title: 'menu'.tr,
+                                                          //   selectedIcon:
+                                                          //       Images.menu,
+                                                          //   unSelectedIcon:
+                                                          //       Images.menu,
+                                                          //   isSelected:
+                                                          //       _pageIndex == 4,
+                                                          //   onTap: () =>
+                                                          //       _setPage(4),
+                                                          // ),
+                                                        ]),
+                                                  ),
+                                                ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ),
+                ]),
+                persistentContentHeight: (widget.fromSplash &&
+                        Get.find<LocationController>().showLocationSuggestion &&
+                        active)
+                    ? 0
+                    : GetPlatform.isIOS
+                        ? 110
+                        : 100,
+                onIsContractedCallback: () {
+                  if (!orderController.showOneOrder) {
+                    orderController.showOrders();
+                  }
+                },
+                onIsExtendedCallback: () {
+                  if (orderController.showOneOrder) {
+                    orderController.showOrders();
+                  }
+                },
+                enableToggle: true,
+                expandableContent: (widget.fromSplash &&
+                        Get.find<LocationController>().showLocationSuggestion &&
+                        active &&
+                        !ResponsiveHelper.isDesktop(context))
+                    ? const SizedBox()
+                    : (ResponsiveHelper.isDesktop(context) ||
+                            !_isLogin ||
+                            orderController.runningOrderModel == null ||
+                            orderController.runningOrderModel!.orders!.isEmpty ||
+                            !orderController.showBottomSheet)
+                        ? const SizedBox()
+                        : Dismissible(
+                            key: UniqueKey(),
+                            onDismissed: (direction) {
+                              if (orderController.showBottomSheet) {
+                                orderController.showRunningOrders();
+                              }
+                            },
+                            child: RunningOrderViewWidget(
+                                reversOrder: reversOrder,
+                                onOrderTap: () {
+                                  _setPage(3);
+                                  if (orderController.showBottomSheet) {
+                                    orderController.showRunningOrders();
+                                  }
+                                }),
+                          ),
               ),
             ),
           );

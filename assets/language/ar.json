@@ -113,6 +113,8 @@
   "already_added_in_cart": "تمت إضافتها بالفعل في سلة التسوق",
   "out_of_stock": "إنتهى من المخزن",
   "my_cart": "سلة التسوق الخاصة بي",
+  "my_cart_nav": "سلة المشتريات",
+
   "removed_from_cart": "تمت إزالتها من سلة التسوق",
   "enter_promo_code": "أدخل  الكوبون",
   "apply": "تاكيد",
