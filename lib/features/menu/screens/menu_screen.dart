@@ -47,7 +47,11 @@ class _MenuScreenState extends State<MenuScreen> {
                 top: 50,
                 bottom: Dimensions.paddingSizeExtremeLarge,
               ),
-              child: Row(children: [
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                // BackButton(),
                 Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor,
