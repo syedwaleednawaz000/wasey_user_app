@@ -41,19 +41,19 @@ class CategoryView extends StatelessWidget {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: Text(
-                              "what_are_you_looking_for".tr,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
+                          // Padding(
+                          //   padding:
+                          //       const EdgeInsets.symmetric(horizontal: 12.0),
+                          //   child: Text(
+                          //     "what_are_you_looking_for".tr,
+                          //     style: Theme.of(context)
+                          //         .textTheme
+                          //         .bodyMedium!
+                          //         .copyWith(
+                          //           fontWeight: FontWeight.bold,
+                          //         ),
+                          //   ),
+                          // ),
                           Row(
                             children: [
                               Expanded(

@@ -19,21 +19,26 @@ class StoreFilterButtonWidget extends StatelessWidget {
         padding:
             const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: isSelected == true
+              ? Theme.of(context).primaryColor
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
           border: Border.all(
               color: isSelected == true
-                  ? Theme.of(context).primaryColor.withAlpha((0.3 * 255).toInt())
-                  : Theme.of(context).disabledColor.withAlpha((0.3 * 255).toInt())),
+                  ? Theme.of(context)
+                      .textTheme.bodyMedium!.color!.withAlpha((0.3 * 255).toInt())
+                  : Theme.of(context)
+                      .disabledColor
+                      .withAlpha((0.3 * 255).toInt())),
         ),
         child: Center(
             child: Text(buttonText,
                 style: STCRegular.copyWith(
                     fontSize: Dimensions.fontSizeSmall,
                     fontWeight:
-                        isSelected == true ? FontWeight.w500 : FontWeight.w400,
+                        isSelected == true ? FontWeight.bold : FontWeight.w400,
                     color: isSelected == true
-                        ? Theme.of(context).primaryColor
+                        ? Theme.of(context).textTheme.bodyMedium!.color
                         : Theme.of(context).disabledColor))),
       ),
     );
