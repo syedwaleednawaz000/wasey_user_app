@@ -3276,7 +3276,8 @@ class SliceSelector extends StatelessWidget {
         _buildSliceButton(2, Images.leftSliceIcon, currentSlice),
         _buildSliceButton(3, Images.rightSliceIcon, currentSlice),
       ],
-    ) : Row(
+    ) :
+    Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildSliceButton(1, Images.rightSliceIcon, currentSlice),
