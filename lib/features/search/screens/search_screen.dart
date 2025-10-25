@@ -26,6 +26,7 @@ import 'package:sixam_mart/features/store/widgets/bottom_cart_widget.dart';
 
 class SearchScreen extends StatefulWidget {
   final String? queryText;
+
   const SearchScreen({super.key, required this.queryText});
 
   @override
@@ -53,7 +54,7 @@ class SearchScreenState extends State<SearchScreen>
       Get.find<search.SearchController>().getSuggestedItems();
     }
     Get.find<search.SearchController>().getHistoryList();
-    if (widget.queryText!.isNotEmpty) {
+    if (widget.queryText != null && widget.queryText!.isNotEmpty) {
       _actionSearch(true, widget.queryText, true);
     }
   }
@@ -237,7 +238,7 @@ class SearchScreenState extends State<SearchScreen>
                         ),
                       )
                     : const SizedBox(),
-                widget.queryText!.isNotEmpty
+                (widget.queryText != null && widget.queryText!.isNotEmpty)
                     ? const SizedBox()
                     : Center(
                         child: ResponsiveHelper.isDesktop(context)
@@ -248,17 +249,18 @@ class SearchScreenState extends State<SearchScreen>
                                     color: Get.find<ThemeController>().darkTheme
                                         ? Colors.black12
                                         : Theme.of(context).cardColor,
-                                    boxShadow:
-                                        Get.find<ThemeController>().darkTheme
-                                            ? null
-                                            : [
-                                                BoxShadow(
-                                                    color: Theme.of(context)
-                                                        .disabledColor
-                                                        .withAlpha((0.2 * 255).toInt()),
-                                                    blurRadius: 3,
-                                                    offset: const Offset(0, 5))
-                                              ]),
+                                    boxShadow: Get.find<ThemeController>()
+                                            .darkTheme
+                                        ? null
+                                        : [
+                                            BoxShadow(
+                                                color: Theme.of(context)
+                                                    .disabledColor
+                                                    .withAlpha(
+                                                        (0.2 * 255).toInt()),
+                                                blurRadius: 3,
+                                                offset: const Offset(0, 5))
+                                          ]),
                                 padding: const EdgeInsets.only(bottom: 5),
                                 child: Row(children: [
                                   IconButton(
@@ -431,7 +433,9 @@ class SearchScreenState extends State<SearchScreen>
                                                             color: Theme.of(
                                                                     context)
                                                                 .primaryColor
-                                                                .withAlpha((0.10 * 255).toInt()),
+                                                                .withAlpha(
+                                                                    (0.10 * 255)
+                                                                        .toInt()),
                                                             border: Border.all(
                                                                 color: Theme.of(
                                                                         context)
@@ -629,7 +633,8 @@ class SearchScreenState extends State<SearchScreen>
                                                                       color: Theme.of(
                                                                               context)
                                                                           .disabledColor
-                                                                         .withAlpha((0.1 * 255).toInt()),
+                                                                          .withAlpha((0.1 * 255)
+                                                                              .toInt()),
                                                                       blurRadius:
                                                                           10)
                                                                 ]),
@@ -767,7 +772,9 @@ class SearchScreenState extends State<SearchScreen>
                                                                   color: Theme.of(
                                                                           context)
                                                                       .disabledColor
-                                                                      .withAlpha((0.2 * 255).toInt()),
+                                                                      .withAlpha((0.2 *
+                                                                              255)
+                                                                          .toInt()),
                                                                   borderRadius:
                                                                       BorderRadius
                                                                           .circular(

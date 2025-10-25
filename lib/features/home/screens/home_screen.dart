@@ -502,9 +502,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )),
                                     IconButton(
                                       onPressed: () => Get.toNamed(
-                                        RouteHelper.getSearchStoreItemRoute(
-                                          Get.find<StoreController>().store!.id,
-                                        ),
+                                        // RouteHelper.getSearchStoreItemRoute(
+                                        //   Get.find<StoreController>().store!.id,
+                                        // ),
+                                        RouteHelper.search
                                       ),
                                       icon: const Icon(Icons.search_outlined),
                                     ),

@@ -495,9 +495,10 @@ class _MarketScreenState extends State<MarketScreen> {
                                             )),
                                         IconButton(
                                           onPressed: () => Get.toNamed(
-                                            RouteHelper.getSearchStoreItemRoute(
-                                              Get.find<StoreController>().store!.id,
-                                            ),
+                                              RouteHelper.search
+                                            // RouteHelper.getSearchStoreItemRoute(
+                                            //   Get.find<StoreController>().store!.id,
+                                            // ),
                                           ),
                                           icon: const Icon(Icons.search_outlined),
                                         ),
