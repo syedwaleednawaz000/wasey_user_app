@@ -19,6 +19,8 @@ import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../../util/images.dart';
+
 class BannerView extends StatefulWidget {
   final bool isFeatured;
   const BannerView({super.key, required this.isFeatured});
@@ -143,7 +145,7 @@ class _BannerViewState extends State<BannerView> {
                               fit: BoxFit.fill,
                               width: screenWidth,
                               height: bannerHeight,
-                              placeholder: 'assets/image/placeholder.jpg',
+                              placeholder: Images.placeholder,
                               // fadeInDuration: const Duration(milliseconds: 500),
                             );
                           },

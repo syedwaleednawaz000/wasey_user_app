@@ -503,7 +503,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                         ),
                                         child: InkWell(
                                           onTap: () {
-                                            print(
+                                            log(
                                                 'Tapped on category: ${category?.name}');
                                             Get.find<StoreController>()
                                                 .getSubCategoriesWithItems(
@@ -752,7 +752,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                               Dimensions.paddingSizeSmall,
                                           crossAxisSpacing:
                                               Dimensions.paddingSizeSmall,
-                                          childAspectRatio: 0.54,
+                                          childAspectRatio: 0.58,
                                         ),
                                         itemBuilder: (context, itemIndex) {
                                           Item item = subCat.items![itemIndex];
@@ -769,6 +769,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                             child: Container(
                                               margin: const EdgeInsets.only(
                                                   bottom: 0),
+                                              // height: 100,
                                               decoration: BoxDecoration(
                                                 color:
                                                     Theme.of(context).cardColor,
@@ -863,7 +864,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                                                         .withOpacity(
                                                                             .5),
                                                                   ),
-                                                                  maxLines: 2,
+                                                                  maxLines: 1,
                                                                   overflow:
                                                                       TextOverflow
                                                                           .ellipsis,

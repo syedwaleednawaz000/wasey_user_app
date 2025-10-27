@@ -584,10 +584,10 @@ class FoodCategoryView extends StatelessWidget {
                                         '',
                                     style: STCBold.copyWith(
                                       fontSize: 13,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .color,
+                                      // color: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyMedium!
+                                      //     .color,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,

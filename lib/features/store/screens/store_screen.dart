@@ -167,9 +167,9 @@ class _StoreScreenState extends State<StoreScreen> {
                         child: GestureDetector(
                           onTap: () {
                             // Ensure 'store' and 'store.id' are not null before navigating
-                            if (store != null && store!.id != null) {
+                            if (store != null && store.id != null) {
                               Get.toNamed(RouteHelper.getSearchStoreItemRoute(
-                                  store!.id!));
+                                  store.id!));
                             } else {
                               // Handle the case where store or store.id is null, maybe show a message
                               print(

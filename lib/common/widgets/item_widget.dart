@@ -74,7 +74,7 @@ class ItemWidget extends StatelessWidget {
         genericName += name;
       }
     }
-    if (isStore) {
+    if (isStore && store != null ) {
       discount = store!.discount != null ? store!.discount!.discount : 0;
       discountType =
           store!.discount != null ? store!.discount!.discountType : 'percent';
@@ -192,7 +192,7 @@ class ItemWidget extends StatelessWidget {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                                (isStore || isCornerTag!)
+                                ( store != null && (isStore || isCornerTag!))
                                     ? DiscountTag(
                                         discount: discount,
                                         discountType: discountType,

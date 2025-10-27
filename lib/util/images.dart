@@ -1,7 +1,8 @@
 class Images {
   // static const String logo = 'assets/image/notification_icon.png';
   static const String logo = 'assets/image/logo.png';
-  static const String placeholder = 'assets/image/placeholder.jpg';
+  static const String placeholder = 'assets/image/logo.png';
+  // static const String placeholder = 'assets/image/placeholder.jpg';
   static const String notificationPlaceholder = 'assets/image/notification_placeholder.jpg';
   static const String arabic = 'assets/image/arabic.png';
   static const String bengali = 'assets/image/bangla.png';

@@ -67,11 +67,11 @@ class _ItemsViewState extends State<ItemsView> {
     return Column(children: [
       !isNull
           ? length > 0
-              ? widget.stores == null &&
+              ? widget.stores != null &&
                       !widget.isStore &&
-                      widget.items!.length > 0
+                      widget.items!.isEmpty
                   ? Container(
-                      // color: Colors.green,
+                      color: Colors.green,
                       height: 205,
                       width: double.infinity,
                       child: ListView.builder(
@@ -126,10 +126,12 @@ class _ItemsViewState extends State<ItemsView> {
                             : ResponsiveHelper.isMobile(context)
                                 ? widget.stores != null && widget.isStore
                                     ? 190
-                                    : 122
+                                    : 180
                                 : 122,
                         crossAxisCount: ResponsiveHelper.isMobile(context)
-                            ? 1
+                            ? widget.stores != null && widget.isStore
+                                ? 1
+                                : 2
                             : ResponsiveHelper.isDesktop(context) &&
                                     widget.stores != null
                                 ? 3
@@ -207,7 +209,7 @@ class _ItemsViewState extends State<ItemsView> {
                                 : 110
                             : 110,
                 crossAxisCount: ResponsiveHelper.isMobile(context)
-                    ? 1
+                    ? widget.isStore ? 1 :2
                     : ResponsiveHelper.isDesktop(context)
                         ? 3
                         : 3,
@@ -223,7 +225,8 @@ class _ItemsViewState extends State<ItemsView> {
                     ? widget.isFoodOrGrocery!
                         ? const StoreCardShimmer()
                         : const NewOnShimmerView()
-                    : ItemShimmer(
+                    :
+                ItemShimmer(
                         isEnabled: isNull,
                         isStore: widget.isStore,
                         hasDivider: index != widget.shimmerLength - 1);

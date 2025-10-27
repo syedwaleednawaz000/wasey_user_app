@@ -102,10 +102,10 @@ class AllStoreFilterWidget extends StatelessWidget {
           shrinkWrap: true,
           padding: EdgeInsets.zero,
           children: [
-            ResponsiveHelper.isDesktop(context)
-                ? const SizedBox()
-                : FilterView(storeController: storeController),
-            const SizedBox(width: Dimensions.paddingSizeSmall),
+            // ResponsiveHelper.isDesktop(context)
+            //     ? const SizedBox()
+            //     : FilterView(storeController: storeController),
+            // const SizedBox(width: Dimensions.paddingSizeSmall),
             StoreFilterButtonWidget(
               buttonText: 'all'.tr,
               onTap: () => storeController.setStoreType('all'),

@@ -620,15 +620,18 @@ class SearchScreenState extends State<SearchScreen>
                                                         itemBuilder:
                                                             (context, index) {
                                                           return Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .cardColor,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                        Dimensions
-                                                                            .radiusSmall),
-                                                                boxShadow: [
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .cardColor,
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(
+                                                                      Dimensions
+                                                                          .radiusSmall,
+                                                                    ),
+                                                                    boxShadow: [
                                                                   BoxShadow(
                                                                       color: Theme.of(
                                                                               context)

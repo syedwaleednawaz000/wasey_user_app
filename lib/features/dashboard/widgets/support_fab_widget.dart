@@ -31,6 +31,22 @@ class SupportFabWidget extends StatelessWidget {
       }
     }
 
+    Future<void> _launchWhatsappUrl() async {
+      String whatsAppUrl =
+          "whatsapp://send?phone=$supportPhoneNumber&text=Hello%20there!";
+
+      if (!await launchUrl(Uri.parse(whatsAppUrl),
+          mode: LaunchMode.externalApplication)) {
+        Get.snackbar(
+          'could_not_launch'.tr,
+          'couldNotOpenWhatsApp'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    }
+
     return SpeedDial(
       icon: Icons.support_agent,
       iconTheme: const IconThemeData(size: 40),
@@ -48,6 +64,20 @@ class SupportFabWidget extends StatelessWidget {
       switchLabelPosition: ltr ? false : true,
       children: [
         // Live Chat Button
+        // SpeedDialChild(
+        //   child: const Icon(Icons.chat_bubble_outline),
+        //   backgroundColor: Colors.green,
+        //   foregroundColor: Colors.white,
+        //   label: 'live_chat_with_admin'.tr,
+        //   labelStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+        //         color: Colors.white,
+        //       ),
+        //   labelBackgroundColor: Colors.green,
+        //   visible: true,
+        //   onTap: () {
+        //     Get.toNamed(RouteHelper.getConversationRoute());
+        //   },
+        // ),
         SpeedDialChild(
           child: const Icon(Icons.chat_bubble_outline),
           backgroundColor: Colors.green,
@@ -58,9 +88,7 @@ class SupportFabWidget extends StatelessWidget {
               ),
           labelBackgroundColor: Colors.green,
           visible: true,
-          onTap: () {
-            Get.toNamed(RouteHelper.getConversationRoute());
-          },
+          onTap: _launchWhatsappUrl,
         ),
 
         // Email Button
@@ -113,6 +141,7 @@ class SupportFabWidget extends StatelessWidget {
           onTap: () {
             final Uri phoneLaunchUri =
                 Uri(scheme: 'tel', path: supportPhoneNumber);
+
             Get.dialog(
               AlertDialog(
                 title: Text('make_a_call'.tr),

@@ -16,6 +16,7 @@
   "could_not_launch": "Could Not Launch",
   "could_not_make_call": "Could not make a call.",
   "could_not_open_email": "Could not open email app.",
+  "couldNotOpenWhatsApp": "Could not open the WhatsApp app",
   "our_address": "Our Address",
   "connection_to_api_server_failed": "Connection to API server failed due to internet connection",
   "select_language": "Select Language",
