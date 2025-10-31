@@ -71,7 +71,7 @@ class _ItemsViewState extends State<ItemsView> {
                       !widget.isStore &&
                       widget.items!.isEmpty
                   ? Container(
-                      color: Colors.green,
+                      // color: Colors.green,
                       height: 205,
                       width: double.infinity,
                       child: ListView.builder(
@@ -110,7 +110,7 @@ class _ItemsViewState extends State<ItemsView> {
                         crossAxisSpacing: ResponsiveHelper.isDesktop(context)
                             ? Dimensions.paddingSizeExtremeLarge
                             : widget.stores != null
-                                ? Dimensions.paddingSizeLarge
+                                ? Dimensions.paddingSizeSmall
                                 : Dimensions.paddingSizeLarge,
                         mainAxisSpacing: ResponsiveHelper.isDesktop(context)
                             ? Dimensions.paddingSizeExtremeLarge
@@ -125,12 +125,12 @@ class _ItemsViewState extends State<ItemsView> {
                             ? 220
                             : ResponsiveHelper.isMobile(context)
                                 ? widget.stores != null && widget.isStore
-                                    ? 190
+                                    ? 210
                                     : 180
                                 : 122,
                         crossAxisCount: ResponsiveHelper.isMobile(context)
                             ? widget.stores != null && widget.isStore
-                                ? 1
+                                ? 2
                                 : 2
                             : ResponsiveHelper.isDesktop(context) &&
                                     widget.stores != null

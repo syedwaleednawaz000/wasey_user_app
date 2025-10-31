@@ -671,6 +671,7 @@ class ItemController extends GetxController implements GetxService {
         '',
         null,
         ModuleHelper.getModuleConfig(item.moduleType).newVariation! ? [] : null,
+        null,
         1,
         [],
         [],

@@ -74,8 +74,10 @@ class _CartScreenState extends State<CartScreen> {
 
     if (Get.find<CartController>().cartList.isNotEmpty) {
       if (kDebugMode) {
-        print(
-            '----cart item : ${Get.find<CartController>().cartList[0].toJson()}');
+        for(int i=0;i<Get.find<CartController>().cartList.length;i++){
+          print(
+              '----cart item $i : ${Get.find<CartController>().cartList[i].toJson()}');
+        }
       }
 
       if (Get.find<CartController>().addCutlery) {

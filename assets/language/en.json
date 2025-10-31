@@ -1,5 +1,8 @@
 {
+  "busy": "Busy",
+  "open": "Open",
   "full": "Full",
+  "temporarily_closed": "Temporarily closed",
   "right": "Right",
   "left": "Left",
   "support": "Support",
@@ -1367,5 +1370,4 @@
   "category_not_found": "Category details not available.",
   "error_loading_category_details": "Could not load category details.",
   "available_categories": "Available Categories"
-
 }

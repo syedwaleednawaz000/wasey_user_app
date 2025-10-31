@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:sixam_mart/common/widgets/address_widget.dart';
@@ -1566,8 +1568,9 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       width: Dimensions.webMaxWidth,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(
-          vertical: Dimensions.paddingSizeSmall,
-          horizontal: Dimensions.paddingSizeLarge,),
+        vertical: Dimensions.paddingSizeSmall,
+        horizontal: Dimensions.paddingSizeLarge,
+      ),
       child: SafeArea(
         child: CustomButton(
             isLoading: checkoutController.isLoading,
@@ -1794,6 +1797,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                             index < _cartList!.length;
                             index++) {
                           CartModel cart = _cartList![index]!;
+                          List<ToppingOption> newToppingOptions = [];
+                          log("CartFromBack $index: ${cart.toJson().toString()}");
                           List<int?> addOnIdList = [];
                           List<int?> addOnQtyList = [];
                           for (var addOn in cart.addOnIds!) {
@@ -1801,34 +1806,43 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                             addOnQtyList.add(addOn.quantity);
                           }
 
-                          List<OrderVariation> variations = [];
+                          List<OrderVariation>? variations = [];
                           if (Get.find<SplashController>()
                               .getModuleConfig(cart.item!.moduleType)
                               .newVariation!) {
+                            log("inside if moduletype newVariation");
                             if (cart.fVariation != null &&
                                 cart.fVariation!.isNotEmpty) {
+                              log("inside if  fVariation notEmpty");
+
                               for (int i = 0;
                                   i < cart.fVariation!.length;
                                   i++) {
-
                                 if (cart.fVariation != null &&
                                     (cart.fVariation!.isNotEmpty &&
                                         cart.fVariation![i].values!
-                                            .toppingOptions !=
+                                                .toppingOptions !=
                                             null &&
                                         cart.fVariation!.isNotEmpty &&
                                         cart.fVariation![i].values!
                                             .toppingOptions!.isNotEmpty)) {
                                   for (int j = 0;
-                                  j <
-                                      cart.fVariation![i].values!
-                                          .toppingOptions!.length;
-                                  j++) {
+                                      j <
+                                          cart.fVariation![i].values!
+                                              .toppingOptions!.length;
+                                      j++) {
                                     if (cart.fVariation![i].values!
                                         .toppingOptions![j].isNotEmpty) {
                                       toppingOptions.add(ToppingOption(
-                                          labelName: cart.fVariation![i]
-                                              .values!.label![j]
+                                          labelName: cart
+                                              .fVariation![i].values!.label![j]
+                                              .toString(),
+                                          info: cart.fVariation![i].values!
+                                              .toppingOptions![j]
+                                              .toString()));
+                                      newToppingOptions.add(ToppingOption(
+                                          labelName: cart
+                                              .fVariation![i].values!.label![j]
                                               .toString(),
                                           info: cart.fVariation![i].values!
                                               .toppingOptions![j]
@@ -1836,14 +1850,12 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                       if (kDebugMode) {
                                         print("fVariationLabelsWithTTopping");
                                         print(ToppingOption(
-                                            labelName: cart.fVariation![i]
-                                                .values!.label![j]
-                                                .toString(),
-                                            info: cart
-                                                .fVariation![i]
-                                                .values!
-                                                .toppingOptions![j]
-                                                .toString())
+                                                labelName: cart.fVariation![i]
+                                                    .values!.label![j]
+                                                    .toString(),
+                                                info: cart.fVariation![i]
+                                                    .values!.toppingOptions![j]
+                                                    .toString())
                                             .toJson()
                                             .toString());
                                         print(
@@ -1852,7 +1864,6 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                     }
                                   }
                                 }
-
                               }
                             } else {
                               for (int i = 0;
@@ -1879,6 +1890,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                               }
                             }
                           }
+
+                          // log("VariationLength ${variations.length}");
+                          // for (int i = 0; i< variations.length; i++) {
+                          //   log("addedVariation $i: ${variations[i].toJson()}");
+                          // }
+                          //
+                          // for(int i =0;i<_cartList!.length;i++){
+                          //   // "viration_new":[{"labelName":"ذره","info":"Full"},{"labelName":"زتون","info":"Left"},{"labelName":"جمبا","info":"Right"}],
+                          //   // _cartList[i].fVariation.first.
+                          // }
                           carts.add(OnlineCart(
                             cart.id,
                             cart.item!.id,
@@ -1895,6 +1916,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                     .newVariation!
                                 ? variations
                                 : null,
+                            newToppingOptions,
                             cart.quantity,
                             addOnIdList,
                             cart.addOns,
@@ -1910,7 +1932,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                             PlaceOrderBodyModel(
                           cart: carts,
                           minimum_shipping_charge: (_deliveryCharge ?? 0.00),
-                          selectedToppings: toppingOptions,
+                          selectedToppings: null,//toppingOptions,
                           couponDiscountAmount:
                               Get.find<CouponController>().discount,
                           distance: checkoutController.distance,
@@ -2016,6 +2038,22 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                             forParcel: false,
                           ));
                         } else {
+                          // for (int i = 0; i < _cartList!.length; i++) {
+                          //   log("cartList $i:${_cartList![i]!.toJson().toString()}");
+                          // }
+                          // log("placeOrderBody: ${placeOrderBody.toJson().toString()}");
+                          // for (int i = 0;
+                          //     i < placeOrderBody.cart!.length;
+                          //     i++) {
+                          //   log("cart $i: ${placeOrderBody.cart?[i].toJson().toString()}");
+                          //
+                          //   for (int j = 0;
+                          //       j < placeOrderBody.selectedToppings!.length;
+                          //       j++) {
+                          //     log("selectedTopping $j: ${placeOrderBody.selectedToppings?[j].toJson().toString()}");
+                          //   }
+                          // }
+
                           checkoutController.placeOrder(
                               placeOrderBody,
                               checkoutController.store!.zoneId,
