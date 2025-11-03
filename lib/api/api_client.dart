@@ -77,6 +77,7 @@ class ApiClient extends GetxService {
     header.addAll({
       'Content-Type': 'application/json; charset=UTF-8',
       AppConstants.zoneId: zoneIDs != null ? jsonEncode([3, 2]) : '',
+      // AppConstants.zoneId: zoneIDs != null ? jsonEncode([5]) : '',
       // AppConstants.zoneId: zoneIDs != null ? jsonEncode(zoneIDs) : '',
       ///this will add in ride module
       // AppConstants.operationAreaId: operationIds != null ? jsonEncode(operationIds) : '',

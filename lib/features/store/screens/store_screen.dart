@@ -217,21 +217,24 @@ class _StoreScreenState extends State<StoreScreen> {
                             ? Flexible(
                                 flex: 1,
                                 child: InkWell(
-                                    onTap: () {
-                                      storeController.shareStore();
-                                    },
-                                    child: Container(
-                                        height: 40,
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 6),
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Theme.of(context).cardColor),
-                                        alignment: Alignment.center,
-                                        child: const Icon(
-                                          Icons.share,
-                                          size: 17,
-                                        ))))
+                                  onTap: () {
+                                    storeController.shareStore();
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 6),
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context).cardColor),
+                                    alignment: Alignment.center,
+                                    child: const Icon(
+                                      Icons.share,
+                                      size: 17,
+                                    ),
+                                  ),
+                                ),
+                              )
                             : const SizedBox.shrink();
                       })
                     ],
@@ -399,7 +402,9 @@ class _StoreScreenState extends State<StoreScreen> {
                                             ((store.open == 1) &&
                                                     (store.active == 1))
                                                 ? 'status_open'.tr
-                                                : "status_closed".tr,
+                                                : store.active == -1
+                                                    ? "temporarily_closed_label".tr
+                                                    : "closed_now".tr,
                                             style: TextStyle(
                                               color: ((store.open == 1) &&
                                                       (store.active == 1))
@@ -805,16 +810,21 @@ class _StoreScreenState extends State<StoreScreen> {
                                                                             .toInt()),
                                                                   ),
                                                                   child: Text(
-                                                                    'closed_now'
-                                                                        .tr,
+                                                                    store.active == -1
+                                                                        ? 'temporarily_closed_label'
+                                                                            .tr
+                                                                        : 'closed_now'
+                                                                            .tr,
                                                                     textAlign:
                                                                         TextAlign
                                                                             .center,
                                                                     style: STCRegular.copyWith(
                                                                         color: Colors
                                                                             .white,
-                                                                        fontSize:
-                                                                            Dimensions.fontSizeSmall),
+                                                                        fontSize: store.active ==
+                                                                                -1
+                                                                            ? Dimensions.fontSizeExtraSmall
+                                                                            : Dimensions.fontSizeSmall),
                                                                   ),
                                                                 ),
                                                               ),

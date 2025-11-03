@@ -40,7 +40,7 @@ class NotAvailableWidget extends StatelessWidget {
                   ? store!.storeOpeningTime == 'closed'
                       ? 'closed_now'.tr // "مغلق الآن"
                       : store!.active == -1 // ثم نتحقق إذا مغلق مؤقتاً
-                          ? 'temporarily_closed'.tr // "مغلق مؤقتًا"
+                          ? 'temporarily_closed_label'.tr // "مغلق مؤقتًا"
                           : store!.storeOpeningTime != 'closed'
                               ? '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
                               : 'open'.tr

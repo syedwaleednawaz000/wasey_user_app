@@ -5,7 +5,8 @@ import 'package:sixam_mart/util/app_constants.dart';
 // Light Theme
 ThemeData light(
     {Color color = const Color(0xFF10B981)}) => ThemeData(
-  fontFamily: AppConstants.fontFamily,
+  // fontFamily: AppConstants.fontFamilyIBMPlexSansArabic,
+  fontFamily: AppConstants.fontFamilyAlmarai,
   primaryColor: color,
   secondaryHeaderColor: const Color(0xFF06B6D4),
   disabledColor: const Color(0xFF9CA3AF),

@@ -149,77 +149,88 @@ class StoreCardWidget extends StatelessWidget {
                         );
                       }),
                     ),
-                    // store!.logoFullUrl != ""
-                    //     ? Positioned(
-                    //         bottom: -40,
-                    //         left: Get.find<LocalizationController>().isLtr
-                    //             ? null
-                    //             : 10,
-                    //         right: Get.find<LocalizationController>().isLtr
-                    //             ? 10
-                    //             : null,
-                    //         child: Container(
-                    //           width: 80,
-                    //           height: 80,
-                    //           decoration: BoxDecoration(
-                    //             borderRadius: BorderRadius.circular(
-                    //                 Dimensions.radiusLarge),
-                    //             boxShadow: [
-                    //               BoxShadow(
-                    //                 color: Colors.black.withOpacity(0.3),
-                    //                 spreadRadius: 1,
-                    //                 blurRadius: 5,
-                    //                 offset: const Offset(
-                    //                   0,
-                    //                   2,
-                    //                 ),
-                    //               ),
-                    //             ],
-                    //           ),
-                    //           child: ClipRRect(
-                    //             borderRadius: BorderRadius.circular(
-                    //                 Dimensions.radiusLarge),
-                    //             child: CachedNetworkImage(
-                    //               imageUrl: store!.logoFullUrl.toString(),
-                    //               fit: BoxFit.fill,
-                    //               errorWidget: (context, url, error) =>
-                    //                   const Icon(
-                    //                 Icons.storefront,
-                    //                 color: Colors.grey,
-                    //               ), // Optional: good for UX
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       )
-                    //     : const SizedBox(),
+                    store!.logoFullUrl != ""
+                        ? Positioned(
+                            bottom: -20,
+                            left: Get.find<LocalizationController>().isLtr
+                                ? null
+                                : 6,
+                            right: Get.find<LocalizationController>().isLtr
+                                ? 6
+                                : null,
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.radiusSmall,
+                                ),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: .5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    spreadRadius: 1,
+                                    blurRadius: 5,
+                                    offset: const Offset(
+                                      0,
+                                      1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                    Dimensions.radiusSmall),
+                                child: CachedNetworkImage(
+                                  imageUrl: store!.logoFullUrl.toString(),
+                                  fit: BoxFit.fill,
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(
+                                    Icons.storefront,
+                                    color: Colors.grey,
+                                  ), // Optional: good for UX
+                                ),
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
                   ]),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: Dimensions.paddingSizeSmall,
+                        horizontal: Dimensions.paddingSizeExtraSmall,
                       ),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              store!.name ?? '',
-                              style: STCMedium.copyWith(
-                                  fontSize: Dimensions.fontSizeDefault),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            SizedBox(
+                              width: Get.width * .3,
+                              child: Text(
+                                store!.name ?? '',
+                                style: STCMedium.copyWith(
+                                    fontSize: Dimensions.fontSizeDefault),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             const SizedBox(
                               height: Dimensions.paddingSizeExtraSmall,
                             ),
-                            Text(
-                              store!.address ?? '',
-                              style: STCMedium.copyWith(
-                                fontSize: Dimensions.fontSizeSmall,
-                                color: Theme.of(context).disabledColor,
+                            SizedBox(
+                              // width: Get.width * .3,
+                              child: Text(
+                                store!.address ?? '',
+                                style: STCMedium.copyWith(
+                                  fontSize: Dimensions.fontSizeSmall,
+                                  color: Theme.of(context).disabledColor,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                             const Divider(),
                             // const SizedBox(
@@ -281,7 +292,7 @@ class StoreCardWidget extends StatelessWidget {
                                           'closed' // أولاً نتحقق إذا خارج ساعات العمل
                                       ? 'closed_now'.tr
                                       : store!.active == 0
-                                          ? 'temporarily_closed'.tr
+                                          ? 'temporarily_closed_label'.tr
                                           : store!.active == -1
                                               ? 'busy'.tr
                                               : store!.active == 1

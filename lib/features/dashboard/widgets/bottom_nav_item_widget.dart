@@ -13,7 +13,7 @@ class BottomNavItemWidget extends StatelessWidget {
   final String title;
   final Function? onTap;
   final bool isSelected;
-  final bool isMarket;
+  // final bool isMarket;
   final bool isParcel;
   final bool isNotParcel;
 
@@ -21,7 +21,7 @@ class BottomNavItemWidget extends StatelessWidget {
       {super.key,
       this.onTap,
       this.isSelected = false,
-      this.isMarket = false,
+      // this.isMarket = false,
       this.isParcel = false,
       this.isNotParcel = false,
       required this.title,
@@ -45,9 +45,9 @@ class BottomNavItemWidget extends StatelessWidget {
               : isNotParcel
                   ? Stack(clipBehavior: Clip.none, children: [
                       Image.asset(
-                        Images.shoppingCart,
-                        height: 35,
-                        width: 35,
+                        Images.myCarts,
+                        height: 30,
+                        width: 30,
                         color: isSelected
                             ? Theme.of(context).primaryColor
                             : Theme.of(context).textTheme.bodyMedium!.color!,
@@ -55,8 +55,8 @@ class BottomNavItemWidget extends StatelessWidget {
                       GetBuilder<CartController>(builder: (cartController) {
                         return cartController.cartList.isNotEmpty
                             ? Positioned(
-                                top: -5,
-                                right: -5,
+                                top: -6,
+                                right: -8,
                                 child: Container(
                                   height: 22 < 20 ? 10 : 22 / 1.5,
                                   width: 22 < 20 ? 10 : 22 / 1.5,
@@ -79,21 +79,11 @@ class BottomNavItemWidget extends StatelessWidget {
                               )
                             : const SizedBox();
                       }),
-                    ])
-                  : isMarket
-                      ? Icon(
-                          isSelected
-                              ? Icons.store_mall_directory
-                              : Icons.store_mall_directory_outlined,
-                          size: 35,
-                          color: isSelected
-                              ? Theme.of(context).primaryColor
-                              : Theme.of(context).textTheme.bodyMedium!.color!,
-                        )
-                      : Image.asset(
+                    ]):
+                  Image.asset(
                           isSelected ? selectedIcon : unSelectedIcon,
-                          height: 32,
-                          width: 32,
+                          height: 30,
+                          width: 30,
                           color: isSelected
                               ? Theme.of(context).primaryColor
                               : Theme.of(context).textTheme.bodyMedium!.color!,

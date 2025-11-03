@@ -120,3 +120,11 @@ flutter:
           weight: 500
         - asset: assets/font/IBMPlexSansArabic-Bold.ttf
           weight: 700
+    - family: Almarai
+      fonts:
+        - asset: assets/font/Almarai-Regular.ttf
+          weight: 400
+        - asset: assets/font/Almarai-Bold.ttf
+          weight: 500
+        - asset: assets/font/Almarai-ExtraBold.ttf
+          weight: 700

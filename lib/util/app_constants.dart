@@ -7,14 +7,15 @@ import 'package:sixam_mart/util/images.dart';
 class AppConstants {
   static const String appName = 'Wasey';
   static const double appVersion = 0.1;
-  static const String appAddress = "71 St, Kafr Manda, Israel";
-  static const String appAdminPhone = "+972537279686";
-  static const String appAdminEmail = "admin@waseyapp.com";
+  // static const String appAddress = "71 St, Kafr Manda, Israel";
+  // static const String appAdminPhone = "+972537279686";
+  // static const String appAdminEmail = "admin@waseyapp.com";
 
 
   ///Flutter Version: 3.24.5
 
-  static const String fontFamily = 'IBMPlexSansArabic';
+  static const String fontFamilyIBMPlexSansArabic = 'IBMPlexSansArabic';
+  static const String fontFamilyAlmarai = 'Almarai';
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
   static const String webHostedUrl = 'https://waseyapp.com';
@@ -81,6 +82,7 @@ class AppConstants {
   static const String lastLocationUri =
       '/api/v1/delivery-man/last-location?order_id=';
   static const String deliveryChargesUri = '/api/v1/delivery-charges';
+  static const String deliveryTimeSlotsUri = '/api/v1/zone/time-slots';
 
   static const String deliveryManReviewUri =
       '/api/v1/delivery-man/reviews/submit';

@@ -3,6 +3,10 @@ class Images {
   static const String logo = 'assets/image/logo.png';
   static const String placeholder = 'assets/image/logo.png';
   // static const String placeholder = 'assets/image/placeholder.jpg';
+  static const String market = 'assets/image/market.png';
+  static const String restaurants = 'assets/image/resturants.png';
+  static const String myOrders = 'assets/image/my-orders.png';
+  static const String myCarts = 'assets/image/cart.png';
   static const String notificationPlaceholder = 'assets/image/notification_placeholder.jpg';
   static const String arabic = 'assets/image/arabic.png';
   static const String bengali = 'assets/image/bangla.png';

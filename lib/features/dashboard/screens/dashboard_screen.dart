@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,7 +36,9 @@ import 'package:sixam_mart/features/order/screens/order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controllers/delivery_working_hours_schedule_controller.dart';
 import '../widgets/bottom_nav_item_widget.dart';
+import '../widgets/delivery_working_hours_bottom_sheet.dart';
 import '../widgets/running_order_view_widget.dart';
 import '../widgets/support_fab_widget.dart';
 
@@ -61,6 +64,51 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   late bool _isLogin;
   bool active = false;
+
+  Future<void> _checkAndShowWorkingHoursPopup() async {
+    final hasShown = false; // Or use SharedPreferences
+
+    if (!hasShown && mounted) {
+      log("working hours triggered");
+
+      final controller = Get.find<TimeSlotController>();
+
+      // Wait for data to load
+      await controller.fetchTimeSlots();
+
+      // Now it's safe to access
+      log("Weekly Pickup: ${controller.timeSlot?.weeklyPickupTimeSlots}");
+
+      if (controller.timeSlot != null) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const WorkingHoursBottomSheet(),
+        );
+      } else {
+        log("No time slot data available");
+      }
+    }
+  }
+  // Future<void> _checkAndShowWorkingHoursPopup() async {
+  //   // final prefs = await SharedPreferences.getInstance();
+  //   final hasShown = false;//prefs.getBool('has_shown_working_hours_popup') ?? false;
+  //
+  //   if (!hasShown && mounted) {
+  //     log("working hours triggered");
+  //     // await prefs.setBool('has_shown_working_hours_popup', true);
+  //     await Get.find<TimeSlotController>().fetchTimeSlots(); // Trigger fetch
+  //     log("Weekly Pickup: ${Get.find<TimeSlotController>().timeSlot?.weeklyPickupTimeSlots}");
+  //     showModalBottomSheet(
+  //       context: context,
+  //       isScrollControlled: true,
+  //       backgroundColor: Colors.transparent,
+  //
+  //       builder: (_) => const WorkingHoursBottomSheet(),
+  //     );
+  //   }
+  // }
 
   @override
   void initState() {
@@ -97,7 +145,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     ];
 
     Future.delayed(const Duration(seconds: 1), () {
-      setState(() {});
+      _checkAndShowWorkingHoursPopup();
     });
   }
 
@@ -206,7 +254,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               key: _scaffoldKey,
               floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
               floatingActionButton: Padding(
-                padding: EdgeInsets.only(bottom: _pageIndex == 3 ? 150 : 100.0),
+                padding: EdgeInsets.only(bottom: _pageIndex == 3 ? 235 : 100.0),
                 child: const SupportFabWidget(),
               ),
 
@@ -358,7 +406,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                                               : Center(
                                                   child: SizedBox(
                                                     width: size.width,
-                                                    height: 80,
+                                                    height: 60,
                                                     child: Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -368,9 +416,9 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                             title:
                                                                 'restaurant'.tr,
                                                             selectedIcon:
-                                                                Images.knife_fork,
+                                                                Images.restaurants,
                                                             unSelectedIcon:
-                                                                Images.knife_fork,
+                                                                Images.restaurants,
                                                             isSelected:
                                                                 _pageIndex == 0,
                                                             onTap: () =>
@@ -384,17 +432,17 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                                 ? Images
                                                                     .addressSelect
                                                                 : Images
-                                                                    .markerStore,
+                                                                    .market,
                                                             unSelectedIcon: isParcel
                                                                 ? Images
                                                                     .addressUnselect
                                                                 : Images
-                                                                    .favouriteUnselect,
+                                                                    .market,
                                                             isSelected:
                                                                 _pageIndex == 1,
                                                             onTap: () =>
                                                                 _setPage(1),
-                                                            isMarket: true,
+                                                            // isMarket: true,
                                                           ),
                                                           // Container(
                                                           //     width: size.width *
@@ -402,9 +450,9 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                           BottomNavItemWidget(
                                                             title: 'my_cart_nav'.tr,
                                                             selectedIcon: Images
-                                                                .shoppingCart,
+                                                                .myCarts,
                                                             unSelectedIcon: Images
-                                                                .shoppingBagIcon,
+                                                                .myCarts,
                                                             isSelected:
                                                                 _pageIndex == 3,
                                                             isParcel: isParcel,
@@ -436,9 +484,9 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                           BottomNavItemWidget(
                                                             title: 'orders'.tr,
                                                             selectedIcon: Images
-                                                                .orderSelect,
+                                                                .myOrders,
                                                             unSelectedIcon: Images
-                                                                .orderUnselect,
+                                                                .myOrders,
                                                             isSelected:
                                                                 _pageIndex == 4,
                                                             onTap: () =>
