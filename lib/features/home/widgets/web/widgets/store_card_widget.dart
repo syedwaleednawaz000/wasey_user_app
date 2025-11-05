@@ -45,7 +45,13 @@ class StoreCardWidget extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+            // color: Colors.green,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.zero,
+              bottom: Radius.circular(
+                Dimensions.radiusDefault,
+              ),
+            ),
             border: Border.all(
                 color: Theme.of(context)
                     .disabledColor
@@ -97,9 +103,8 @@ class StoreCardWidget extends StatelessWidget {
                   Stack(clipBehavior: Clip.none, children: [
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(
-                          Dimensions.radiusSmall,
-                        ),
+                        top: Radius.zero,
+                        bottom: Radius.zero,
                       ),
                       child: CustomImage(
                         isHovered: hovered,
@@ -119,7 +124,9 @@ class StoreCardWidget extends StatelessWidget {
                             isStore: true,
                             store: store,
                             fontSize: Dimensions.fontSizeExtraSmall,
-                            isAllSideRound: false),
+                            isAllSideRound: false,
+                            radius: 0,
+                          ),
                     Positioned(
                       top: Dimensions.paddingSizeSmall,
                       right: Dimensions.paddingSizeSmall,
@@ -151,7 +158,7 @@ class StoreCardWidget extends StatelessWidget {
                     ),
                     store!.logoFullUrl != ""
                         ? Positioned(
-                            bottom: -20,
+                            bottom: -45,
                             left: Get.find<LocalizationController>().isLtr
                                 ? null
                                 : 6,
@@ -162,28 +169,27 @@ class StoreCardWidget extends StatelessWidget {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  Dimensions.radiusSmall,
-                                ),
+                                borderRadius: BorderRadius.circular(1),
                                 border: Border.all(
                                   color: Colors.white,
-                                  width: .5,
+                                  width: .2,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.3),
-                                    spreadRadius: 1,
+                                    spreadRadius: .2,
                                     blurRadius: 5,
                                     offset: const Offset(
                                       0,
-                                      1,
+                                      .2,
                                     ),
                                   ),
                                 ],
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(
-                                    Dimensions.radiusSmall),
+                                  1,
+                                ),
                                 child: CachedNetworkImage(
                                   imageUrl: store!.logoFullUrl.toString(),
                                   fit: BoxFit.fill,
@@ -221,7 +227,7 @@ class StoreCardWidget extends StatelessWidget {
                               height: Dimensions.paddingSizeExtraSmall,
                             ),
                             SizedBox(
-                              // width: Get.width * .3,
+                              width: Get.width * .3,
                               child: Text(
                                 store!.address ?? '',
                                 style: STCMedium.copyWith(
@@ -286,35 +292,50 @@ class StoreCardWidget extends StatelessWidget {
                             //   maxLines: 2,
                             //   overflow: TextOverflow.ellipsis,
                             // ),
-                            Text(
-                              store != null
-                                  ? store!.storeOpeningTime ==
-                                          'closed' // أولاً نتحقق إذا خارج ساعات العمل
-                                      ? 'closed_now'.tr
-                                      : store!.active == 0
-                                          ? 'temporarily_closed_label'.tr
-                                          : store!.active == -1
-                                              ? 'busy'.tr
-                                              : store!.active == 1
-                                                  ? 'open'.tr
-                                                  : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
-                                  : 'closed_now'.tr,
-                              // : 'not_available_now_break'.tr,
-                              style: STCMedium.copyWith(
-                                fontSize: Dimensions.fontSizeExtraSmall,
+                            Container(
+                              padding: const EdgeInsets.only(
+                                left: Dimensions.paddingSizeExtraSmall,
+                                right: Dimensions.paddingSizeExtraSmall,
+                                top: 1,
+                                bottom: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  Dimensions.radiusDefault,
+                                ),
                                 color: store!.storeOpeningTime == 'closed'
-                                    ? Colors.red
+                                    ? Colors.red.withOpacity(.9)
                                     : store!.active == 0
-                                        ? Colors.red
+                                        ? Colors.red.withOpacity(.9)
                                         : store!.active == -1
-                                            ? Colors.blue
+                                            ? Colors.orangeAccent.withOpacity(.8)
                                             : store!.active == 1
-                                                ? Colors.green
+                                                ? Colors.green.withOpacity(.8)
                                                 : Theme.of(context)
                                                     .disabledColor,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              child: Text(
+                                store != null
+                                    ? store!.storeOpeningTime ==
+                                            'closed' // أولاً نتحقق إذا خارج ساعات العمل
+                                        ? 'closed_now'.tr
+                                        : store!.active == 0
+                                            ? 'temporarily_closed_label'.tr
+                                            : store!.active == -1
+                                                ? 'busy'.tr
+                                                : store!.active == 1
+                                                    ? 'open'.tr
+                                                    : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
+                                    : 'closed_now'.tr,
+                                // : 'not_available_now_break'.tr,
+                                style: STCBold.copyWith(
+                                  fontSize: Dimensions.fontSizeExtraSmall,
+                                  color: Colors.white,
+                                  // fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             const SizedBox(
                               height: Dimensions.paddingSizeExtraSmall,

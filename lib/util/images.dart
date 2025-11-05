@@ -22,6 +22,10 @@ class Images {
   static const String onboard_2 = 'assets/image/onboard_2.png';
   static const String onboard_3 = 'assets/image/onboard_3.png';
   static const String restaurantMarker = 'assets/image/restaurant_marker.png';
+  static const String deliveryClicked = 'assets/image/delivery-clicked.png';
+  static const String deliveryNotClicked = 'assets/image/delivery-not-clicked.png';
+  static const String pickupClicked = 'assets/image/pickup-clicked.png';
+  static const String pickupNotClicked = 'assets/image/pickup-not-clicked.png';
   static const String deliveryManMarker = 'assets/image/delivery_man_marker.png';
   static const String user = 'assets/image/user.png';
   static const String aboutUs = 'assets/image/about_us.png';

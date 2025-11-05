@@ -1,4 +1,7 @@
 {
+ "pickup": "Pickup",
+  "delivery": "Delivery"
+,
   "sunday": "Sunday",
   "monday": "Monday",
   "tuesday": "Tuesday",

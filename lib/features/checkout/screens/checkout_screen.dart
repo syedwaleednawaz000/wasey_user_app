@@ -487,7 +487,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                                       badWeatherChargeForToolTip,
                                                   extraChargeForToolTip:
                                                       extraChargeForToolTip,
-                                                )),
+                                                ),),
                                             const SizedBox(
                                                 width: Dimensions
                                                     .paddingSizeLarge),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
+import 'package:sixam_mart/features/checkout/widgets/payment_method_selection_section.dart';
+import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -16,6 +18,7 @@ class PaymentSection extends StatelessWidget {
   final double total;
   final CheckoutController checkoutController;
   final bool isOfflinePaymentActive;
+
   const PaymentSection({
     super.key,
     this.storeId,
@@ -29,58 +32,26 @@ class PaymentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLtr = Get.find<LocalizationController>().isLtr;
     return Column(children: [
-      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(storeId != null ? 'payment_method'.tr : 'choose_payment_method'.tr,
-            style: STCMedium),
-        storeId == null && !ResponsiveHelper.isDesktop(context)
-            ? InkWell(
-                onTap: () {
-                  Get.bottomSheet(
-                    PaymentMethodBottomSheet(
-                      isCashOnDeliveryActive: isCashOnDeliveryActive,
-                      isDigitalPaymentActive: isDigitalPaymentActive,
-                      isWalletActive: isWalletActive,
-                      storeId: storeId,
-                      totalPrice: total,
-                      isOfflinePaymentActive: isOfflinePaymentActive,
-                    ),
-                    backgroundColor: Colors.transparent,
-                    isScrollControlled: true,
-                  );
-                },
-child: Container(
-  height: 45,
-  padding: const EdgeInsets.symmetric(horizontal: 12),
-  alignment: Alignment.center,
-  margin: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-  decoration: BoxDecoration(
-    color: Theme.of(context).primaryColor,
-    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-  ),
-  child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const Icon(Icons.edit, size: 18, color: Colors.white),
-      const SizedBox(width: 4),
-      Text(
-        'تغيير',
-        style: STCMedium.copyWith(
-          fontSize: Dimensions.fontSizeSmall,
-          color: Colors.white,
+      Align(
+        alignment: isLtr ? Alignment.topLeft : Alignment.topRight,
+        child: Text(
+          storeId != null ? 'payment_method'.tr : 'choose_payment_method'.tr,
+          style: STCMedium,
         ),
       ),
-    ],
-  ),
-),
-
-
-              )
-            : const SizedBox(),
-      ]),
       !ResponsiveHelper.isDesktop(context)
           ? const Divider()
           : const SizedBox(height: Dimensions.paddingSizeSmall),
+      PaymentMethodSelectionSection(
+        isCashOnDeliveryActive: isCashOnDeliveryActive,
+        isDigitalPaymentActive: isDigitalPaymentActive,
+        isWalletActive: isWalletActive,
+        storeId: storeId,
+        totalPrice: total,
+        isOfflinePaymentActive: isOfflinePaymentActive,
+      ),
       SizedBox(
           height: !ResponsiveHelper.isDesktop(context)
               ? Dimensions.paddingSizeSmall
@@ -91,8 +62,9 @@ child: Container(
                 borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                 color: Theme.of(context).cardColor,
                 border: Border.all(
-                    color:
-                        Theme.of(context).disabledColor.withAlpha((0.3 * 255).toInt()),
+                    color: Theme.of(context)
+                        .disabledColor
+                        .withAlpha((0.3 * 255).toInt()),
                     width: 1),
               )
             : const BoxDecoration(),
@@ -222,7 +194,8 @@ child: Container(
                   storeId == null && ResponsiveHelper.isDesktop(context)
                       ? InkWell(
                           onTap: () {
-                            Get.dialog(Dialog(
+                            Get.dialog(
+                              Dialog(
                                 backgroundColor: Colors.transparent,
                                 child: PaymentMethodBottomSheet(
                                   isCashOnDeliveryActive:
@@ -234,10 +207,15 @@ child: Container(
                                   totalPrice: total,
                                   isOfflinePaymentActive:
                                       isOfflinePaymentActive,
-                                )));
+                                ),
+                              ),
+                            );
                           },
-                          child: Image.asset(Images.paymentSelect,
-                              height: 24, width: 24),
+                          child: Image.asset(
+                            Images.paymentSelect,
+                            height: 24,
+                            width: 24,
+                          ),
                         )
                       : const SizedBox(),
                 ]),

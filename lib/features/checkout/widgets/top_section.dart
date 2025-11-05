@@ -309,7 +309,7 @@ class TopSection extends StatelessWidget {
             ],
           ),
           padding: const EdgeInsets.symmetric(
-              horizontal: Dimensions.paddingSizeLarge,
+              horizontal: Dimensions.paddingSizeSmall,
               vertical: Dimensions.paddingSizeSmall),
           width: double.infinity,
           child: Column(
@@ -330,52 +330,64 @@ class TopSection extends StatelessWidget {
                       badWeatherCharge: badWeatherCharge,
                       extraChargeForToolTip: extraChargeForToolTip,
                     )
-                  : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(children: [
-                        Get.find<SplashController>()
-                                        .configModel!
-                                        .homeDeliveryStatus ==
-                                    1 &&
-                                checkoutController.store!.delivery!
-                            ? DeliveryOptionButtonWidget(
+                  : SizedBox(
+                    height: 120,
+                    width: double.infinity,
+                    child: Row(children: [
+                      Get.find<SplashController>()
+                                      .configModel!
+                                      .homeDeliveryStatus ==
+                                  1 &&
+                              checkoutController.store!.delivery!
+                          ? Expanded(
+                              child: DeliveryOptionButtonWidget(
                                 value: 'delivery',
-                                title: 'home_delivery'.tr,
-                                charge:
-                                    checkoutController.orderType == "delivery"
-                                        ? deliveryCharge
-                                        : 0.00,
-                                isFree: checkoutController.store!.freeDelivery,
+                                title: 'delivery'.tr,
+                                isNewUI: true,
+                                charge: checkoutController.orderType ==
+                                        "delivery"
+                                    ? deliveryCharge
+                                    : 0.00,
+                                isFree:
+                                    checkoutController.store!.freeDelivery,
                                 fromWeb: true,
                                 total: total,
                                 deliveryChargeForView:
-                                    checkoutController.orderType == "delivery"
+                                    checkoutController.orderType ==
+                                            "delivery"
                                         ? deliveryChargeForView
                                         : "free".tr,
                                 badWeatherCharge: badWeatherCharge,
-                                extraChargeForToolTip: extraChargeForToolTip,
-                              )
-                            : const SizedBox(),
-                        const SizedBox(width: Dimensions.paddingSizeDefault),
-                        Get.find<SplashController>()
-                                        .configModel!
-                                        .takeawayStatus ==
-                                    1 &&
-                                checkoutController.store!.takeAway!
-                            ? DeliveryOptionButtonWidget(
+                                extraChargeForToolTip:
+                                    extraChargeForToolTip,
+                              ),
+                            )
+                          : const SizedBox(),
+                      const SizedBox(width: Dimensions.paddingSizeSmall),
+                      Get.find<SplashController>()
+                                      .configModel!
+                                      .takeawayStatus ==
+                                  1 &&
+                              checkoutController.store!.takeAway!
+                          ? Expanded(
+                              child: DeliveryOptionButtonWidget(
                                 value: 'take_away',
-                                title: 'take_away'.tr,
+                                title: 'pickup'.tr,
                                 charge: deliveryCharge,
+                                isNewUI: true,
                                 isFree: true,
                                 fromWeb: true,
                                 total: total,
-                                deliveryChargeForView: deliveryChargeForView,
+                                deliveryChargeForView:
+                                    deliveryChargeForView,
                                 badWeatherCharge: badWeatherCharge,
-                                extraChargeForToolTip: extraChargeForToolTip,
-                              )
-                            : const SizedBox(),
-                      ]),
-                    ),
+                                extraChargeForToolTip:
+                                    extraChargeForToolTip,
+                              ),
+                            )
+                          : const SizedBox(),
+                    ]),
+                  ),
               checkoutController.orderType == "delivery"
                   ? Obx(() {
                       // <-- Add Obx here to listen to controller's reactive variables
