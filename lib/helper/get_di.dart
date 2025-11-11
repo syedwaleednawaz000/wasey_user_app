@@ -178,6 +178,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 
 import '../features/dashboard/controllers/delivery_working_hours_schedule_controller.dart';
+import '../features/market/controllers/market_controller.dart';
 
 Future<Map<String, Map<String, String>>> init() async {
   /// Core
@@ -492,6 +493,9 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => StoreController(storeServiceInterface: Get.find()));
   Get.lazyPut(() => FavouriteController(favouriteServiceInterface: Get.find()));
   Get.lazyPut(() => HomeController(homeServiceInterface: Get.find()));
+
+  Get.lazyPut(() => MarketController()); // 2. Add the MarketController here
+
   Get.lazyPut(() => SearchController(searchServiceInterface: Get.find()));
   Get.lazyPut(() => CouponController(couponServiceInterface: Get.find()));
   Get.lazyPut(() => OrderController(orderServiceInterface: Get.find()));

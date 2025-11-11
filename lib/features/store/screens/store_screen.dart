@@ -117,6 +117,7 @@ class _StoreScreenState extends State<StoreScreen> {
         }
       }
     });
+    // Get.find<StoreController>().getSubCatWithItems();
   }
 
   @override

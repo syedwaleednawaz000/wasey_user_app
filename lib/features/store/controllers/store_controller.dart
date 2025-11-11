@@ -1,6 +1,5 @@
+import 'dart:convert';
 import 'dart:developer';
-
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,6 +19,7 @@ import 'package:sixam_mart/features/review/domain/models/review_model.dart';
 import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model_new_api.dart';
+import 'package:sixam_mart/features/store/domain/repositories/store_repository.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:get/get.dart';
@@ -30,12 +30,17 @@ import 'package:sixam_mart/features/store/domain/services/store_service_interfac
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
+import '../../../api/api_checker.dart';
+import '../../../api/api_client.dart';
+import '../domain/models/category_with_stores.dart';
+import 'package:http/http.dart' as http;
 
 class StoreController extends GetxController implements GetxService {
   final StoreServiceInterface storeServiceInterface;
 
   StoreController({required this.storeServiceInterface});
 
+  StoreRepository? storeRepo;
   StoreModel? _storeModel;
 
   StoreModel? get storeModel => _storeModel;
@@ -64,9 +69,12 @@ class StoreController extends GetxController implements GetxService {
 
   Store? get store => _store;
 
-  ItemNewApiModel? _storeItemModel;
-
-  ItemNewApiModel? get storeItemModel => _storeItemModel;
+  // ItemNewApiModel? _storeItemModel;
+  //
+  // ItemNewApiModel? get storeItemModel => _storeItemModel;
+  // REPLACE them with this reactive version:
+  final Rx<ItemNewApiModel?> rxStoreItemModel = Rx(null);
+  ItemNewApiModel? get storeItemModel => rxStoreItemModel.value;
 
   ItemModel? _storeSearchItemModel;
 
@@ -157,12 +165,64 @@ class StoreController extends GetxController implements GetxService {
 
   StoreCategories? get selectedSubCategory => _selectedSubCategory;
 
-  getSubCatWithItems() async{
-    await getSubCategoriesWithItems(store!.categoryIds!.first);
-    await getSubCatItems(selectedStoreSubCategories!.first.id);
+  List<CategoryWithStores>? _categoryWithStoreList;
+
+  List<CategoryWithStores>? get categoryWithStoreList => _categoryWithStoreList;
+
+  bool _isLoadingCategoriesWithStores = false;
+
+  bool get isLoadingCategoriesWithStores => _isLoadingCategoriesWithStores;
+
+  Future<void> getCategoriesWithStoreList(bool reload) async {
+    if (_categoryWithStoreList == null || reload) {
+      _isLoadingCategoriesWithStores = true;
+      update();
+
+      ApiClient apiClient = Get.find<ApiClient>();
+
+      String uri =
+          '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+
+      log("Verifying Correct API Call: ${apiClient.appBaseUrl}$uri");
+
+      try {
+        Response response = await apiClient.getData(uri);
+
+        if (response.statusCode == 200) {
+          _categoryWithStoreList = [];
+          response.body.forEach((categoryJson) {
+            _categoryWithStoreList!
+                .add(CategoryWithStores.fromJson(categoryJson));
+          });
+          log("SUCCESS: Fetched and parsed categories with stores.");
+        } else {
+          _categoryWithStoreList = [];
+          log("API CALL FAILED: The server responded with an error.");
+          ApiChecker.checkApi(response);
+        }
+      } catch (e) {
+        _categoryWithStoreList = [];
+        log("EXCEPTION CAUGHT: $e");
+        // showCustomSnackBar(e.toString());
+      }
+
+      _isLoadingCategoriesWithStores = false;
+      update();
+    }
   }
 
- getSubCatItems(int? selectedSubCatIdFromParam) {
+  getSubCatWithItems() async {
+    if (store?.categoryIds != null) {
+      log("calling  getSubCategoriesWithItems");
+      await getSubCategoriesWithItems(store!.categoryIds![0]);
+    }
+    // if (selectedStoreSubCategories != null) {
+    //   log("calling getSubCatItems");
+    //   await getSubCatItems(selectedStoreSubCategories![0].id);
+    // }
+  }
+
+  getSubCatItems(int? selectedSubCatIdFromParam) {
     if (selectedSubCatIdFromParam == null) {
       log("Error: selectedSubCatIdFromParam is null.");
       _selectedSubCategoryId = 0;
@@ -175,7 +235,8 @@ class StoreController extends GetxController implements GetxService {
     log("_selectedSubCategoryId $_selectedSubCategoryId and selectedSubCatIdFromParam $selectedSubCatIdFromParam");
     _selectedSubCategory = null; // Reset
 
-    if (_selectedStoreSubCategories != null && _selectedStoreSubCategories!.isNotEmpty) {
+    if (_selectedStoreSubCategories != null &&
+        _selectedStoreSubCategories!.isNotEmpty) {
       for (var category in _selectedStoreSubCategories!) {
         if (category.id == _selectedSubCategoryId) {
           _selectedSubCategory = category;
@@ -197,7 +258,7 @@ class StoreController extends GetxController implements GetxService {
   getSubCategoriesWithItems(int? selectedCatId) {
     if (selectedCatId == null) {
       log("Error: selectedCatId is null.");
-      update();
+      // update();
       return;
     }
     _selectedCategoryId = selectedCatId;
@@ -215,7 +276,7 @@ class StoreController extends GetxController implements GetxService {
       }).toList();
       _selectedStoreSubCategories?.addAll(filteredCategories);
     } else {
-      // ... logging for null storeItemModel or categories ...
+      log("... logging for null storeItemModel or categories ...");
     }
 
     print(
@@ -224,8 +285,9 @@ class StoreController extends GetxController implements GetxService {
       // Safe
       print('  - ID: ${cat.id}, Name: ${cat.name}, ParentID: ${cat.parentId}');
     }
-    if(_selectedStoreSubCategories != null && _selectedStoreSubCategories!.isNotEmpty) {
-      final catId = _selectedStoreSubCategories!.first.id??0;
+    if (_selectedStoreSubCategories != null &&
+        _selectedStoreSubCategories!.isNotEmpty) {
+      final catId = _selectedStoreSubCategories![0].id ?? 0;
       _selectedSubCategoryId = catId;
       getSubCatItems(catId);
     }
@@ -648,32 +710,62 @@ class StoreController extends GetxController implements GetxService {
     }
     update();
   }
-
-  Future<void> getStoreItemList(
-      int? storeID, int offset, String type, bool notify) async {
-    if (offset == 1 || _storeItemModel == null) {
+  Future<void> getStoreItemList(int? storeID, int offset, String type, bool notify) async {
+    if (offset == 1 || rxStoreItemModel.value == null) { // Use reactive variable here
       _type = type;
-      _storeItemModel = null;
+      rxStoreItemModel.value = null; // Use .value to assign
       if (notify) {
         update();
       }
     }
-    ItemNewApiModel? storeItemModel =
-        await storeServiceInterface.getStoreItemListNewAPI(
-      storeID,
-      offset,
-    );
-    if (storeItemModel != null) {
+
+    ItemNewApiModel? storeItemModelResult = await storeServiceInterface.getStoreItemListNewAPI(storeID, offset);
+
+    if (storeItemModelResult != null) {
       if (offset == 1) {
-        _storeItemModel = storeItemModel;
+        rxStoreItemModel.value = storeItemModelResult; // Use .value to assign
       } else {
-        _storeItemModel = storeItemModel;
-        _storeItemModel!.totalSize = storeItemModel.totalSize;
-        _storeItemModel!.offset = storeItemModel.offset;
+        // This part for pagination needs to be handled carefully with reactive state
+        // For now, let's focus on the initial load.
+        rxStoreItemModel.value = storeItemModelResult; // Simplified for the fix
+      }
+    } else {
+      // If the API fails, make sure to set it to a non-null but empty model if needed, or handle null state in UI
+      if (offset == 1) {
+        rxStoreItemModel.value = ItemNewApiModel(categories: []); // Ensures it's not null
       }
     }
+
+    // The 'update()' call is no longer strictly necessary for reactive variables, but good to keep for GetBuilders
     update();
   }
+
+
+  // Future<void> getStoreItemList(
+  //     int? storeID, int offset, String type, bool notify) async {
+  //   if (offset == 1 || _storeItemModel == null) {
+  //     _type = type;
+  //     _storeItemModel = null;
+  //     if (notify) {
+  //       update();
+  //     }
+  //   }
+  //   ItemNewApiModel? storeItemModel =
+  //       await storeServiceInterface.getStoreItemListNewAPI(
+  //     storeID,
+  //     offset,
+  //   );
+  //   if (storeItemModel != null) {
+  //     if (offset == 1) {
+  //       _storeItemModel = storeItemModel;
+  //     } else {
+  //       _storeItemModel = storeItemModel;
+  //       _storeItemModel!.totalSize = storeItemModel.totalSize;
+  //       _storeItemModel!.offset = storeItemModel.offset;
+  //     }
+  //   }
+  //   update();
+  // }
 
   Future<void> getStoreSearchItemList(
       String searchText, String? storeID, int offset, String type) async {
@@ -730,7 +822,7 @@ class StoreController extends GetxController implements GetxService {
       _storeSearchItemModel = null;
       getStoreSearchItemList(_searchText, _store!.id.toString(), 1, type);
     } else {
-      _storeItemModel = null;
+      rxStoreItemModel.value = null;
       getStoreItemList(_store!.id, 1, Get.find<StoreController>().type, false);
     }
     update();
@@ -807,9 +899,13 @@ class StoreController extends GetxController implements GetxService {
 
   // Getters
   int get currentCategoryIndex => _currentCategoryIndex;
+
   int get currentSubCategoryIndex => _currentSubCategoryIndex;
+
   List<Item> get allItems => _allItems;
+
   bool get isLoadingMore => _isLoadingMore;
+
   bool get hasMoreItems => _hasMoreItems;
 
   // Initialize scrolling state
@@ -855,7 +951,8 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> _loadNextSubCategory() async {
-    final nextSubCategory = _selectedStoreSubCategories![_currentSubCategoryIndex];
+    final nextSubCategory =
+        _selectedStoreSubCategories![_currentSubCategoryIndex];
     await getSubCatItems(nextSubCategory.id);
 
     // Add the new items to our combined list
@@ -871,7 +968,8 @@ class StoreController extends GetxController implements GetxService {
     await getSubCategoriesWithItems(nextCategoryId);
 
     // Once subcategories are loaded, get the first subcategory's items
-    if (_selectedStoreSubCategories != null && _selectedStoreSubCategories!.isNotEmpty) {
+    if (_selectedStoreSubCategories != null &&
+        _selectedStoreSubCategories!.isNotEmpty) {
       final firstSubCategory = _selectedStoreSubCategories!.first;
       await getSubCatItems(firstSubCategory.id);
 
@@ -974,7 +1072,8 @@ class StoreController extends GetxController implements GetxService {
   // Helper method to get category name by ID
   String getCategoryNameById(int categoryId) {
     if (_categoryList == null) return '';
-    final category = _categoryList!.firstWhereOrNull((cat) => cat.id == categoryId);
+    final category =
+        _categoryList!.firstWhereOrNull((cat) => cat.id == categoryId);
     return category?.name ?? '';
   }
 }

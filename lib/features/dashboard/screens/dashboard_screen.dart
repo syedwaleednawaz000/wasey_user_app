@@ -91,6 +91,7 @@ class DashboardScreenState extends State<DashboardScreen> {
       }
     }
   }
+
   // Future<void> _checkAndShowWorkingHoursPopup() async {
   //   // final prefs = await SharedPreferences.getInstance();
   //   final hasShown = false;//prefs.getBool('has_shown_working_hours_popup') ?? false;
@@ -252,12 +253,15 @@ class DashboardScreenState extends State<DashboardScreen> {
             bottom: true,
             child: Scaffold(
               key: _scaffoldKey,
-              floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
-              floatingActionButton: Padding(
-                padding: EdgeInsets.only(bottom: _pageIndex == 3 ? 235 : 100.0),
-                child: const SupportFabWidget(),
-              ),
-
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endContained,
+              floatingActionButton: _pageIndex == 3
+                  ? const SizedBox()
+                  : Padding(
+                      padding: EdgeInsets.only(
+                          bottom: _pageIndex == 3 ? 235 : 100.0),
+                      child: const SupportFabWidget(),
+                    ),
               body: ExpandableBottomSheet(
                 background: Stack(children: [
                   PageView.builder(
@@ -275,8 +279,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                           child: GetBuilder<SplashController>(
                               builder: (splashController) {
                             bool isParcel = splashController.module != null &&
-                                splashController
-                                    .configModel!.moduleConfig!.module!.isParcel!;
+                                splashController.configModel!.moduleConfig!
+                                    .module!.isParcel!;
 
                             _screens = [
                               const HomeScreen(),
@@ -295,7 +299,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                               decoration: BoxDecoration(
                                 color: Theme.of(context).cardColor,
                                 borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(Dimensions.radiusLarge)),
+                                    top: Radius.circular(
+                                        Dimensions.radiusLarge)),
                                 boxShadow: const [
                                   BoxShadow(
                                     color: Colors.black12,
@@ -415,10 +420,11 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                           BottomNavItemWidget(
                                                             title:
                                                                 'restaurant'.tr,
-                                                            selectedIcon:
-                                                                Images.restaurants,
+                                                            selectedIcon: Images
+                                                                .restaurants,
                                                             unSelectedIcon:
-                                                                Images.restaurants,
+                                                                Images
+                                                                    .restaurants,
                                                             isSelected:
                                                                 _pageIndex == 0,
                                                             onTap: () =>
@@ -431,13 +437,11 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                             selectedIcon: isParcel
                                                                 ? Images
                                                                     .addressSelect
-                                                                : Images
-                                                                    .market,
+                                                                : Images.market,
                                                             unSelectedIcon: isParcel
                                                                 ? Images
                                                                     .addressUnselect
-                                                                : Images
-                                                                    .market,
+                                                                : Images.market,
                                                             isSelected:
                                                                 _pageIndex == 1,
                                                             onTap: () =>
@@ -448,11 +452,12 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                           //     width: size.width *
                                                           //         0.2),
                                                           BottomNavItemWidget(
-                                                            title: 'my_cart_nav'.tr,
-                                                            selectedIcon: Images
-                                                                .myCarts,
-                                                            unSelectedIcon: Images
-                                                                .myCarts,
+                                                            title: 'my_cart_nav'
+                                                                .tr,
+                                                            selectedIcon:
+                                                                Images.myCarts,
+                                                            unSelectedIcon:
+                                                                Images.myCarts,
                                                             isSelected:
                                                                 _pageIndex == 3,
                                                             isParcel: isParcel,
@@ -483,10 +488,10 @@ class DashboardScreenState extends State<DashboardScreen> {
                                                           ),
                                                           BottomNavItemWidget(
                                                             title: 'orders'.tr,
-                                                            selectedIcon: Images
-                                                                .myOrders,
-                                                            unSelectedIcon: Images
-                                                                .myOrders,
+                                                            selectedIcon:
+                                                                Images.myOrders,
+                                                            unSelectedIcon:
+                                                                Images.myOrders,
                                                             isSelected:
                                                                 _pageIndex == 4,
                                                             onTap: () =>
@@ -538,7 +543,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                     : (ResponsiveHelper.isDesktop(context) ||
                             !_isLogin ||
                             orderController.runningOrderModel == null ||
-                            orderController.runningOrderModel!.orders!.isEmpty ||
+                            orderController
+                                .runningOrderModel!.orders!.isEmpty ||
                             !orderController.showBottomSheet)
                         ? const SizedBox()
                         : Dismissible(

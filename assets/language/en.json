@@ -1,7 +1,7 @@
 {
- "pickup": "Pickup",
-  "delivery": "Delivery"
-,
+  "no_categories_with_stores_found_yet": "Currently no categories with stores found, please visit again later.",
+  "pickup": "Pickup",
+  "delivery": "Delivery",
   "sunday": "Sunday",
   "monday": "Monday",
   "tuesday": "Tuesday",

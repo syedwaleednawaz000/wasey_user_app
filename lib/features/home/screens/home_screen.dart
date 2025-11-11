@@ -49,7 +49,9 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/features/home/widgets/module_view.dart';
 import 'package:sixam_mart/features/parcel/screens/parcel_category_screen.dart';
 
+import '../../coupon/domain/models/coupon_model.dart';
 import '../../dashboard/widgets/bottom_nav_item_widget.dart';
+import '../../store/domain/models/category_with_stores.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -131,6 +133,10 @@ class HomeScreen extends StatefulWidget {
             Get.find<ItemController>().commonConditions![0].id!, false);
       }
     }
+    // --- ADD THIS CALL TO THE END OF THE METHOD ---
+    print("getCategoriesWithStoreList called");
+    await Get.find<StoreController>().getCategoriesWithStoreList(reload);
+    // ---------------------------------------------
   }
 
   @override
@@ -149,12 +155,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     // splashController.switchModule(1, true);
-    setModuleRestaurant();
-    Get.find<SplashController>().getStoredModule();
+    // setModuleRestaurant();
+    // Get.find<SplashController>().getStoredModule();
 
-    print("splashController.switchModule(0, true); executed");
+    // print("splashController.switchModule(0, true); executed");
 
-    HomeScreen.loadData(false).then((value) {
+    Get.find<HomeController>().loadHomeData(false).then((value) {
       Get.find<SplashController>().getReferBottomSheetStatus();
 
       if ((Get.find<ProfileController>().userInfoModel?.isValidForDiscount ??
@@ -188,20 +194,20 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
     });
-    Get.find<HomeController>().setModuleRestaurant();
+    // Get.find<HomeController>().setModuleRestaurant();
   }
-
-  setModuleRestaurant() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString("moduleId", "2");
-    splashController.switchModule(1, true);
-    print("ModuleID is Set to: ${sharedPreferences.getString("moduleId")}");
-    print("Module setting to 1////////////////////////////////////////");
-    await sharedPreferences.setString(
-        AppConstants.moduleId, AppConstants.restaurantModuleId);
-    print(
-        "Module settled to ${sharedPreferences.getString(AppConstants.moduleId)}////////////////////////////////////////");
-  }
+  //
+  // setModuleRestaurant() async {
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   sharedPreferences.setString("moduleId", "2");
+  //   splashController.switchModule(1, true);
+  //   print("ModuleID is Set to: ${sharedPreferences.getString("moduleId")}");
+  //   print("Module setting to 1////////////////////////////////////////");
+  //   await sharedPreferences.setString(
+  //       AppConstants.moduleId, AppConstants.restaurantModuleId);
+  //   print(
+  //       "Module settled to ${sharedPreferences.getString(AppConstants.moduleId)}////////////////////////////////////////");
+  // }
 
   @override
   void dispose() {
@@ -502,11 +508,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )),
                                     IconButton(
                                       onPressed: () => Get.toNamed(
-                                        // RouteHelper.getSearchStoreItemRoute(
-                                        //   Get.find<StoreController>().store!.id,
-                                        // ),
-                                        RouteHelper.search
-                                      ),
+                                          // RouteHelper.getSearchStoreItemRoute(
+                                          //   Get.find<StoreController>().store!.id,
+                                          // ),
+                                          RouteHelper.search),
                                       icon: const Icon(Icons.search_outlined),
                                     ),
                                     // InkWell(
@@ -568,6 +573,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ? const PharmacyHomeScreen()
                                                       : isFood
                                                           ? const FoodHomeScreen()
+                                                          // ? Text("data")
                                                           : isShop
                                                               ? const ShopHomeScreen()
                                                               : const SizedBox(),
@@ -594,52 +600,189 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               SliverToBoxAdapter(
                                   child: !showMobileModule
-                                      ? Center(
-                                          child: GetBuilder<StoreController>(
-                                              builder: (storeController) {
-                                            return Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: ResponsiveHelper
-                                                          .isDesktop(context)
-                                                      ? 0
-                                                      : 100),
-                                              child: PaginatedListView(
-                                                scrollController:
-                                                    _scrollController,
-                                                totalSize: storeController
-                                                    .storeModel?.totalSize,
-                                                offset: storeController
-                                                    .storeModel?.offset,
-                                                onPaginate:
-                                                    (int? offset) async =>
-                                                        await storeController
-                                                            .getStoreList(
-                                                                offset!, false),
-                                                itemView: ItemsView(
-                                                  isStore: true,
-                                                  items: null,
-                                                  isFoodOrGrocery:
-                                                      (isFood || isGrocery),
-                                                  stores: storeController
-                                                      .storeModel?.stores,
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: ResponsiveHelper
-                                                            .isDesktop(context)
-                                                        ? Dimensions
-                                                            .paddingSizeExtraSmall
-                                                        : Dimensions
-                                                            .paddingSizeSmall,
-                                                    vertical: ResponsiveHelper
-                                                            .isDesktop(context)
-                                                        ? Dimensions
-                                                            .paddingSizeExtraSmall
-                                                        : Dimensions
-                                                            .paddingSizeDefault,
+                                      ? Column(
+                                          children: [
+                                            GetBuilder<StoreController>(
+                                                builder: (storeController) {
+                                              if (storeController
+                                                  .isLoadingCategoriesWithStores) {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator());
+                                              }
+
+                                              if (storeController
+                                                          .categoryWithStoreList ==
+                                                      null ||
+                                                  storeController
+                                                      .categoryWithStoreList!
+                                                      .isEmpty) {
+                                                return Center(
+                                                  child: Text(
+                                                    'no_categories_with_stores_found_yet'
+                                                        .tr,
                                                   ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
+                                                );
+                                              }
+                                              return ListView.builder(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: storeController
+                                                    .categoryWithStoreList!
+                                                    .length,
+                                                itemBuilder: (context, index) {
+                                                  CategoryWithStores
+                                                      categoryWithStore =
+                                                      storeController
+                                                              .categoryWithStoreList![
+                                                          index];
+
+                                                  return categoryWithStore
+                                                          .stores!.isEmpty
+                                                      ? const SizedBox.shrink()
+                                                      : Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              // Display the category name
+                                                              child: Text(
+                                                                categoryWithStore
+                                                                        .cName ??
+                                                                    '',
+                                                                style: STCBold
+                                                                    .copyWith(
+                                                                        fontSize:
+                                                                            20),
+                                                              ),
+                                                            ),
+
+                                                            ItemsView(
+                                                              isStore: true,
+                                                              items: null,
+                                                              isFoodOrGrocery:
+                                                                  (isFood ||
+                                                                      isGrocery),
+                                                              stores:
+                                                                  categoryWithStore
+                                                                      .stores,
+                                                              // storeController
+                                                              //     .storeModel?.stores,
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: ResponsiveHelper
+                                                                        .isDesktop(
+                                                                            context)
+                                                                    ? Dimensions
+                                                                        .paddingSizeExtraSmall
+                                                                    : Dimensions
+                                                                        .paddingSizeSmall,
+                                                                vertical: ResponsiveHelper
+                                                                        .isDesktop(
+                                                                            context)
+                                                                    ? Dimensions
+                                                                        .paddingSizeExtraSmall
+                                                                    : Dimensions
+                                                                        .paddingSizeDefault,
+                                                              ),
+                                                            )
+                                                            // Create a horizontal list for the stores in this category
+                                                            // SizedBox(
+                                                            //   height: 220,
+                                                            //   // Adjust height as needed
+                                                            //   child: ListView.builder(
+                                                            //     scrollDirection:
+                                                            //         Axis.horizontal,
+                                                            //     shrinkWrap: true,
+                                                            //     itemCount:
+                                                            //         categoryWithStore
+                                                            //                 .stores
+                                                            //                 ?.length ??
+                                                            //             0,
+                                                            //     itemBuilder: (context,
+                                                            //         storeIndex) {
+                                                            //       final store =
+                                                            //           categoryWithStore
+                                                            //                   .stores![
+                                                            //               storeIndex];
+                                                            //       // Use your existing StoreWidget to display the store
+                                                            //       return Padding(
+                                                            //         padding:
+                                                            //             const EdgeInsets
+                                                            //                 .symmetric(
+                                                            //                 horizontal:
+                                                            //                     8.0),
+                                                            //         child: Text(store
+                                                            //             .name
+                                                            //             .toString()),
+                                                            //       );
+                                                            //     },
+                                                            //   ),
+                                                            // ),
+                                                          ],
+                                                        );
+                                                },
+                                              );
+                                            }),
+                                            // Center(
+                                            //   child:
+                                            //       GetBuilder<StoreController>(
+                                            //           builder:
+                                            //               (storeController) {
+                                            //     return Padding(
+                                            //       padding: EdgeInsets.only(
+                                            //           bottom: ResponsiveHelper
+                                            //                   .isDesktop(
+                                            //                       context)
+                                            //               ? 0
+                                            //               : 100),
+                                            //       child: PaginatedListView(
+                                            //         scrollController:
+                                            //             _scrollController,
+                                            //         totalSize: storeController
+                                            //             .storeModel?.totalSize,
+                                            //         offset: storeController
+                                            //             .storeModel?.offset,
+                                            //         onPaginate: (int?
+                                            //                 offset) async =>
+                                            //             await storeController
+                                            //                 .getStoreList(
+                                            //                     offset!, false),
+                                            //         itemView: ItemsView(
+                                            //           isStore: true,
+                                            //           items: null,
+                                            //           isFoodOrGrocery:
+                                            //               (isFood || isGrocery),
+                                            //           stores: storeController
+                                            //               .storeModel?.stores,
+                                            //           padding:
+                                            //               EdgeInsets.symmetric(
+                                            //             horizontal: ResponsiveHelper
+                                            //                     .isDesktop(
+                                            //                         context)
+                                            //                 ? Dimensions
+                                            //                     .paddingSizeExtraSmall
+                                            //                 : Dimensions
+                                            //                     .paddingSizeSmall,
+                                            //             vertical: ResponsiveHelper
+                                            //                     .isDesktop(
+                                            //                         context)
+                                            //                 ? Dimensions
+                                            //                     .paddingSizeExtraSmall
+                                            //                 : Dimensions
+                                            //                     .paddingSizeDefault,
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //     );
+                                            //   }),
+                                            // ),
+                                          ],
                                         )
                                       : const SizedBox()),
                             ],

@@ -20,6 +20,8 @@ import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/header_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
+import '../models/category_with_stores.dart';
+
 class StoreRepository implements StoreRepositoryInterface {
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
@@ -310,6 +312,43 @@ class StoreRepository implements StoreRepositoryInterface {
 
     return recommendedStoreList;
   }
+
+  // Future<List<CategoryWithStores>?> getCategoriesWithStoreList(int offset, String type, {DataSourceEnum source = DataSourceEnum.client}) async {
+  //   List<CategoryWithStores>? categoryWithStoreList;
+  //   // Define a unique cache ID for this request
+  //   String cacheId = '${AppConstants.CATEGORY_WITH_STORE_URI}?offset=$offset&limit=10&type=$type-${Get.find<SplashController>().module?.id ?? ''}';
+  //
+  //   switch(source) {
+  //     case DataSourceEnum.client:
+  //     // Fetch from the network
+  //       Response response = await apiClient.getData('${AppConstants.CATEGORY_WITH_STORE_URI}?offset=$offset&limit=10&type=$type');
+  //       if (response.statusCode == 200) {
+  //         categoryWithStoreList = [];
+  //         response.body.forEach((category) {
+  //           categoryWithStoreList!.add(CategoryWithStores.fromJson(category));
+  //         });
+  //         // Save the successful response to the local cache
+  //         LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), apiClient.getHeader());
+  //         log("getCategoriesWithStoreList successful from API");
+  //       } else {
+  //         log("getCategoriesWithStoreList failed from API. Status: ${response.statusCode}");
+  //       }
+  //       break;
+  //
+  //     case DataSourceEnum.local:
+  //     // Attempt to fetch from the local cache
+  //       String? cacheResponseData = await LocalClient.organize(DataSourceEnum.local, cacheId, null, null);
+  //       if(cacheResponseData != null) {
+  //         categoryWithStoreList = [];
+  //         jsonDecode(cacheResponseData).forEach((category) {
+  //           categoryWithStoreList!.add(CategoryWithStores.fromJson(category));
+  //         });
+  //         log("getCategoriesWithStoreList successful from Cache");
+  //       }
+  //       break;
+  //   }
+  //   return categoryWithStoreList;
+  // }
 
   @override
   Future add(value) {

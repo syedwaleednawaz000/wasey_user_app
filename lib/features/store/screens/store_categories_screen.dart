@@ -43,91 +43,39 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
   late ScrollController _scrollController;
   final Map<int, GlobalKey> _subCategoryKeys = {};
   final _currentSubCategoryIndex = 0.obs;
-  bool _isScrolling = false;
 
-/*  @override
-  void initState() {
+
+  // --- START: NEW REACTIVE INITIALIZATION ---
+
+  Worker? _itemModelWorker;
+  bool _isDataInitialized = false; // Prevents re-initialization
+
+  void initDataLoad() {
+    _currentSubCategoryIndex.value = 0;
     _scrollController = ScrollController();
     super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 100) {
-        // near bottom
-        Get.find<StoreController>().loadNextItems();
-      }
-
-      // Set scrolling flag
-      _isScrolling = _scrollController.position.isScrollingNotifier.value;
-
-      // Auto-detect which subcategory is currently in view
-      if (_isScrolling) {
-        _updateCurrentSubCategory();
-      }
-    });
 
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        Get.find<StoreController>().getSubCatWithItems();
+        Future.delayed(const Duration(milliseconds: 400), () {
+          log("getSubCatWithItems called init");
+          log(Get.find<StoreController>()
+              .selectedStoreSubCategories!
+              .length
+              .toString());
+
+          log("After zero call");
+          log(Get.find<StoreController>()
+              .selectedStoreSubCategories!
+              .length
+              .toString());
+          Get.find<StoreController>().getSubCatWithItems();
+
+          _updateCurrentSubCategory();
+        });
       }
     });
-  }
-
-  void _updateCurrentSubCategory() {
-    final storeController = Get.find<StoreController>();
-    final subCategories = storeController.selectedStoreSubCategories;
-
-    if (subCategories == null || subCategories.isEmpty) return;
-
-    // Find which subcategory is currently most visible
-    int newIndex = _currentSubCategoryIndex.value;
-    double maxVisibility = 0;
-
-    for (int i = 0; i < subCategories.length; i++) {
-      final key = _subCategoryKeys[i];
-      if (key?.currentContext != null) {
-        final box = key!.currentContext!.findRenderObject() as RenderBox;
-        final position = box.localToGlobal(Offset.zero);
-        final viewportHeight = MediaQuery.of(context).size.height;
-
-        // Calculate how much of this section is visible
-        double visibleHeight = box.size.height;
-        if (position.dy < 0) {
-          visibleHeight += position.dy; // Top is above screen
-        }
-        if (position.dy + box.size.height > viewportHeight) {
-          visibleHeight -= (position.dy + box.size.height - viewportHeight); // Bottom is below screen
-        }
-
-        double visibility = visibleHeight / box.size.height;
-
-        // If more than 30% of this section is visible, consider it the active one
-        if (visibility > 0.3 && visibility > maxVisibility) {
-          maxVisibility = visibility;
-          newIndex = i;
-        }
-      }
-    }
-
-    // Update if the active subcategory has changed
-    if (_currentSubCategoryIndex != newIndex) {
-
-        _currentSubCategoryIndex.value = newIndex;
-
-      // Automatically select this subcategory
-      final subCat = subCategories[newIndex];
-      if (storeController.selectedSubCategoryId != subCat.id) {
-        storeController.getSubCatItems(subCat.id);
-      }
-    }
-  }*/
-
-  @override
-  void initState() {
-    _scrollController = ScrollController();
-    super.initState();
-
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
@@ -139,17 +87,110 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
       _updateCurrentSubCategory();
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        Get.find<StoreController>().getSubCatWithItems();
+  }
 
-        // Add a small delay to ensure all keys are available
-        Future.delayed(const Duration(milliseconds: 300), () {
-          _updateCurrentSubCategory();
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100) {
+      Get.find<StoreController>().loadNextItems();
+    }
+    _updateCurrentSubCategory();
+  }
+  @override
+  // void initState() {
+  //   super.initState();
+  //   // initDataLoad();
+  //   _scrollController = ScrollController();
+  //   _scrollController.addListener(_onScroll);
+  //
+  //   final storeController = Get.find<StoreController>();
+  //
+  //   // This is the core of the fix. We create a listener.
+  //   _itemModelWorker = ever(storeController.rxStoreItemModel, (ItemNewApiModel? model) {
+  //     // This block will run every time rxStoreItemModel changes.
+  //     log("StoreItemModel Worker fired. Model is ${model == null ? 'null' : 'not null'}.");
+  //
+  //     // We only proceed if the model is NOT null and we haven't initialized yet.
+  //     if (model != null && !_isDataInitialized) {
+  //       log("StoreItemModel is ready. Initializing the screen logic now.");
+  //       _isDataInitialized = true; // Mark as initialized
+  //
+  //       // Safely call the original logic now that data is guaranteed to exist.
+  //       if (widget.store!.categoryIds != null && widget.store!.categoryIds!.isNotEmpty) {
+  //         storeController.getSubCategoriesWithItems(widget.store!.categoryIds![0]);
+  //       }
+  //
+  //       // Post-frame callback to safely update UI after build.
+  //       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //         if (mounted) {
+  //           _updateCurrentSubCategory();
+  //         }
+  //       });
+  //     }
+  //   });
+  //
+  //   // This handles the case where data might already be loaded (e.g., navigating back to the screen).
+  //   if (storeController.storeItemModel != null && !_isDataInitialized) {
+  //     log("StoreItemModel was already available on initState.");
+  //     _isDataInitialized = true;
+  //     if (widget.store!.categoryIds != null && widget.store!.categoryIds!.isNotEmpty) {
+  //       storeController.getSubCategoriesWithItems(widget.store!.categoryIds![0]);
+  //     }
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       if (mounted) {
+  //         _updateCurrentSubCategory();
+  //       }
+  //     });
+  //   }
+  // }
+// In lib/features/store/screens/store_categories_screen.dart
+// ... inside _StoreCategoriesScreenState
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
+    final storeController = Get.find<StoreController>();
+
+    // The 'ever' worker for when data is NOT initially ready. This is correct.
+    _itemModelWorker = ever(storeController.rxStoreItemModel, (ItemNewApiModel? model) {
+      log("StoreItemModel Worker fired. Model is ${model == null ? 'null' : 'not null'}.");
+      if (model != null && !_isDataInitialized) {
+        log("StoreItemModel is ready. Initializing the screen logic now.");
+        _isDataInitialized = true;
+        if (widget.store!.categoryIds != null && widget.store!.categoryIds!.isNotEmpty) {
+          storeController.getSubCategoriesWithItems(widget.store!.categoryIds![0]);
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _updateCurrentSubCategory();
+          }
         });
       }
     });
+
+    // --- FIX APPLIED HERE ---
+    // This handles the case where data IS already available on initState.
+    // Instead of calling the methods directly, we schedule them to run AFTER the build.
+    if (storeController.storeItemModel != null && !_isDataInitialized) {
+      log("StoreItemModel was already available. Scheduling init for after build.");
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // This code now runs after the first frame is drawn, which is safe.
+        if (mounted) {
+          log("Post-frame callback executing for pre-loaded data.");
+          _isDataInitialized = true;
+          if (widget.store!.categoryIds != null && widget.store!.categoryIds!.isNotEmpty) {
+            storeController.getSubCategoriesWithItems(widget.store!.categoryIds![0]);
+          }
+          _updateCurrentSubCategory();
+        }
+      });
+    }
   }
+
+// ... rest of your code ...
 
   void _updateCurrentSubCategory() {
     final storeController = Get.find<StoreController>();
@@ -232,7 +273,11 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
 
   @override
   void dispose() {
+    // _scrollController.dispose();
+    // super.dispose();
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _itemModelWorker?.dispose(); // IMPORTANT: Always dispose of GetX workers!
     super.dispose();
   }
 
@@ -299,7 +344,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                           Get.toNamed(
                               RouteHelper.getSearchStoreItemRoute(store!.id!));
                         } else {
-                          print(
+                          log(
                               "Error: Store ID is null, cannot navigate to search.");
                         }
                       },
@@ -417,7 +462,8 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                     padding: const EdgeInsets.all(16.0),
                                     alignment: Alignment.center,
                                     child: Text(
-                                        "no_categories_found_for_store".tr),
+                                      "no_categories_found_for_store".tr,
+                                    ),
                                   );
                                 }
 
@@ -503,8 +549,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                         ),
                                         child: InkWell(
                                           onTap: () {
-                                            log(
-                                                'Tapped on category: ${category?.name}');
+                                            log('Tapped on category: ${category?.name}');
                                             Get.find<StoreController>()
                                                 .getSubCategoriesWithItems(
                                                     catId);
@@ -619,72 +664,65 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                               height: Dimensions.paddingSizeExtraSmall),
                           SizedBox(
                             height: 42,
-                            child: Row(
-                              children: [
-                                ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: const BouncingScrollPhysics(),
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: storeController
-                                        .selectedStoreSubCategories!.length,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6),
-                                    itemBuilder: (context, index) {
-                                      final int selectedSubCatId =
-                                          storeController.selectedSubCategoryId;
-                                      final cat = storeController
-                                          .selectedStoreSubCategories![index];
-                                      final isSelected =
-                                          _currentSubCategoryIndex.value ==
-                                              index; // Use value
+                            width: double.infinity,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const BouncingScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: storeController
+                                    .selectedStoreSubCategories!.length,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                itemBuilder: (context, index) {
+                                  final int selectedSubCatId =
+                                      storeController.selectedSubCategoryId;
+                                  final cat = storeController
+                                      .selectedStoreSubCategories![index];
+                                  final isSelected =
+                                      _currentSubCategoryIndex.value ==
+                                          index; // Use value
 
-                                      return InkWell(
-                                        onTap: () {
-                                          storeController
-                                              .getSubCatItems(cat.id);
-                                          _scrollToSubCategory(index);
-                                          // _currentSubCategoryIndex.value = index;
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 5),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          decoration: BoxDecoration(
+                                  return InkWell(
+                                    onTap: () {
+                                      storeController.getSubCatItems(cat.id);
+                                      _scrollToSubCategory(index);
+                                      // _currentSubCategoryIndex.value = index;
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                      decoration: BoxDecoration(
+                                        color: selectedSubCatId == cat.id
+                                            // color: isSelected
+                                            ? Theme.of(context)
+                                                .primaryColor
+                                                .withOpacity(.3)
+                                            : Theme.of(context)
+                                                .disabledColor
+                                                .withOpacity(.3),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          cat.name.toString(),
+                                          style: STCRegular.copyWith(
                                             color: selectedSubCatId == cat.id
-                                                // color: isSelected
-                                                ? Theme.of(context)
-                                                    .primaryColor
-                                                    .withOpacity(.3)
-                                                : Theme.of(context)
-                                                    .disabledColor
-                                                    .withOpacity(.3),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              cat.name.toString(),
-                                              style: STCRegular.copyWith(
-                                                color:
-                                                    selectedSubCatId == cat.id
-                                                        // isSelected
-                                                        ? Theme.of(context)
-                                                            .primaryColor
-                                                        : null,
-                                                fontWeight:
-                                                    selectedSubCatId == cat.id
-                                                        // isSelected
-                                                        ? FontWeight.bold
-                                                        : null,
-                                              ),
-                                            ),
+                                                // isSelected
+                                                ? Theme.of(context).primaryColor
+                                                : null,
+                                            fontWeight:
+                                                selectedSubCatId == cat.id
+                                                    // isSelected
+                                                    ? FontWeight.bold
+                                                    : null,
                                           ),
                                         ),
-                                      );
-                                    })
-                              ],
-                            ),
+                                      ),
+                                    ),
+                                  );
+                                }),
                           ),
                           const SizedBox(height: Dimensions.paddingSizeDefault),
                         ],
@@ -752,7 +790,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                               Dimensions.paddingSizeSmall,
                                           crossAxisSpacing:
                                               Dimensions.paddingSizeSmall,
-                                          childAspectRatio: 0.58,
+                                          childAspectRatio: 0.595,
                                         ),
                                         itemBuilder: (context, itemIndex) {
                                           Item item = subCat.items![itemIndex];
@@ -879,21 +917,18 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                                                 child:
                                                                     Container(
                                                                   height: 30,
-                                                                  width: 30,
+                                                                  width: double
+                                                                      .infinity,
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     color: Theme.of(
                                                                             context)
                                                                         .primaryColor,
                                                                     borderRadius:
-                                                                        const BorderRadius
-                                                                            .only(
-                                                                      topLeft: Radius.circular(
-                                                                          Dimensions
-                                                                              .radiusLarge),
-                                                                      bottomRight:
-                                                                          Radius.circular(
-                                                                              Dimensions.radiusLarge),
+                                                                        BorderRadius
+                                                                            .circular(
+                                                                      Dimensions
+                                                                          .radiusDefault,
                                                                     ),
                                                                   ),
                                                                   child: Icon(
