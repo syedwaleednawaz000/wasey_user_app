@@ -26,6 +26,7 @@ class ItemsView extends StatefulWidget {
   final bool isCampaign;
   final bool inStorePage;
   final bool isFeatured;
+  final bool isFromHome;
   final bool? isFoodOrGrocery;
 
   const ItemsView(
@@ -40,6 +41,7 @@ class ItemsView extends StatefulWidget {
       this.isCampaign = false,
       this.inStorePage = false,
       this.isFeatured = false,
+      this.isFromHome = false,
       this.isFoodOrGrocery = true,
       this.categoryId});
 
@@ -104,73 +106,102 @@ class _ItemsViewState extends State<ItemsView> {
                                 : SizedBox.shrink();
                           }),
                     )
-                  : GridView.builder(
-                      key: UniqueKey(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisSpacing: ResponsiveHelper.isDesktop(context)
-                            ? Dimensions.paddingSizeExtremeLarge
-                            : widget.stores != null
-                                ? Dimensions.paddingSizeSmall
-                                : Dimensions.paddingSizeLarge,
-                        mainAxisSpacing: ResponsiveHelper.isDesktop(context)
-                            ? Dimensions.paddingSizeExtremeLarge
-                            : widget.stores != null && widget.isStore
-                                ? Dimensions.paddingSizeLarge
-                                : Dimensions.paddingSizeSmall,
-                        // childAspectRatio: ResponsiveHelper.isDesktop(context) && widget.isStore ? (1/0.6)
-                        //     : ResponsiveHelper.isMobile(context) ? widget.stores != null && widget.isStore ? 2 : 3.8
-                        //     : 3.3,
-                        mainAxisExtent: ResponsiveHelper.isDesktop(context) &&
-                                widget.isStore
-                            ? 220
-                            : ResponsiveHelper.isMobile(context)
+                  : widget.isFromHome
+                      ? Container(
+                          // color: Colors.green,
+                          height: 165,
+                          width: double.infinity,
+                          child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: length,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              // shrinkWrap: false,
+                              // padding: EdgeInsets.symmetric(horizontal: 12),
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  width: 200,
+                                  // color: Colors.red,
+                                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 6),
+                                  child: StoreCardWidget(
+                                    store: widget.stores![index],
+                                  ),
+                                );
+                              }),
+                        )
+                      : GridView.builder(
+                          key: UniqueKey(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisSpacing:
+                                ResponsiveHelper.isDesktop(context)
+                                    ? Dimensions.paddingSizeExtremeLarge
+                                    : widget.stores != null
+                                        ? Dimensions.paddingSizeExtraSmall
+                                        : Dimensions.paddingSizeLarge,
+                            mainAxisSpacing: ResponsiveHelper.isDesktop(context)
+                                ? Dimensions.paddingSizeExtremeLarge
+                                : widget.stores != null && widget.isStore
+                                    ? Dimensions.paddingSizeSmall
+                                    : Dimensions.paddingSizeSmall,
+                            // childAspectRatio: ResponsiveHelper.isDesktop(context) && widget.isStore ? (1/0.6)
+                            //     : ResponsiveHelper.isMobile(context) ? widget.stores != null && widget.isStore ? 2 : 3.8
+                            //     : 3.3,
+                            mainAxisExtent: ResponsiveHelper.isDesktop(
+                                        context) &&
+                                    widget.isStore
+                                ? 220
+                                : ResponsiveHelper.isMobile(context)
+                                    ? widget.stores != null && widget.isStore
+                                        ? 155
+                                        : 180
+                                    : 122,
+                            crossAxisCount: ResponsiveHelper.isMobile(context)
                                 ? widget.stores != null && widget.isStore
-                                    ? 210
-                                    : 180
-                                : 122,
-                        crossAxisCount: ResponsiveHelper.isMobile(context)
-                            ? widget.stores != null && widget.isStore
-                                ? 2
-                                : 2
-                            : ResponsiveHelper.isDesktop(context) &&
-                                    widget.stores != null
-                                ? 3
-                                : 3,
-                      ),
-                      // scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      // widget.isScrollable
-                      //     ? const BouncingScrollPhysics()
-                      //     : const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      // widget.isScrollable ? false : true,
-                      itemCount: length,
+                                    ? 2
+                                    : 2
+                                : ResponsiveHelper.isDesktop(context) &&
+                                        widget.stores != null
+                                    ? 3
+                                    : 3,
+                          ),
+                          // scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          // widget.isScrollable
+                          //     ? const BouncingScrollPhysics()
+                          //     : const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          // widget.isScrollable ? false : true,
+                          itemCount: length,
 
-                      padding: widget.padding,
-                      itemBuilder: (context, index) {
-                        return widget.stores != null && widget.isStore
-                            ? widget.isFoodOrGrocery! && widget.isStore
-                                ? StoreCardWidget(store: widget.stores![index])
-                                : StoreCardWithDistance(
-                                    store: widget.stores![index]!,
-                                    fromAllStore: true,
-                                  )
-                            : ItemWidget(
-                                isStore: widget.isStore,
-                                item: widget.isStore
-                                    ? null
-                                    : widget.items![index],
-                                isFeatured: widget.isFeatured,
-                                store: widget.isStore
-                                    ? widget.stores![index]
-                                    : null,
-                                index: index,
-                                length: length,
-                                isCampaign: widget.isCampaign,
-                                inStore: widget.inStorePage,
-                              );
-                      },
-                    )
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Dimensions.paddingSizeExtraSmall,
+                          ),//widget.padding,
+                          itemBuilder: (context, index) {
+                            return widget.stores != null && widget.isStore
+                                ? widget.isFoodOrGrocery! && widget.isStore
+                                    ? StoreCardWidget(
+                                        store: widget.stores![index])
+                                    : StoreCardWithDistance(
+                                        store: widget.stores![index]!,
+                                        fromAllStore: true,
+                                      )
+                                : ItemWidget(
+                                    isStore: widget.isStore,
+                                    item: widget.isStore
+                                        ? null
+                                        : widget.items![index],
+                                    isFeatured: widget.isFeatured,
+                                    store: widget.isStore
+                                        ? widget.stores![index]
+                                        : null,
+                                    index: index,
+                                    length: length,
+                                    isCampaign: widget.isCampaign,
+                                    inStore: widget.inStorePage,
+                                  );
+                          },
+                        )
               : NoDataScreen(
                   text: widget.noDataText ??
                       (widget.isStore
@@ -209,7 +240,9 @@ class _ItemsViewState extends State<ItemsView> {
                                 : 110
                             : 110,
                 crossAxisCount: ResponsiveHelper.isMobile(context)
-                    ? widget.isStore ? 1 :2
+                    ? widget.isStore
+                        ? 1
+                        : 2
                     : ResponsiveHelper.isDesktop(context)
                         ? 3
                         : 3,
@@ -225,8 +258,7 @@ class _ItemsViewState extends State<ItemsView> {
                     ? widget.isFoodOrGrocery!
                         ? const StoreCardShimmer()
                         : const NewOnShimmerView()
-                    :
-                ItemShimmer(
+                    : ItemShimmer(
                         isEnabled: isNull,
                         isStore: widget.isStore,
                         hasDivider: index != widget.shimmerLength - 1);

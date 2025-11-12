@@ -665,6 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ItemsView(
                                                               isStore: true,
                                                               items: null,
+                                                              isFromHome: true,
                                                               isFoodOrGrocery:
                                                                   (isFood ||
                                                                       isGrocery),
@@ -729,6 +730,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 },
                                               );
                                             }),
+                                            const SizedBox(height: 200),
                                             // Center(
                                             //   child:
                                             //       GetBuilder<StoreController>(
