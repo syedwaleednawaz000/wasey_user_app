@@ -22,10 +22,10 @@ ThemeData dark({Color color = const Color(0xFF10B981)}) => ThemeData(
   popupMenuTheme: const PopupMenuThemeData(color: Color(0xFF1F2937), surfaceTintColor: Color(0xFF1F2937)),
   dialogTheme: const DialogThemeData(surfaceTintColor: Colors.white10),
   floatingActionButtonTheme: FloatingActionButtonThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(500))),
-  bottomAppBarTheme: const BottomAppBarTheme(
-    surfaceTintColor: Colors.black, height: 60,
-    padding: EdgeInsets.symmetric(vertical: 5),
-  ),
+  // bottomAppBarTheme: const BottomAppBarTheme(
+  //   surfaceTintColor: Colors.black, height: 60,
+  //   padding: EdgeInsets.symmetric(vertical: 5),
+  // ),
   dividerTheme: const DividerThemeData(thickness: 0.5, color: Color(0xFF374151)),
   tabBarTheme: const TabBarThemeData(dividerColor: Colors.transparent),
 );

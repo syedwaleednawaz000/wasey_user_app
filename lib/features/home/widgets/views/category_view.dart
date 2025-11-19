@@ -545,7 +545,7 @@ class FoodCategoryView extends StatelessWidget {
                                           ),
                                         ),
                                         Text(
-                                          'المزيد',
+                                          'see_all'.tr,
                                           style: STCBold.copyWith(
                                             color:
                                                 Theme.of(context).primaryColor,

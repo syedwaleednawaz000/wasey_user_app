@@ -29,21 +29,20 @@ class ItemsView extends StatefulWidget {
   final bool isFromHome;
   final bool? isFoodOrGrocery;
 
-  const ItemsView(
-      {super.key,
-      required this.stores,
-      required this.items,
-      required this.isStore,
-      this.isScrollable = false,
-      this.shimmerLength = 20,
-      this.padding = const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      this.noDataText,
-      this.isCampaign = false,
-      this.inStorePage = false,
-      this.isFeatured = false,
-      this.isFromHome = false,
-      this.isFoodOrGrocery = true,
-      this.categoryId});
+  const ItemsView({super.key,
+    required this.stores,
+    required this.items,
+    required this.isStore,
+    this.isScrollable = false,
+    this.shimmerLength = 20,
+    this.padding = const EdgeInsets.all(Dimensions.paddingSizeDefault),
+    this.noDataText,
+    this.isCampaign = false,
+    this.inStorePage = false,
+    this.isFeatured = false,
+    this.isFromHome = false,
+    this.isFoodOrGrocery = true,
+    this.categoryId});
 
   @override
   State<ItemsView> createState() => _ItemsViewState();
@@ -69,67 +68,70 @@ class _ItemsViewState extends State<ItemsView> {
     return Column(children: [
       !isNull
           ? length > 0
-              ? widget.stores != null &&
-                      !widget.isStore &&
-                      widget.items!.isEmpty
-                  ? Container(
-                      // color: Colors.green,
-                      height: 205,
-                      width: double.infinity,
-                      child: ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: length,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          // shrinkWrap: false,
-                          itemBuilder: (context, index) {
-                            if (widget.categoryId ==
-                                widget.items![index]?.categoryId.toString()) {
-                              log("argument cID : ${widget.categoryId} category: ${widget.items![index]?.categoryId.toString()}");
-                            }
-                            return (widget.categoryId ==
-                                    widget.items![index]?.categoryId.toString())
-                                ? ItemWidget(
-                                    isStore: widget.isStore,
-                                    item: widget.isStore
-                                        ? null
-                                        : widget.items![index],
-                                    isFeatured: widget.isFeatured,
-                                    store: widget.isStore
-                                        ? widget.stores![index]
-                                        : null,
-                                    index: index,
-                                    length: length,
-                                    isCampaign: widget.isCampaign,
-                                    inStore: widget.inStorePage,
-                                  )
-                                : SizedBox.shrink();
-                          }),
-                    )
-                  : widget.isFromHome
-                      ? Container(
-                          // color: Colors.green,
-                          height: 165,
-                          width: double.infinity,
-                          child: ListView.builder(
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: length,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              // shrinkWrap: false,
-                              // padding: EdgeInsets.symmetric(horizontal: 12),
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  width: 200,
-                                  // color: Colors.red,
-                                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 6),
-                                  child: StoreCardWidget(
-                                    store: widget.stores![index],
-                                  ),
-                                );
-                              }),
-                        )
-                      : GridView.builder(
+          ? widget.stores != null &&
+          !widget.isStore &&
+          widget.items!.isEmpty
+          ? Container(
+        // color: Colors.green,
+        height: 205,
+        width: double.infinity,
+        child: ListView.builder(
+            physics: const BouncingScrollPhysics(),
+            itemCount: length,
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            // shrinkWrap: false,
+            itemBuilder: (context, index) {
+              if (widget.categoryId ==
+                  widget.items![index]?.categoryId.toString()) {
+                log("argument cID : ${widget.categoryId} category: ${widget
+                    .items![index]?.categoryId.toString()}");
+              }
+              return (widget.categoryId ==
+                  widget.items![index]?.categoryId.toString())
+                  ? ItemWidget(
+                isStore: widget.isStore,
+                item: widget.isStore
+                    ? null
+                    : widget.items![index],
+                isFeatured: widget.isFeatured,
+                store: widget.isStore
+                    ? widget.stores![index]
+                    : null,
+                index: index,
+                length: length,
+                isCampaign: widget.isCampaign,
+                inStore: widget.inStorePage,
+              )
+                  : SizedBox.shrink();
+            }),
+      )
+          : widget.isFromHome
+          ? Container(
+        // color: Colors.green,
+        height: 165,
+        width: double.infinity,
+        child: ListView.builder(
+            physics: const BouncingScrollPhysics(),
+            itemCount: length,
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            // shrinkWrap: false,
+            // padding: EdgeInsets.symmetric(horizontal: 12),
+            itemBuilder: (context, index) {
+              return Container(
+                width: 200,
+                // color: Colors.red,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                child: StoreCardWidget(
+                  store: widget.stores![index],
+                ),
+              );
+            }),
+      )
+          :
+      // widget.stores != null ? Text(widget.stores!.length.toString()): Text("data")
+      GridView.builder(
                           key: UniqueKey(),
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
@@ -202,68 +204,69 @@ class _ItemsViewState extends State<ItemsView> {
                                   );
                           },
                         )
-              : NoDataScreen(
-                  text: widget.noDataText ??
-                      (widget.isStore
-                          ? Get.find<SplashController>()
-                                  .configModel!
-                                  .moduleConfig!
-                                  .module!
-                                  .showRestaurantText!
-                              ? 'no_restaurant_available'.tr
-                              : 'no_store_available'.tr
-                          : 'no_item_available'.tr),
-                )
-          //Shimmers starts from here
+          : NoDataScreen(
+        text: widget.noDataText ??
+            (widget.isStore
+                ? Get
+                .find<SplashController>()
+                .configModel!
+                .moduleConfig!
+                .module!
+                .showRestaurantText!
+                ? 'no_restaurant_available'.tr
+                : 'no_store_available'.tr
+                : 'no_item_available'.tr),
+      )
+      //Shimmers starts from here
           : GridView.builder(
-              key: UniqueKey(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisSpacing: ResponsiveHelper.isDesktop(context)
-                    ? Dimensions.paddingSizeExtremeLarge
-                    : widget.stores != null
-                        ? Dimensions.paddingSizeLarge
-                        : Dimensions.paddingSizeLarge,
-                mainAxisSpacing: ResponsiveHelper.isDesktop(context)
-                    ? Dimensions.paddingSizeLarge
-                    : widget.stores != null
-                        ? Dimensions.paddingSizeLarge
-                        : Dimensions.paddingSizeSmall,
-                // childAspectRatio: ResponsiveHelper.isDesktop(context) && widget.isStore ? (1/0.6)
-                //     : ResponsiveHelper.isMobile(context) ? widget.isStore ? 2 : 3.8
-                //     : 3,
-                mainAxisExtent:
-                    ResponsiveHelper.isDesktop(context) && widget.isStore
-                        ? 220
-                        : ResponsiveHelper.isMobile(context)
-                            ? widget.isStore
-                                ? 200
-                                : 110
-                            : 110,
-                crossAxisCount: ResponsiveHelper.isMobile(context)
-                    ? widget.isStore
-                        ? 1
-                        : 2
-                    : ResponsiveHelper.isDesktop(context)
-                        ? 3
-                        : 3,
-              ),
-              physics: widget.isScrollable
-                  ? const BouncingScrollPhysics()
-                  : const NeverScrollableScrollPhysics(),
-              shrinkWrap: widget.isScrollable ? false : true,
-              itemCount: widget.shimmerLength,
-              padding: widget.padding,
-              itemBuilder: (context, index) {
-                return widget.isStore
-                    ? widget.isFoodOrGrocery!
-                        ? const StoreCardShimmer()
-                        : const NewOnShimmerView()
-                    : ItemShimmer(
-                        isEnabled: isNull,
-                        isStore: widget.isStore,
-                        hasDivider: index != widget.shimmerLength - 1);
-              },
-            ),
+        key: UniqueKey(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisSpacing: ResponsiveHelper.isDesktop(context)
+              ? Dimensions.paddingSizeExtremeLarge
+              : widget.stores != null
+              ? Dimensions.paddingSizeLarge
+              : Dimensions.paddingSizeLarge,
+          mainAxisSpacing: ResponsiveHelper.isDesktop(context)
+              ? Dimensions.paddingSizeLarge
+              : widget.stores != null
+              ? Dimensions.paddingSizeLarge
+              : Dimensions.paddingSizeSmall,
+          // childAspectRatio: ResponsiveHelper.isDesktop(context) && widget.isStore ? (1/0.6)
+          //     : ResponsiveHelper.isMobile(context) ? widget.isStore ? 2 : 3.8
+          //     : 3,
+          mainAxisExtent:
+          ResponsiveHelper.isDesktop(context) && widget.isStore
+              ? 220
+              : ResponsiveHelper.isMobile(context)
+              ? widget.isStore
+              ? 200
+              : 110
+              : 110,
+          crossAxisCount: ResponsiveHelper.isMobile(context)
+              ? widget.isStore
+              ? 1
+              : 2
+              : ResponsiveHelper.isDesktop(context)
+              ? 3
+              : 3,
+        ),
+        physics: widget.isScrollable
+            ? const BouncingScrollPhysics()
+            : const NeverScrollableScrollPhysics(),
+        shrinkWrap: widget.isScrollable ? false : true,
+        itemCount: widget.shimmerLength,
+        padding: widget.padding,
+        itemBuilder: (context, index) {
+          return widget.isStore
+              ? widget.isFoodOrGrocery!
+              ? const StoreCardShimmer()
+              : const NewOnShimmerView()
+              : ItemShimmer(
+              isEnabled: isNull,
+              isStore: widget.isStore,
+              hasDivider: index != widget.shimmerLength - 1);
+        },
+      ),
     ]);
   }
 }
@@ -295,7 +298,8 @@ class NewOnShimmerView extends StatelessWidget {
                   Container(
                     height: double.infinity,
                     width: double.infinity,
-                    color: Theme.of(context)
+                    color: Theme
+                        .of(context)
                         .primaryColor
                         .withAlpha((0.1 * 255).toInt()),
                   ),
@@ -306,12 +310,15 @@ class NewOnShimmerView extends StatelessWidget {
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Theme.of(context)
+                        color: Theme
+                            .of(context)
                             .cardColor
                             .withAlpha((0.8 * 255).toInt()),
                       ),
                       child: Icon(Icons.favorite_border,
-                          color: Theme.of(context).primaryColor, size: 20),
+                          color: Theme
+                              .of(context)
+                              .primaryColor, size: 20),
                     ),
                   ),
                 ]),
@@ -331,7 +338,9 @@ class NewOnShimmerView extends StatelessWidget {
                             child: Container(
                               height: 5,
                               width: 100,
-                              color: Theme.of(context).cardColor,
+                              color: Theme
+                                  .of(context)
+                                  .cardColor,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -344,7 +353,9 @@ class NewOnShimmerView extends StatelessWidget {
                               child: Container(
                                 height: 10,
                                 width: 100,
-                                color: Theme.of(context).cardColor,
+                                color: Theme
+                                    .of(context)
+                                    .cardColor,
                               ),
                             ),
                           ]),
@@ -366,20 +377,23 @@ class NewOnShimmerView extends StatelessWidget {
                                 vertical: 3,
                                 horizontal: Dimensions.paddingSizeSmall),
                             decoration: BoxDecoration(
-                              color: Theme.of(context)
+                              color: Theme
+                                  .of(context)
                                   .primaryColor
                                   .withAlpha((0.1 * 255).toInt()),
                               borderRadius:
-                                  BorderRadius.circular(Dimensions.radiusLarge),
+                              BorderRadius.circular(Dimensions.radiusLarge),
                             ),
                           ),
                           Container(
                             height: 20,
                             width: 65,
                             decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
+                              color: Theme
+                                  .of(context)
+                                  .cardColor,
                               borderRadius:
-                                  BorderRadius.circular(Dimensions.radiusSmall),
+                              BorderRadius.circular(Dimensions.radiusSmall),
                             ),
                           ),
                         ]),
@@ -400,7 +414,9 @@ class NewOnShimmerView extends StatelessWidget {
                 width: 65,
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
+                  color: Theme
+                      .of(context)
+                      .cardColor,
                   borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                 ),
               ),

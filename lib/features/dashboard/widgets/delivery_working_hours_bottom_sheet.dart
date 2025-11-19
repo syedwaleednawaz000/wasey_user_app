@@ -19,18 +19,16 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
   Widget build(BuildContext context) {
     return GetBuilder<TimeSlotController>(
       builder: (controller) {
-        // Loading State
         if (controller.isLoading) {
           return _buildLoadingSheet();
         }
 
-        // Error or No Data
         if (controller.error != null || controller.timeSlot == null) {
           return _buildErrorSheet(controller.error);
         }
 
         final slot = controller.timeSlot!;
-        final bool deliveryHoursAvailable = slot.isDeliveryAvailableNow;
+        // final bool deliveryHoursAvailable = slot.isDeliveryAvailableNow;
         final bool pickupHoursAvailable = slot.isPickupAvailableNow;
         final bool isDeliverySystemEnable = slot.deliverySlotSystemEnabled;
         final bool isPickupSystemEnable = slot.pickupSlotSystemEnabled;
@@ -43,7 +41,6 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header with Icon & Close Button
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
                 child: Row(
@@ -83,7 +80,6 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
                 ),
               ),
 
-              // Main Message
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -99,22 +95,18 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
 
               const SizedBox(height: 12),
 
-              // Expand/Collapse Button
               TextButton.icon(
                 onPressed: () => setState(() => _isExpanded = !_isExpanded),
                 icon: Icon(
                   _isExpanded
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  // color: Colors.white,
                 ),
                 label: Text(
                   _isExpanded ? "hideWorkingHours".tr : "showWorkingHours".tr,
-                  // style: const TextStyle(color: Colors.white),
                 ),
               ),
 
-              // Expanded Hours List
               if (_isExpanded)
                 Container(
                   width: double.infinity,
@@ -173,7 +165,7 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
         const SizedBox(height: 8),
         ...daysOrder.map((dayKey) {
           final times = slots[dayKey];
-          final dayNameTr = dayKey.tr; // Localized day name
+          final dayNameTr = dayKey.tr;
 
           if (times == null) {
             return _dayRow(dayNameTr, "closed".tr, isClosed: true);
@@ -185,53 +177,6 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
       ],
     );
   }
-  // Reusable Hours Section (Your Style)
-  // Widget _buildHoursSection(
-  //     String title, Map<String, List<String>?> slots, String type) {
-  //   final daysOrder = [
-  //     'sunday',
-  //     'monday',
-  //     'tuesday',
-  //     'wednesday',
-  //     'thursday',
-  //     'friday',
-  //     'saturday'
-  //   ];
-  //
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Row(
-  //         children: [
-  //           Icon(
-  //             type == 'pickup' ? Icons.directions_walk : Icons.delivery_dining,
-  //             color: Colors.white,
-  //           ),
-  //           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-  //           Text(
-  //             title,
-  //             style: const TextStyle(
-  //               fontWeight: FontWeight.bold,
-  //               color: Colors.white,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //       const SizedBox(height: 8),
-  //       ...daysOrder.map((dayKey) {
-  //         final times = slots[dayKey];
-  //         final dayName = dayKey[0].toUpperCase() + dayKey.substring(1);
-  //
-  //         if (times == null) {
-  //           return _dayRow(dayName, "closed".tr, isClosed: true);
-  //         }
-  //
-  //         final timeStr = times.join(' - ');
-  //         return _dayRow(dayName, timeStr, isClosed: false);
-  //       }),
-  //     ],
-  //   );
-  // }
 
   Widget _dayRow(String day, String time, {required bool isClosed}) {
     return Padding(
@@ -255,7 +200,6 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
     );
   }
 
-  // Loading & Error Sheets
   Widget _buildLoadingSheet() => Container(
         height: 150,
         decoration: const BoxDecoration(
@@ -287,173 +231,3 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
         ),
       );
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import '../../../util/dimensions.dart';
-// import '../../../util/styles.dart';
-//
-// class WorkingHoursBottomSheet extends StatefulWidget {
-//   const WorkingHoursBottomSheet({Key? key}) : super(key: key);
-//
-//   @override
-//   State<WorkingHoursBottomSheet> createState() =>
-//       _WorkingHoursBottomSheetState();
-// }
-//
-// class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
-//   bool _isExpanded = false;
-//
-//   final Map<String, Map<String, String>> _hours = {
-//     'Sunday': {'delivery': '13:00 - 02:00', 'pickup': '09:00 - 02:00'},
-//     'Monday': {'delivery': 'Closed', 'pickup': '09:00 - 02:00'},
-//     'Tuesday': {'delivery': '13:00 - 02:00', 'pickup': '09:00 - 02:00'},
-//     'Wednesday': {'delivery': '13:00 - 02:00', 'pickup': '09:00 - 02:00'},
-//     'Thursday': {'delivery': '13:00 - 02:00', 'pickup': '09:00 - 02:00'},
-//     'Friday': {'delivery': '24 Hours', 'pickup': '24 Hours'},
-//     'Saturday': {'delivery': '05:00 - 02:00', 'pickup': '05:00 - 02:00'},
-//   };
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     // final isRTL = !Get.find<LocalizationController>().isLtr;
-//
-//     return Container(
-//       decoration: const BoxDecoration(
-//         color: Colors.black54,
-//         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-//       ),
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Padding(
-//             padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
-//             child: Row(
-//               children: [
-//                 const Icon(Icons.access_time, color: Colors.orange),
-//                 const SizedBox(width: 8),
-//                 Text(
-//                   "openForPickup".tr,
-//                   style: const TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 16,
-//                     color: Colors.white,
-//                   ),
-//                 ),
-//                 const Spacer(),
-//                 IconButton(
-//                   style: IconButton.styleFrom(
-//                     minimumSize: const Size(20, 20),
-//                     padding:
-//                         const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-//                     iconSize: 16,
-//                     backgroundColor: Colors.grey,
-//                     foregroundColor: Colors.white,
-//                   ),
-//                   icon: const Icon(Icons.close),
-//                   onPressed: () => Navigator.pop(context),
-//                 ),
-//               ],
-//             ),
-//           ),
-//
-//           Padding(
-//             padding: const EdgeInsets.symmetric(horizontal: 16),
-//             child: Text(
-//               "deliveryNotAvailable".tr,
-//               style: const TextStyle(
-//                 fontSize: 14,
-//                 color: Colors.white,
-//               ),
-//               textAlign: TextAlign.center,
-//             ),
-//           ),
-//
-//           const SizedBox(height: 12),
-//
-//           TextButton.icon(
-//             onPressed: () => setState(() => _isExpanded = !_isExpanded),
-//             icon: Icon(
-//               _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-//             ),
-//             label: Text(
-//               _isExpanded ? "hideWorkingHours".tr : "showWorkingHours".tr,
-//             ),
-//           ),
-//
-//           if (_isExpanded)
-//             Container(
-//               width: double.infinity,
-//               color: Colors.black54,
-//               padding: const EdgeInsets.all(16),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   _buildHoursSection("deliveryHours".tr, 'delivery'),
-//                   const SizedBox(height: 16),
-//                   _buildHoursSection("pickupHours".tr, 'pickup'),
-//                 ],
-//               ),
-//             ),
-//
-//           const SizedBox(height: 20),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildHoursSection(String title, String type) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.start,
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             Icon(
-//               type == "pickup" ? Icons.directions_walk : Icons.delivery_dining,
-//               color: Colors.white,
-//             ),
-//             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-//             Text(
-//               title,
-//               style: const TextStyle(
-//                 fontWeight: FontWeight.bold,
-//                 color: Colors.white,
-//               ),
-//             ),
-//           ],
-//         ),
-//         const SizedBox(height: 8),
-//         ..._hours.entries.map((entry) {
-//           final day = entry.key;
-//           final time = entry.value[type]!;
-//           final isClosed = time.toLowerCase() == 'closed';
-//
-//           return Padding(
-//             padding: const EdgeInsets.symmetric(vertical: 2),
-//             child: Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   day,
-//                   style: STCRegular.copyWith(
-//                     color: Colors.white,
-//                   ),
-//                 ),
-//                 Text(
-//                   isClosed ? "closed".tr : time,
-//                   style: STCMedium.copyWith(
-//                     color:
-//                         isClosed ? Colors.red : Theme.of(context).primaryColor,
-//                     fontWeight: FontWeight.w500,
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           );
-//         }),
-//       ],
-//     );
-//   }
-// }

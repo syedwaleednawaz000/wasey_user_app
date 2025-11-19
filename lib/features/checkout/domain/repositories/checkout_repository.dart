@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get_connect/connect.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,6 +55,8 @@ class CheckoutRepository implements CheckoutRepositoryInterface {
 
   @override
   Future<Response> placeOrder(PlaceOrderBodyModel orderBody, List<MultipartBody>? orderAttachment) async {
+    print("this is new log");
+    log("orderBody.toJson()  ${orderBody.toJson().toString()}");
     return await apiClient.postMultipartData(AppConstants.placeOrderUri, orderBody.toJson(), orderAttachment ?? [], handleError: false);
   }
 

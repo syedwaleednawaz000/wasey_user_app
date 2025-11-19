@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:sixam_mart/common/widgets/address_widget.dart';
@@ -1380,7 +1379,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                           //     child: Text("data")),
                                           TopSection(
                                             checkoutController:
-                                                checkoutController,
+                                            checkoutController,
                                             charge: originalCharge,
                                             deliveryCharge:
                                                 (_deliveryCharge ?? 0.00),

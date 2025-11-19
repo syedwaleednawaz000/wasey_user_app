@@ -196,6 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     // Get.find<HomeController>().setModuleRestaurant();
   }
+
   //
   // setModuleRestaurant() async {
   //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -497,10 +498,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           TextOverflow.ellipsis,
                                                     ),
                                                   ),
-                                                  Icon(Icons.expand_more,
-                                                      color: Theme.of(context)
-                                                          .disabledColor,
-                                                      size: 18),
+                                                  Icon(
+                                                    Icons.expand_more,
+                                                    color: Theme.of(context)
+                                                        .disabledColor,
+                                                    size: 18,
+                                                  ),
                                                 ]),
                                               ]);
                                         }),
@@ -589,7 +592,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       key: _headerKey,
                                       pinned: true,
                                       delegate: SliverDelegate(
-                                        height: 85,
+                                        height: 50,
                                         callback: (val) {
                                           searchBgShow = val;
                                         },

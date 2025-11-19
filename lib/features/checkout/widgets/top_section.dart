@@ -611,6 +611,7 @@ class TopSection extends StatelessWidget {
               vertical: Dimensions.paddingSizeLarge,
               horizontal: Dimensions.paddingSizeLarge),
           child: Column(children: [
+            // Text("data"),
             PaymentSection(
               storeId: storeId,
               isCashOnDeliveryActive: isCashOnDeliveryActive,

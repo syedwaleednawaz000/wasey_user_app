@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -85,14 +87,13 @@ class _PaymentMethodSelectionSectionState
     bool isLoggedIn = AuthHelper.isLoggedIn();
     bool isDesktop = ResponsiveHelper.isDesktop(context);
 
-    return           SizedBox(
+    return SizedBox(
       height: 85,
       width: double.infinity,
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
-        child:
-        GetBuilder<CheckoutController>(builder: (checkoutController) {
+        child: GetBuilder<CheckoutController>(builder: (checkoutController) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -119,8 +120,7 @@ class _PaymentMethodSelectionSectionState
                       checkoutController.setPaymentMethod(1);
                     } else if (checkoutController.isPartialPay) {
                       showCustomSnackBar(
-                          'you_can_not_user_wallet_in_partial_payment'
-                              .tr);
+                          'you_can_not_user_wallet_in_partial_payment'.tr);
                       Get.back();
                     } else {
                       showCustomSnackBar(
@@ -143,6 +143,7 @@ class _PaymentMethodSelectionSectionState
                         checkoutController.paymentMethodIndex == 2 &&
                             paymentMethod.getWay! ==
                                 checkoutController.digitalPaymentName;
+                    // paymentMethod.
                     return PaymentMethodButton(
                       paymentName: paymentMethod.getWayTitle,
                       paymentImagePath: paymentMethod.getWayImageFullUrl,
@@ -150,8 +151,10 @@ class _PaymentMethodSelectionSectionState
                       isSelected: isSelected,
                       onTap: () {
                         checkoutController.setPaymentMethod(2);
-                        checkoutController.changeDigitalPaymentName(
-                            paymentMethod.getWay!);
+                        // log("paymentMethod.getWay!: ");
+                        // log(paymentMethod.getWayImageFullUrl!);
+                        checkoutController
+                            .changeDigitalPaymentName(paymentMethod.getWay!);
                       },
                     );
                   }).toList(),

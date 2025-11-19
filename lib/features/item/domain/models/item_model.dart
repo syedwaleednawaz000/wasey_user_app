@@ -210,12 +210,9 @@ class Item {
             addOns = [];
           }
         } else {
-          // Case: unexpected format
-          print("Warning: Unexpected type for add_ons -> ${rawAddOns.runtimeType}");
           addOns = [];
         }
       } catch (e, s) {
-        print("Error parsing add_ons: $e\n$s");
         addOns = [];
       }
     } else {
