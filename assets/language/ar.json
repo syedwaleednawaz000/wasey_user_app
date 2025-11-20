@@ -1,5 +1,14 @@
 {
-  "newly_added_stores": "المتاجر المضافة حديثاً",
+ "manage_cards": "إدارة البطاقات",
+  "done": "تم",
+  "delete_card": "حذف البطاقة",
+  "delete_card_confirmation": "هل أنت متأكد أنك تريد حذف هذه البطاقة؟",
+  "set_as_default": "تعيين كافتراضي",
+  "delete": "حذف",
+  "card_deleted": "تم حذف البطاقة بنجاح",
+  "default_card_updated": "تم تحديث البطاقة الافتراضية"
+,
+"newly_added_stores": "المتاجر المضافة حديثاً",
   "newest": "الأحدث",
   "offers": "عروض",
   "select_month": "الشهر",

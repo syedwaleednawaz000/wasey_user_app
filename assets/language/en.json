@@ -1,5 +1,13 @@
 {
 
+  "manage_cards": "Manage Cards",
+  "done": "Done",
+  "delete_card": "Delete Card",
+  "delete_card_confirmation": "Are you sure you want to delete this card?",
+  "set_as_default": "Set as Default",
+  "delete": "Delete",
+  "card_deleted": "Card deleted successfully",
+  "default_card_updated": "Default card updated",
   "newly_added_stores": "Newly Added Stores",
   "newest": "Newest",
   "offers": "Offers"
