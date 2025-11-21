@@ -48,15 +48,15 @@ setModuleRestaurant() async {
       fenix: true); // fenix: true keeps it alive
   // await sharedPreferences.clear();
 
-  print("Module setting to 1////////////////////////////////////////");
+  log("Module setting to 1////////////////////////////////////////");
   await sharedPreferences.setString(
     AppConstants.moduleId,
     AppConstants.restaurantModuleId,
   );
   // await sharedPreferences.setString(
   //     AppConstants.cacheModuleId, AppConstants.restaurantModuleId);
-  print("Module settled to 2////////////////////////////////////////");
-  print("Module settled to 2////////////////////////////////////////");
+  log("Module settled to 2////////////////////////////////////////");
+  log("Module settled to 2////////////////////////////////////////");
   final id = sharedPreferences.getString(AppConstants.moduleId);
   String? cacheModuleID;
   if (sharedPreferences.containsKey(AppConstants.cacheModuleId)) {

@@ -190,7 +190,10 @@ class CategoryView extends StatelessWidget {
                                                                               Text(
                                                                             '+${categoryController.categoryList!.length - 10}',
                                                                             style:
-                                                                                STCMedium.copyWith(fontSize: Dimensions.fontSizeExtraLarge, color: Theme.of(context).cardColor),
+                                                                                STCMedium.copyWith(
+                                                                              fontSize: Dimensions.fontSizeExtraLarge,
+                                                                              color: Theme.of(context).cardColor,
+                                                                            ),
                                                                             maxLines:
                                                                                 2,
                                                                             overflow:
@@ -225,7 +228,7 @@ class CategoryView extends StatelessWidget {
                                                                 .categoryList![
                                                                     index]
                                                                 .name!,
-                                                        style: STCMedium.copyWith(
+                                                        style: STCBold.copyWith(
                                                             fontSize: 11,
                                                             color: (index ==
                                                                         9 &&

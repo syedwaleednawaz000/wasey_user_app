@@ -682,7 +682,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> {
         ),
         // --- END MODIFICATION ---
         body: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             child: _showAddCardForm
                 ? _buildAddNewCardForm()

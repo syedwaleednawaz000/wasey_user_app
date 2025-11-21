@@ -1,5 +1,7 @@
 {
-
+  "featured_restaurants": "Featured Restaurants",
+  "newly_added_restaurants": "Newly Added Restaurants"
+,
   "manage_cards": "Manage Cards",
   "done": "Done",
   "delete_card": "Delete Card",
@@ -512,6 +514,7 @@
   "delivery_id": "Delivery ID",
   "version_1.1": "Version 1.1",
   "featured_stores": "Featured Stores",
+  "featured": "Featured",
   "max_size_2_mb": "Max size 2MB",
   "version_1.2": "Version 1.2",
   "no_parcel_category_data_found": "No parcel category data found",
