@@ -34,9 +34,11 @@ import 'package:sixam_mart/features/cart/widgets/web_cart_items_widget.dart';
 import 'package:sixam_mart/features/cart/widgets/web_suggested_item_view_widget.dart';
 import 'package:sixam_mart/features/home/screens/home_screen.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
+import '../../store/component/store_item_view.dart';
 
 class CartScreen extends StatefulWidget {
   final bool fromNav;
+
   const CartScreen({super.key, required this.fromNav});
 
   @override
@@ -62,10 +64,20 @@ class _CartScreenState extends State<CartScreen> {
     if (Get.find<CartController>().cartList.isEmpty) {
       await Get.find<CartController>().getCartDataOnline();
     }
+
+    // Now, call the new function in the controller to handle suggested items.
+    // This call will manage its own loading state internally.
+    Get.find<StoreController>().getRestaurantRecommendedItemList(
+        Get.find<CartController>().cartList.first.item?.storeId ??
+            Get.find<StoreController>().store!.id,
+        false);
+
     if (Get.find<CartController>().cartList.isNotEmpty) {
       if (kDebugMode) {
-        print(
-            '----cart item : ${Get.find<CartController>().cartList[0].toJson()}');
+        for(int i=0;i<Get.find<CartController>().cartList.length;i++){
+          print(
+              '----cart item $i : ${Get.find<CartController>().cartList[i].toJson()}');
+        }
       }
 
       if (Get.find<CartController>().addCutlery) {
@@ -85,6 +97,14 @@ class _CartScreenState extends State<CartScreen> {
           fromCart: true);
       Get.find<CartController>().calculationCart();
       showReferAndEarnSnackBar();
+      print("cart list is not empty");
+      if (widget.fromNav) {
+        print("inside fromNav if");
+        await Get.find<CartController>().getSuggestedItems();
+      }
+      if (Get.find<CartController>().suggestedItems.isEmpty) {
+        await Get.find<CartController>().getSuggestedItems();
+      }
     }
   }
 
@@ -233,56 +253,56 @@ class _CartScreenState extends State<CartScreen> {
                                                             const Divider(
                                                                 thickness: 0.5,
                                                                 height: 5),
-                                                            Padding(
-                                                              padding: const EdgeInsets
-                                                                  .only(
-                                                                  left: Dimensions
-                                                                      .paddingSizeExtraSmall),
-                                                              child: TextButton
-                                                                  .icon(
-                                                                onPressed: () {
-                                                                  cartController.forcefullySetModule(
-                                                                      cartController
-                                                                          .cartList[
-                                                                              0]
-                                                                          .item!
-                                                                          .moduleId!);
-                                                                  Get.toNamed(
-                                                                    RouteHelper.getStoreRoute(
-                                                                        id: cartController
-                                                                            .cartList[
-                                                                                0]
-                                                                            .item!
-                                                                            .storeId,
-                                                                        page:
-                                                                            'item'),
-                                                                    arguments: StoreScreen(
-                                                                        store: Store(
-                                                                            id: cartController
-                                                                                .cartList[
-                                                                                    0]
-                                                                                .item!
-                                                                                .storeId),
-                                                                        fromModule:
-                                                                            false),
-                                                                  );
-                                                                },
-                                                                icon: Icon(
-                                                                    Icons
-                                                                        .add_circle_outline_sharp,
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .primaryColor),
-                                                                label: Text(
-                                                                    'add_more_items'
-                                                                        .tr,
-                                                                    style: STCMedium.copyWith(
-                                                                        color: Theme.of(context)
-                                                                            .primaryColor,
-                                                                        fontSize:
-                                                                            Dimensions.fontSizeDefault)),
-                                                              ),
-                                                            ),
+                                                            // Padding(
+                                                            //   padding: const EdgeInsets
+                                                            //       .only(
+                                                            //       left: Dimensions
+                                                            //           .paddingSizeExtraSmall),
+                                                            //   child: TextButton
+                                                            //       .icon(
+                                                            //     onPressed: () {
+                                                            //       cartController.forcefullySetModule(
+                                                            //           cartController
+                                                            //               .cartList[
+                                                            //                   0]
+                                                            //               .item!
+                                                            //               .moduleId!);
+                                                            //       Get.toNamed(
+                                                            //         RouteHelper.getStoreRoute(
+                                                            //             id: cartController
+                                                            //                 .cartList[
+                                                            //                     0]
+                                                            //                 .item!
+                                                            //                 .storeId,
+                                                            //             page:
+                                                            //                 'item'),
+                                                            //         arguments: StoreScreen(
+                                                            //             store: Store(
+                                                            //                 id: cartController
+                                                            //                     .cartList[
+                                                            //                         0]
+                                                            //                     .item!
+                                                            //                     .storeId),
+                                                            //             fromModule:
+                                                            //                 false),
+                                                            //       );
+                                                            //     },
+                                                            //     icon: Icon(
+                                                            //         Icons
+                                                            //             .add_circle_outline_sharp,
+                                                            //         color: Theme.of(
+                                                            //                 context)
+                                                            //             .primaryColor),
+                                                            //     label: Text(
+                                                            //         'add_more_items'
+                                                            //             .tr,
+                                                            //         style: STCMedium.copyWith(
+                                                            //             color: Theme.of(context)
+                                                            //                 .primaryColor,
+                                                            //             fontSize:
+                                                            //                 Dimensions.fontSizeDefault)),
+                                                            //   ),
+                                                            // ),
                                                             ExtraPackagingWidget(
                                                                 cartController:
                                                                     cartController),
@@ -482,9 +502,15 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   ResponsiveHelper.isDesktop(context)
                       ? const SizedBox.shrink()
-                      : CheckoutButton(
-                          cartController: cartController,
-                          availableList: cartController.availableList),
+                      : Padding(
+                          padding: widget.fromNav
+                              ? const EdgeInsets.only(bottom: 70.0)
+                              : EdgeInsets.zero,
+                          child: CheckoutButton(
+                            cartController: cartController,
+                            availableList: cartController.availableList,
+                          ),
+                        ),
                 ])
               : const NoDataScreen(isCart: true, text: '', showFooter: true);
         });
@@ -590,50 +616,85 @@ class _CartScreenState extends State<CartScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
-                        onTap: () {
-                          if (ResponsiveHelper.isDesktop(context)) {
-                            Get.dialog(const Dialog(
-                                child: NotAvailableBottomSheetWidget()));
-                          } else {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (con) =>
-                                  const NotAvailableBottomSheetWidget(),
-                            );
-                          }
-                        },
-                        child: Row(children: [
-                          Expanded(
-                              child: Text('if_any_product_is_not_available'.tr,
-                                  style: STCMedium,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis)),
-                          const Icon(Icons.arrow_forward_ios_sharp, size: 18),
-                        ]),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: Dimensions.paddingSizeSmall,
+                            vertical: Dimensions.paddingSizeSmall),
+                        child: Text(
+                          'you_may_also_like'.tr,
+                        ),
                       ),
-                      cartController.notAvailableIndex != -1
-                          ? Row(children: [
-                              Text(
-                                  cartController
-                                      .notAvailableList[
-                                          cartController.notAvailableIndex]
-                                      .tr,
-                                  style: STCMedium.copyWith(
-                                      fontSize: Dimensions.fontSizeSmall,
-                                      color: Theme.of(context).primaryColor)),
-                              IconButton(
-                                onPressed: () =>
-                                    cartController.setAvailableIndex(-1),
-                                icon: const Icon(Icons.clear, size: 18),
-                              )
-                            ])
-                          : const SizedBox(),
+
+                      cartController.isSuggestLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : cartController.suggestedItems.isNotEmpty
+                              ? SizedBox(
+                                  // color: Colors.red,
+                                  height: 200,
+                                  // Give it a fixed height for horizontal scrolling
+                                  child: StoreItemView(
+                                    categoryId: '0',
+                                    isStore: false,
+                                    // isFoodOrGrocery: false,
+                                    stores: null,
+                                    items: cartController.suggestedItems,
+                                    inStorePage: false,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: Dimensions.paddingSizeSmall,
+                                      vertical: Dimensions.paddingSizeSmall,
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    'no_suggestions_available'.tr,
+                                  ),
+                                ),
+                      // InkWell(
+                      //   onTap: () {
+                      //     if (ResponsiveHelper.isDesktop(context)) {
+                      //       Get.dialog(const Dialog(
+                      //           child: NotAvailableBottomSheetWidget()));
+                      //     } else {
+                      //       showModalBottomSheet(
+                      //         context: context,
+                      //         isScrollControlled: true,
+                      //         backgroundColor: Colors.transparent,
+                      //         builder: (con) =>
+                      //             const NotAvailableBottomSheetWidget(),
+                      //       );
+                      //     }
+                      //   },
+                      //   child: Row(children: [
+                      //     Expanded(
+                      //         child: Text('if_any_product_is_not_available'.tr,
+                      //             style: STCMedium,
+                      //             maxLines: 2,
+                      //             overflow: TextOverflow.ellipsis)),
+                      //     const Icon(Icons.arrow_forward_ios_sharp, size: 18),
+                      //   ]),
+                      // ),
+                      // cartController.notAvailableIndex != -1
+                      //     ? Row(children: [
+                      //         Text(
+                      //             cartController
+                      //                 .notAvailableList[
+                      //                     cartController.notAvailableIndex]
+                      //                 .tr,
+                      //             style: STCMedium.copyWith(
+                      //                 fontSize: Dimensions.fontSizeSmall,
+                      //                 color: Theme.of(context).primaryColor)),
+                      //         IconButton(
+                      //           onPressed: () =>
+                      //               cartController.setAvailableIndex(-1),
+                      //           icon: const Icon(Icons.clear, size: 18),
+                      //         )
+                      //       ])
+                      //     : const SizedBox(),
                     ],
                   ),
                 ),
+
           ResponsiveHelper.isDesktop(context)
               ? const SizedBox()
               : const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -817,6 +878,7 @@ class _CartScreenState extends State<CartScreen> {
 class CheckoutButton extends StatelessWidget {
   final CartController cartController;
   final List<bool> availableList;
+
   const CheckoutButton(
       {super.key, required this.cartController, required this.availableList});
 
@@ -870,8 +932,9 @@ class CheckoutButton extends StatelessWidget {
                     ]),
                     const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                     LinearProgressIndicator(
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withAlpha((0.2 * 255).toInt()),
+                      backgroundColor: Theme.of(context)
+                          .primaryColor
+                          .withAlpha((0.2 * 255).toInt()),
                       value: percentage,
                     ),
                   ])
@@ -1030,7 +1093,8 @@ class CheckoutButton extends StatelessWidget {
                     if (!cartController.cartList.first.item!.scheduleOrder! &&
                         availableList.contains(false)) {
                       showCustomSnackBar('one_or_more_product_unavailable'.tr);
-                    } /*else if(AuthHelper.isGuestLoggedIn() && !Get.find<SplashController>().configModel!.guestCheckoutStatus!) {
+                    }
+                    /*else if(AuthHelper.isGuestLoggedIn() && !Get.find<SplashController>().configModel!.guestCheckoutStatus!) {
                     showCustomSnackBar('currently_your_zone_have_no_permission_to_place_any_order'.tr);
                   }*/
                     else {

@@ -68,6 +68,7 @@ dependencies:
   location: ^7.0.0
   drift: ^2.21.0
   drift_flutter: ^0.2.1
+  flutter_speed_dial: ^7.0.0
 #  js: ^0.6.7
 #  universal_io: ^2.2.2
 
@@ -118,4 +119,12 @@ flutter:
         - asset: assets/font/IBMPlexSansArabic-Medium.ttf
           weight: 500
         - asset: assets/font/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+    - family: Almarai
+      fonts:
+        - asset: assets/font/Almarai-Regular.ttf
+          weight: 400
+        - asset: assets/font/Almarai-Bold.ttf
+          weight: 500
+        - asset: assets/font/Almarai-ExtraBold.ttf
           weight: 700

@@ -24,6 +24,7 @@ class CartItemWidget extends StatelessWidget {
   final int cartIndex;
   final List<AddOns> addOns;
   final bool isAvailable;
+
   const CartItemWidget(
       {super.key,
       required this.cart,
@@ -101,7 +102,10 @@ class CartItemWidget extends StatelessWidget {
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
                       builder: (con) => ItemBottomSheet(
-                          item: cart.item, cartIndex: cartIndex, cart: cart),
+                        item: cart.item,
+                        cartIndex: cartIndex,
+                        cart: cart,
+                      ),
                     )
                   : showDialog(
                       context: context,
@@ -114,8 +118,9 @@ class CartItemWidget extends StatelessWidget {
             },
             radius: Dimensions.radiusDefault,
             padding: const EdgeInsets.symmetric(
-                vertical: Dimensions.paddingSizeExtraSmall,
-                horizontal: Dimensions.paddingSizeExtraSmall),
+              vertical: Dimensions.paddingSizeExtraSmall,
+              horizontal: Dimensions.paddingSizeExtraSmall,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -453,21 +458,24 @@ class CartItemWidget extends StatelessWidget {
       for (var variation in cart.fVariation!) {
         if (variation.name != null && variation.values != null) {
           variationText =
-          '${variationText!}${variationText.isNotEmpty ? ', ' : ''}${variation.name} (';
+              '${variationText!}${variationText.isNotEmpty ? ', ' : ''}${variation.name} (';
 
           List<String> pairedValues = [];
 
           // Check if we have labels
-          if (variation.values!.label != null && variation.values!.label!.isNotEmpty) {
-
+          if (variation.values!.label != null &&
+              variation.values!.label!.isNotEmpty) {
             // If toppingOptions is empty or null, only show labels
-            if (variation.values!.toppingOptions == null || variation.values!.toppingOptions!.isEmpty) {
+            if (variation.values!.toppingOptions == null ||
+                variation.values!.toppingOptions!.isEmpty) {
               // Only add labels
               pairedValues.addAll(variation.values!.label!);
             }
             // If we have both labels and toppings, pair them
-            else if (variation.values!.toppingOptions != null && variation.values!.toppingOptions!.isNotEmpty) {
-              int minLength = Math.min(variation.values!.label!.length, variation.values!.toppingOptions!.length);
+            else if (variation.values!.toppingOptions != null &&
+                variation.values!.toppingOptions!.isNotEmpty) {
+              int minLength = Math.min(variation.values!.label!.length,
+                  variation.values!.toppingOptions!.length);
               // debugPrint('variationText ==========> labels: ${variation.values!.label}, toppings: ${variation.values!.toppingOptions}');
 
               for (int i = 0; i < minLength; i++) {
@@ -478,7 +486,8 @@ class CartItemWidget extends StatelessWidget {
                 if (topping != null && topping.isNotEmpty) {
                   pairedValues.add('$label $topping');
                 } else {
-                  pairedValues.add(label); // Just add the label if topping is null or empty
+                  pairedValues.add(
+                      label); // Just add the label if topping is null or empty
                 }
               }
             }
@@ -496,11 +505,11 @@ class CartItemWidget extends StatelessWidget {
           for (int index = 0; index < cart.foodVariations!.length; index++) {
             if (cart.foodVariations![index].contains(true)) {
               variationText =
-              '${variationText!}${variationText.isNotEmpty ? ', ' : ''}${cart.item!.foodVariations![index].name} (';
+                  '${variationText!}${variationText.isNotEmpty ? ', ' : ''}${cart.item!.foodVariations![index].name} (';
               for (int i = 0; i < cart.foodVariations![index].length; i++) {
                 if (cart.foodVariations![index][i]!) {
                   variationText =
-                  '${variationText!}${variationText.endsWith('(') ? '' : ', '}${cart.item!.foodVariations![index].variationValues![i].level}';
+                      '${variationText!}${variationText.endsWith('(') ? '' : ', '}${cart.item!.foodVariations![index].variationValues![i].level}';
                 }
               }
               variationText = '${variationText!})';
@@ -514,7 +523,7 @@ class CartItemWidget extends StatelessWidget {
             int index0 = 0;
             for (var choice in cart.item!.choiceOptions!) {
               variationText =
-              '${variationText!}${(index0 == 0) ? '' : ',  '}${choice.title} - ${variationTypes[index0]}';
+                  '${variationText!}${(index0 == 0) ? '' : ',  '}${choice.title} - ${variationTypes[index0]}';
               index0 = index0 + 1;
             }
           } else {

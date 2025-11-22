@@ -155,6 +155,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                 '',
                 variation != null ? [variation] : [],
                 null,
+                null,
                 itemController.cartIndex != -1
                     ? cartController.cartList[itemController.cartIndex].quantity
                     : itemController.quantity,

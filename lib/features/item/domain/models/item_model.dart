@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/item/domain/models/basic_medicine_model.dart';
@@ -185,24 +187,38 @@ class Item {
     //         ? List<AddOns>.from(json['addons'].map((v) => AddOns.fromJson(v)))
     //         : [];
 
-    if (json['add_ons'] != null && json['add_ons'] is List) {
-      // It's not null AND it's actually a List
-      List<dynamic> addOnsData = json['add_ons']; // Cast to List<dynamic>
-      if (addOnsData.isNotEmpty) {
-        addOns = addOnsData.map((v) => AddOns.fromJson(v as Map<String, dynamic>)).toList();
-      } else {
-        addOns = []; // It's an empty list
+    if (json['add_ons'] != null) {
+      final rawAddOns = json['add_ons'];
+
+      try {
+        if (rawAddOns is List) {
+          // Case: proper list
+          addOns = rawAddOns
+              .where((v) => v is Map<String, dynamic>)
+              .map((v) => AddOns.fromJson(v as Map<String, dynamic>))
+              .toList();
+        } else if (rawAddOns is String) {
+          // Case: add_ons is a string, try to decode
+          final decoded = jsonDecode(rawAddOns);
+          if (decoded is List) {
+            addOns = decoded
+                .where((v) => v is Map<String, dynamic>)
+                .map((v) => AddOns.fromJson(v as Map<String, dynamic>))
+                .toList();
+          } else {
+            addOns = [];
+          }
+        } else {
+          addOns = [];
+        }
+      } catch (e, s) {
+        addOns = [];
       }
     } else {
-      // It's null, not a list (e.g., it's the string "[]"), or some other incorrect type.
-      // Decide how to handle this. Usually, defaulting to an empty list is safe.
+      // Case: null
       addOns = [];
-      if (json['add_ons'] != null && json['add_ons'] is String && json['add_ons'] == "[]") {
-        print("Warning: 'add_ons' field was received as the string '[]'. Treating as empty list.");
-      } else if (json['add_ons'] != null) {
-        print("Warning: 'add_ons' field was received with unexpected type: ${json['add_ons'].runtimeType}. Treating as empty list.");
-      }
     }
+
     choiceOptions = (json['choice_options'] != null)
         ? List<ChoiceOptions>.from(
             json['choice_options'].map((v) => ChoiceOptions.fromJson(v)))

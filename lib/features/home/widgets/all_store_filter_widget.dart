@@ -5,8 +5,12 @@ import 'package:sixam_mart/features/home/widgets/store_filter_button_widget.dart
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
+import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
+
+import '../../../helper/module_helper.dart';
+import '../../../util/app_constants.dart';
 
 class AllStoreFilterWidget extends StatelessWidget {
   const AllStoreFilterWidget({
@@ -15,15 +19,20 @@ class AllStoreFilterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool? showRestaurantText = ModuleHelper.getModule()!.id!.toString() ==
+        AppConstants.restaurantModuleId;
     return GetBuilder<StoreController>(builder: (storeController) {
       return Center(
         child: Container(
           width: Dimensions.webMaxWidth,
           transform: Matrix4.translationValues(0, -2, 0),
           color: Theme.of(context).colorScheme.surface,
+          // color: Theme.of(context).disabledColor,
           padding: const EdgeInsets.only(
-              left: Dimensions.paddingSizeDefault,
-              top: Dimensions.paddingSizeSmall),
+            left: Dimensions.paddingSizeDefault,
+            right: Dimensions.paddingSizeDefault,
+            // top: Dimensions.paddingSizeSmall
+          ),
           child: ResponsiveHelper.isDesktop(context)
               ? Row(children: [
                   Expanded(
@@ -31,18 +40,12 @@ class AllStoreFilterWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            Get.find<SplashController>()
-                                    .configModel!
-                                    .moduleConfig!
-                                    .module!
-                                    .showRestaurantText!
-                                ? 'restaurants'.tr
-                                : 'stores'.tr,
+                            showRestaurantText ? 'restaurants'.tr : 'stores'.tr,
                             style: STCBold.copyWith(
                                 fontSize: Dimensions.fontSizeLarge),
                           ),
                           Text(
-                            '${storeController.storeModel?.totalSize ?? 0} ${Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'restaurants_near_you'.tr : 'stores_near_you'.tr}',
+                            '${storeController.storeModel?.totalSize ?? 0} ${showRestaurantText ? 'restaurants_near_you'.tr : 'stores_near_you'.tr}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: STCRegular.copyWith(
@@ -54,39 +57,55 @@ class AllStoreFilterWidget extends StatelessWidget {
                   const SizedBox(width: Dimensions.paddingSizeSmall),
                   filter(context, storeController),
                 ])
-              : Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        right: Dimensions.paddingSizeSmall),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            Get.find<SplashController>()
-                                    .configModel!
-                                    .moduleConfig!
-                                    .module!
-                                    .showRestaurantText!
-                                ? 'restaurants'.tr
-                                : 'stores'.tr,
-                            style: STCBold.copyWith(
-                                fontSize: Dimensions.fontSizeLarge),
-                          ),
-                          Flexible(
-                            child: Text(
-                              '${storeController.storeModel?.totalSize ?? 0} ${Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'restaurants_near_you'.tr : 'stores_near_you'.tr}',
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              showRestaurantText
+                                  ? 'restaurants'.tr
+                                  : 'stores'.tr,
+                              style: STCBold.copyWith(
+                                  fontSize: Dimensions.fontSizeLarge),
+                            ),
+                            Text(
+                              '${storeController.storeModel?.totalSize ?? 0} ${showRestaurantText ? 'restaurants_near_you'.tr : 'stores_near_you'.tr}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: STCRegular.copyWith(
                                   color: Theme.of(context).disabledColor,
                                   fontSize: Dimensions.fontSizeSmall),
                             ),
+
+                            // Flexible(
+                            //   child: Text(
+                            //     '${storeController.storeModel?.totalSize ?? 0} ${Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'restaurants_near_you'.tr : 'stores_near_you'.tr}',
+                            //     maxLines: 1,
+                            //     overflow: TextOverflow.ellipsis,
+                            //     style: STCRegular.copyWith(
+                            //         color: Theme.of(context).disabledColor,
+                            //         fontSize: Dimensions.fontSizeSmall),
+                            //   ),
+                            // ),
+                          ]),
+                      // const SizedBox(height: Dimensions.paddingSizeSmall),
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: StoreFilterButtonWidget(
+                            buttonText: 'see_all'.tr,
+                            onTap: () => Get.toNamed(RouteHelper.allStores),
+                            isSelected: true,
+                            isSeeAll: true,
+                            // isSelected: storeController.storeType == 'all',
                           ),
-                        ]),
-                  ),
-                  const SizedBox(height: Dimensions.paddingSizeSmall),
-                  filter(context, storeController),
-                ]),
+                        ),
+                      )
+                      // filter(context, storeController),
+                    ]),
         ),
       );
     });
@@ -106,6 +125,15 @@ class AllStoreFilterWidget extends StatelessWidget {
                 ? const SizedBox()
                 : FilterView(storeController: storeController),
             const SizedBox(width: Dimensions.paddingSizeSmall),
+            // StoreFilterButtonWidget(
+            //   buttonText: 'see_all'.tr,
+            //   onTap: () => Get.toNamed(RouteHelper.allStores),
+            //   isSelected: true,
+            //   isSeeAll: true,
+            //   // isSelected: storeController.storeType == 'all',
+            // ),
+            // const SizedBox(width: Dimensions.paddingSizeSmall),
+
             StoreFilterButtonWidget(
               buttonText: 'all'.tr,
               onTap: () => storeController.setStoreType('all'),

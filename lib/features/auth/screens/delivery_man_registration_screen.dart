@@ -406,7 +406,8 @@ class _DeliveryManRegistrationScreenState
                                               Expanded(
                                                   child: CustomTextField(
                                                 labelText: 'first_name'.tr,
-                                                titleText: 'ex_jhon'.tr,
+                                                // titleText: 'ex_jhon'.tr,
+                                                titleText: "",
                                                 controller: _fNameController,
                                                 capitalization:
                                                     TextCapitalization.words,

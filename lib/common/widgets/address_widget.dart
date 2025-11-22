@@ -86,7 +86,7 @@ class AddressWidget extends StatelessWidget {
                                 ? Images.homeIcon
                                 : address!.addressType == 'office'
                                     ? Images.workIcon
-                                    : Images.otherIcon,
+                                    : Images.addressSelect,
                             color: Theme.of(context).primaryColor,
                             height:
                                 ResponsiveHelper.isDesktop(context) ? 25 : 20,

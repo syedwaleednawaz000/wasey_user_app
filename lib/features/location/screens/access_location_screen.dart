@@ -287,58 +287,58 @@ class BottomButton extends StatelessWidget {
                 },
                 icon: Icons.my_location,
               ),
-              const SizedBox(height: Dimensions.paddingSizeSmall),
-              TextButton(
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                        width: 1, color: Theme.of(context).primaryColor),
-                    borderRadius:
-                        BorderRadius.circular(Dimensions.radiusDefault),
-                  ),
-                  minimumSize: const Size(Dimensions.webMaxWidth, 50),
-                  padding: EdgeInsets.zero,
-                ),
-                onPressed: () {
-                  if (ResponsiveHelper.isDesktop(Get.context)) {
-                    showGeneralDialog(
-                        context: Get.context!,
-                        pageBuilder: (_, __, ___) {
-                          return SizedBox(
-                              height: 300,
-                              width: 300,
-                              child: PickMapScreen(
-                                  fromSignUp: fromSignUp,
-                                  canRoute: route != null,
-                                  fromAddAddress: false,
-                                  route: route ?? RouteHelper.accessLocation));
-                        });
-                  } else {
-                    Get.toNamed(RouteHelper.getPickMapRoute(
-                      route ??
-                          (fromSignUp
-                              ? RouteHelper.signUp
-                              : RouteHelper.accessLocation),
-                      route != null,
-                    ));
-                  }
-                },
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        right: Dimensions.paddingSizeExtraSmall),
-                    child:
-                        Icon(Icons.map, color: Theme.of(context).primaryColor),
-                  ),
-                  Text('set_from_map'.tr,
-                      textAlign: TextAlign.center,
-                      style: STCBold.copyWith(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: Dimensions.fontSizeLarge,
-                      )),
-                ]),
-              ),
+              // const SizedBox(height: Dimensions.paddingSizeSmall),
+              // TextButton(
+              //   style: TextButton.styleFrom(
+              //     shape: RoundedRectangleBorder(
+              //       side: BorderSide(
+              //           width: 1, color: Theme.of(context).primaryColor),
+              //       borderRadius:
+              //           BorderRadius.circular(Dimensions.radiusDefault),
+              //     ),
+              //     minimumSize: const Size(Dimensions.webMaxWidth, 50),
+              //     padding: EdgeInsets.zero,
+              //   ),
+              //   onPressed: () {
+              //     if (ResponsiveHelper.isDesktop(Get.context)) {
+              //       showGeneralDialog(
+              //           context: Get.context!,
+              //           pageBuilder: (_, __, ___) {
+              //             return SizedBox(
+              //                 height: 300,
+              //                 width: 300,
+              //                 child: PickMapScreen(
+              //                     fromSignUp: fromSignUp,
+              //                     canRoute: route != null,
+              //                     fromAddAddress: false,
+              //                     route: route ?? RouteHelper.accessLocation));
+              //           });
+              //     } else {
+              //       Get.toNamed(RouteHelper.getPickMapRoute(
+              //         route ??
+              //             (fromSignUp
+              //                 ? RouteHelper.signUp
+              //                 : RouteHelper.accessLocation),
+              //         route != null,
+              //       ));
+              //     }
+              //   },
+              //   child:
+              //       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              //     Padding(
+              //       padding: const EdgeInsets.only(
+              //           right: Dimensions.paddingSizeExtraSmall),
+              //       child:
+              //           Icon(Icons.map, color: Theme.of(context).primaryColor),
+              //     ),
+              //     Text('set_from_map'.tr,
+              //         textAlign: TextAlign.center,
+              //         style: STCBold.copyWith(
+              //           color: Theme.of(context).primaryColor,
+              //           fontSize: Dimensions.fontSizeLarge,
+              //         )),
+              //   ]),
+              // ),
             ])));
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
@@ -47,15 +48,15 @@ setModuleRestaurant() async {
       fenix: true); // fenix: true keeps it alive
   // await sharedPreferences.clear();
 
-  print("Module setting to 1////////////////////////////////////////");
+  log("Module setting to 1////////////////////////////////////////");
   await sharedPreferences.setString(
     AppConstants.moduleId,
     AppConstants.restaurantModuleId,
   );
   // await sharedPreferences.setString(
   //     AppConstants.cacheModuleId, AppConstants.restaurantModuleId);
-  print("Module settled to 2////////////////////////////////////////");
-  print("Module settled to 2////////////////////////////////////////");
+  log("Module settled to 2////////////////////////////////////////");
+  log("Module settled to 2////////////////////////////////////////");
   final id = sharedPreferences.getString(AppConstants.moduleId);
   String? cacheModuleID;
   if (sharedPreferences.containsKey(AppConstants.cacheModuleId)) {
@@ -65,7 +66,7 @@ setModuleRestaurant() async {
   }
   log("Module ID now: ///////////////");
   log("Module ID: ${id.toString()}");
-  log("hhshdhsg "+cacheModuleID.toString());
+  log("hhshdhsg " + cacheModuleID.toString());
 }
 
 Future<void> main() async {
@@ -166,7 +167,11 @@ Future<void> main() async {
       version: "v15.0",
     );
   }
-
+// Ensure system navigation bar is visible
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+    SystemUiOverlay.top,
+    SystemUiOverlay.bottom,
+  ]);
   runApp(MyApp(languages: languages, body: body));
 }
 

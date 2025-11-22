@@ -8,8 +8,11 @@ import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model_new_api.dart';
 
+import '../models/category_with_stores.dart';
+
 abstract class StoreServiceInterface {
   Future<StoreModel?> getStoreList(int offset, String filterBy, String storeType, {required DataSourceEnum source});
+  // Future<List<CategoryWithStores>?> getCategoriesWithStoreList(int offset, String type);
   Future<List<Store>?> getPopularStoreList(String type, {required DataSourceEnum source});
   Future<List<Store>?> getLatestStoreList(String type, {required DataSourceEnum source});
   Future<List<Store>?> getTopOfferStoreList({required DataSourceEnum source});

@@ -17,6 +17,7 @@ import 'package:get/get.dart';
 
 class ChooseLanguageScreen extends StatefulWidget {
   final bool fromMenu;
+
   const ChooseLanguageScreen({super.key, this.fromMenu = false});
 
   @override
@@ -114,7 +115,9 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen> {
                         if (widget.fromMenu) {
                           Navigator.pop(context);
                         } else {
-                          Get.offNamed(RouteHelper.getOnBoardingRoute());
+                          // Get.offNamed(RouteHelper.getOnBoardingRoute());
+                          Get.offNamed(
+                              RouteHelper.getSignInRoute(RouteHelper.signIn));
                         }
                       } else {
                         showCustomSnackBar('select_a_language'.tr);
