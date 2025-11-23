@@ -1,7 +1,7 @@
 class Images {
-  // static const String logo = 'assets/image/notification_icon.png';
-  static const String logo = 'assets/image/logo.png';
-  static const String placeholder = 'assets/image/logo.png';
+  static const String logo = 'assets/image/logo_black.png';
+  static const String app_icon = 'assets/image/app_icon_logo.png';
+  static const String placeholder = 'assets/image/logo_black.png';
   // static const String placeholder = 'assets/image/placeholder.jpg';
   static const String market = 'assets/image/market.png';
   static const String restaurants = 'assets/image/resturants.png';
