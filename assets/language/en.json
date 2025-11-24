@@ -1428,5 +1428,10 @@
   "no_categories_found_for_store": "No categories found for this store.",
   "category_not_found": "Category details not available.",
   "error_loading_category_details": "Could not load category details.",
-  "available_categories": "Available Categories"
+  "available_categories": "Available Categories",
+  "location_permission_title": "Location Access Required",
+  "location_permission_message": "We use your location to show nearby restaurants and provide accurate delivery.",
+  "location_permission_allow": "Allow",
+  "location_permission_cancel": "Cancel"
+
 }

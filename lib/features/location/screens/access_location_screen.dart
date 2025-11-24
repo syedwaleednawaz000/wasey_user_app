@@ -50,6 +50,8 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -234,6 +236,22 @@ class BottomButton extends StatelessWidget {
   const BottomButton(
       {super.key, required this.fromSignUp, required this.route});
 
+  void showLocationPermissionExplanation(VoidCallback onContinue) {
+    Get.defaultDialog(
+      title: "location_permission_title".tr,
+      middleText: "location_permission_message".tr,
+      textConfirm: "location_permission_allow".tr,
+      textCancel: "location_permission_cancel".tr,
+      onConfirm: () {
+        Get.back();
+        onContinue();
+      },
+      onCancel: () {},
+    );
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -242,49 +260,101 @@ class BottomButton extends StatelessWidget {
             child: Column(children: [
               CustomButton(
                 buttonText: 'user_current_location'.tr,
-                onPressed: () async {
-                  Get.find<LocationController>().checkPermission(() async {
-                    Get.dialog(const CustomLoaderWidget(),
-                        barrierDismissible: false);
-                    AddressModel address = await Get.find<LocationController>()
-                        .getCurrentLocation(true);
-                    ZoneResponseModel response =
-                        await Get.find<LocationController>().getZone(
-                            address.latitude, address.longitude, false);
-                    if (response.isSuccess) {
-                      Get.find<LocationController>().saveAddressAndNavigate(
-                        address,
-                        fromSignUp,
-                        route,
-                        route != null,
-                        ResponsiveHelper.isDesktop(Get.context),
-                      );
-                    } else {
-                      Get.back();
-                      if (ResponsiveHelper.isDesktop(Get.context)) {
-                        showGeneralDialog(
-                            context: Get.context!,
-                            pageBuilder: (_, __, ___) {
-                              return SizedBox(
-                                  height: 300,
-                                  width: 300,
-                                  child: PickMapScreen(
+
+
+                onPressed: () {
+                  showLocationPermissionExplanation(() async {
+                    Get.find<LocationController>().checkPermission(() async {
+                      Get.dialog(const CustomLoaderWidget(),
+                          barrierDismissible: false);
+
+                      AddressModel address = await Get.find<LocationController>()
+                          .getCurrentLocation(true);
+
+                      ZoneResponseModel response =
+                      await Get.find<LocationController>()
+                          .getZone(address.latitude, address.longitude, false);
+
+                      if (response.isSuccess) {
+                        Get.find<LocationController>().saveAddressAndNavigate(
+                          address,
+                          fromSignUp,
+                          route,
+                          route != null,
+                          ResponsiveHelper.isDesktop(Get.context),
+                        );
+                      } else {
+                        Get.back();
+                        if (ResponsiveHelper.isDesktop(Get.context)) {
+                          showGeneralDialog(
+                              context: Get.context!,
+                              pageBuilder: (_, __, ___) {
+                                return SizedBox(
+                                    height: 300,
+                                    width: 300,
+                                    child: PickMapScreen(
                                       fromSignUp: fromSignUp,
                                       canRoute: route != null,
                                       fromAddAddress: false,
-                                      route:
-                                          route ?? RouteHelper.accessLocation));
-                            });
-                      } else {
-                        Get.toNamed(RouteHelper.getPickMapRoute(
-                            route ?? RouteHelper.accessLocation,
-                            route != null));
-                        showCustomSnackBar(
-                            'service_not_available_in_current_location'.tr);
+                                      route: route ?? RouteHelper.accessLocation,
+                                    ));
+                              });
+                        } else {
+                          Get.toNamed(RouteHelper.getPickMapRoute(
+                              route ?? RouteHelper.accessLocation, route != null));
+                          showCustomSnackBar(
+                              'service_not_available_in_current_location'.tr);
+                        }
                       }
-                    }
+                    });
                   });
-                },
+                }
+
+
+                // onPressed: () async {
+                //   Get.find<LocationController>().checkPermission(() async {
+                //     Get.dialog(const CustomLoaderWidget(),
+                //         barrierDismissible: false);
+                //     AddressModel address = await Get.find<LocationController>()
+                //         .getCurrentLocation(true);
+                //     ZoneResponseModel response =
+                //         await Get.find<LocationController>().getZone(
+                //             address.latitude, address.longitude, false);
+                //     if (response.isSuccess) {
+                //       Get.find<LocationController>().saveAddressAndNavigate(
+                //         address,
+                //         fromSignUp,
+                //         route,
+                //         route != null,
+                //         ResponsiveHelper.isDesktop(Get.context),
+                //       );
+                //     } else {
+                //       Get.back();
+                //       if (ResponsiveHelper.isDesktop(Get.context)) {
+                //         showGeneralDialog(
+                //             context: Get.context!,
+                //             pageBuilder: (_, __, ___) {
+                //               return SizedBox(
+                //                   height: 300,
+                //                   width: 300,
+                //                   child: PickMapScreen(
+                //                       fromSignUp: fromSignUp,
+                //                       canRoute: route != null,
+                //                       fromAddAddress: false,
+                //                       route:
+                //                           route ?? RouteHelper.accessLocation));
+                //             });
+                //       } else {
+                //         Get.toNamed(RouteHelper.getPickMapRoute(
+                //             route ?? RouteHelper.accessLocation,
+                //             route != null));
+                //         showCustomSnackBar(
+                //             'service_not_available_in_current_location'.tr);
+                //       }
+                //     }
+                //   });
+                // },
+                ,
                 icon: Icons.my_location,
               ),
               // const SizedBox(height: Dimensions.paddingSizeSmall),

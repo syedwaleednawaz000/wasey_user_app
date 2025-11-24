@@ -1432,5 +1432,10 @@
   "no_categories_found_for_store": "لم يتم العثور على تصنيفات لهذا المتجر.",
   "category_not_found": "تفاصيل التصنيف غير متوفرة.",
   "error_loading_category_details": "تعذر تحميل تفاصيل التصنيف.",
-  "available_categories": "التصنيفات المتاحة"
+  "available_categories": "التصنيفات المتاحة",
+  "location_permission_title": "يتطلب الوصول إلى الموقع",
+  "location_permission_message": "نستخدم موقعك لعرض المطاعم القريبة وتوفير توصيل دقيق وسريع.",
+  "location_permission_allow": "السماح",
+  "location_permission_cancel": "إلغاء"
+
 }
