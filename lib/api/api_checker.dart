@@ -13,7 +13,7 @@ class ApiChecker {
       });
     }else {
       if(response.statusText != 'The guest id field is required.') {
-        if(Get.currentRoute.contains('splash')){
+        if(Get.currentRoute.contains('splash') ||Get.currentRoute.contains('sign') ){
 
         }else{
           showCustomSnackBar("${response.statusText}", getXSnackBar: getXSnackBar);
