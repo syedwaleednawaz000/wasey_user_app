@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Wasey</string>
+	<string>وصي</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -19,89 +19,60 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>1.0.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>LSApplicationQueriesSchemes</key>
-  
-    <array>
-        <string>fbapi</string>
-        <string>fb-messenger-share-api</string>
-    </array>
-
-    <key>CFBundleURLTypes</key>
-    <array>
-        <!-- Add your URL schemes here -->
-    </array>
-
-    <key>CFBundleVersion</key>
-    <string>$(CURRENT_PROJECT_VERSION)</string>
-
-    <key>LSRequiresIPhoneOS</key>
-    <true/>
-
-    
-    
-    <!-- CAMERA -->
-    <key>NSCameraUsageDescription</key>
-    <string>This app uses the camera to upload profile photos or images.</string>
-
-  
-    <!-- PHOTO LIBRARY -->
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app requires access to your gallery to upload profile photos or images.</string>
-
-    <!-- PHOTO LIBRARY ADD -->
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>This app needs permission to save images to your photo library.</string>
-
-    <!-- LOCATION -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app uses your location to show nearby restaurants and add delivery addresses.</string>
-
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Location access is required to improve delivery accuracy and track orders even when the app is running in the background.</string>
-
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app needs background location access for delivery tracking and location-based service accuracy.</string>
-
-
-
-    <!-- PUSH NOTIFICATIONS -->
-    <key>NSUserNotificationUsageDescription</key>
-    <string>This app uses notifications for order updates, promotions, and alerts.</string>
-
-
-    <!-- BACKGROUND MODES -->
-    <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-        <string>remote-notification</string>
-    </array>
-
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
-    <key>UIMainStoryboardFile</key>
-    <string>Main</string>
-
-    <!-- ORIENTATIONS -->
-    <key>UISupportedInterfaceOrientations</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    <key>UISupportedInterfaceOrientations~ipad</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-
-    
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array/>
+	<key>CFBundleVersion</key>
+	<string>2</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses the camera to upload profile photos or images.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your gallery to upload profile photos or images.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs permission to save images to your photo library.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location to show nearby restaurants and add delivery addresses.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location access is required to improve delivery accuracy and track orders even when the app is running in the background.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs background location access for delivery tracking and location-based service accuracy.</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>This app uses notifications for order updates, promotions, and alerts.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 	<key>io.flutter.embedded_views_preview</key>
 	<string>YES</string>
 </dict>
