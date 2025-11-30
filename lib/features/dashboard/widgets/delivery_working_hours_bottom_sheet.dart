@@ -54,9 +54,10 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      isPickupSystemEnable
-                          ? "openForPickup".tr
-                          : "pickupTemporarilyClosed".tr,
+                      "delivery_currently_unavailable".tr,
+                      // isPickupSystemEnable
+                      //     ? "openForPickup".tr
+                      //     : "pickupTemporarilyClosed".tr,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -68,62 +69,60 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
                       style: IconButton.styleFrom(
                         minimumSize: const Size(20, 20),
                         padding: const EdgeInsets.all(
-                            Dimensions.paddingSizeExtraSmall),
+                            Dimensions.paddingSizeExtraSmall,),
                         iconSize: 16,
                         backgroundColor: Colors.grey,
                         foregroundColor: Colors.white,
                       ),
                       icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Get.back(),
                     ),
                   ],
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  !isDeliverySystemEnable && !isPickupSystemEnable
-                      ? "deliveryTemporarilyClosed".tr
-                      : !isPickupSystemEnable && isDeliverySystemEnable
-                          ? "deliveryAvailableNow".tr
-                          : "deliveryNotAvailable".tr,
+                  "you_can_pick_up_your_order".tr,
+                  // !isDeliverySystemEnable && !isPickupSystemEnable
+                  //     ? "deliveryTemporarilyClosed".tr
+                  //     : !isPickupSystemEnable && isDeliverySystemEnable
+                  //         ? "deliveryAvailableNow".tr
+                  //         : "deliveryNotAvailable".tr,
                   style: const TextStyle(fontSize: 14, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
               ),
-
               const SizedBox(height: 12),
 
-              TextButton.icon(
-                onPressed: () => setState(() => _isExpanded = !_isExpanded),
-                icon: Icon(
-                  _isExpanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                ),
-                label: Text(
-                  _isExpanded ? "hideWorkingHours".tr : "showWorkingHours".tr,
-                ),
-              ),
-
-              if (_isExpanded)
-                Container(
-                  width: double.infinity,
-                  color: Colors.black54,
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHoursSection("${"deliveryHours".tr}",
-                          slot.weeklyDeliveryTimeSlots, 'delivery'),
-                      const SizedBox(height: 16),
-                      _buildHoursSection("pickupHours".tr,
-                          slot.weeklyPickupTimeSlots, 'pickup'),
-                    ],
-                  ),
-                ),
-
+              //working hours section starts from here
+              // TextButton.icon(
+              //   onPressed: () => setState(() => _isExpanded = !_isExpanded),
+              //   icon: Icon(
+              //     _isExpanded
+              //         ? Icons.keyboard_arrow_up
+              //         : Icons.keyboard_arrow_down,
+              //   ),
+              //   label: Text(
+              //     _isExpanded ? "hideWorkingHours".tr : "showWorkingHours".tr,
+              //   ),
+              // ),
+              // if (_isExpanded)
+              //   Container(
+              //     width: double.infinity,
+              //     color: Colors.black54,
+              //     padding: const EdgeInsets.all(16),
+              //     child: Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: [
+              //         _buildHoursSection("${"deliveryHours".tr}",
+              //             slot.weeklyDeliveryTimeSlots, 'delivery'),
+              //         const SizedBox(height: 16),
+              //         _buildHoursSection("pickupHours".tr,
+              //             slot.weeklyPickupTimeSlots, 'pickup'),
+              //       ],
+              //     ),
+              //   ),
               const SizedBox(height: 20),
             ],
           ),
@@ -132,7 +131,8 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
     );
   }
 
-  Widget _buildHoursSection(String title, Map<String, List<String>?> slots, String type) {
+  Widget _buildHoursSection(
+      String title, Map<String, List<String>?> slots, String type) {
     final daysOrder = [
       'sunday',
       'monday',

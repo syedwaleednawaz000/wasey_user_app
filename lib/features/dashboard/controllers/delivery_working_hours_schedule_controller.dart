@@ -1,9 +1,11 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import '../../../api/api_client.dart';
 import '../models/delivery_working_hours_schedule_model.dart';
+import '../widgets/delivery_working_hours_bottom_sheet.dart';
 
 class TimeSlotController extends GetxController {
   final ApiClient apiClient;
@@ -57,7 +59,42 @@ class TimeSlotController extends GetxController {
       _isLoading(false);
     }
   }
-  // Future<void> fetchTimeSlots() async {
+
+  Future<void> checkAndShowWorkingHoursPopup({
+    required BuildContext context,
+    required bool mounted,
+  }) async {
+    const hasShown = false; // Or use SharedPreferences
+
+    if (!hasShown && mounted) {
+      log("working hours triggered");
+
+      // final controller = Get.find<TimeSlotController>();
+
+      // Wait for data to load
+      await fetchTimeSlots();
+
+      // Now it's safe to access
+      log("Weekly Pickup: ${timeSlot?.weeklyPickupTimeSlots}");
+
+      if (timeSlot != null) {
+        if(!timeSlot!.deliverySlotSystemEnabled) {
+          showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const WorkingHoursBottomSheet(),
+        );
+        }else{
+          log("Delivery System Disabled");
+        }
+      } else {
+        log("No time slot data available");
+      }
+    }
+  }
+
+// Future<void> fetchTimeSlots() async {
   //   try {
   //     _isLoading(true);
   //     _error(null);
