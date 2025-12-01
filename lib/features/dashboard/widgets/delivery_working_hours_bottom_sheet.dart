@@ -46,11 +46,12 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
                 child: Row(
                   children: [
                     Icon(
-                      isPickupSystemEnable
-                          ? Icons.access_time
-                          : Icons.access_time_filled,
-                      color:
-                          pickupHoursAvailable ? Colors.green : Colors.orange,
+                      // isPickupSystemEnable
+                      //     ? Icons.access_time
+                      //     :
+                      Icons.access_time_filled,
+                      color: Theme.of(context).primaryColor,
+                      // pickupHoursAvailable ? Colors.green : Colors.orange,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -69,7 +70,8 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
                       style: IconButton.styleFrom(
                         minimumSize: const Size(20, 20),
                         padding: const EdgeInsets.all(
-                            Dimensions.paddingSizeExtraSmall,),
+                          Dimensions.paddingSizeExtraSmall,
+                        ),
                         iconSize: 16,
                         backgroundColor: Colors.grey,
                         foregroundColor: Colors.white,
