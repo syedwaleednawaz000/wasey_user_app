@@ -133,10 +133,9 @@ class HomeScreen extends StatefulWidget {
             Get.find<ItemController>().commonConditions![0].id!, false);
       }
     }
-    // --- ADD THIS CALL TO THE END OF THE METHOD ---
     print("getCategoriesWithStoreList called");
-    await Get.find<StoreController>().getCategoriesWithStoreList(reload);
-    // ---------------------------------------------
+    await Get.find<StoreController>()
+        .getCategoriesWithStoreList(reload: reload);
   }
 
   @override
@@ -290,6 +289,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: RefreshIndicator(
                     onRefresh: () async {
                       splashController.setRefreshing(true);
+                      print("getCategoriesWithStoreList called");
+                      await Get.find<StoreController>()
+                          .getCategoriesWithStoreList(reload: true);
                       if (Get.find<SplashController>().module != null) {
                         await Get.find<LocationController>().syncZoneData();
                         await Get.find<BannerController>().getBannerList(true);
@@ -609,9 +611,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 builder: (storeController) {
                                               if (storeController
                                                   .isLoadingCategoriesWithStores) {
-                                                return const Center(
+                                                return const Padding(
+                                                  padding: EdgeInsets.all(
+                                                      Dimensions
+                                                          .paddingSizeDefault),
+                                                  child: Center(
                                                     child:
-                                                        CircularProgressIndicator());
+                                                        CircularProgressIndicator(),
+                                                  ),
+                                                );
                                               }
 
                                               if (storeController
@@ -620,10 +628,62 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   storeController
                                                       .categoryWithStoreList!
                                                       .isEmpty) {
-                                                return Center(
-                                                  child: Text(
-                                                    'no_categories_with_stores_found_yet'
-                                                        .tr,
+                                                return Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    Dimensions
+                                                        .paddingSizeDefault,
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      const SizedBox(
+                                                        height: Dimensions
+                                                            .paddingSizeDefault,
+                                                      ),
+                                                      Center(
+                                                        child: Text(
+                                                          'no_categories_with_stores_found_yet'
+                                                              .tr,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: Dimensions
+                                                            .paddingSizeDefault,
+                                                      ),
+                                                      ElevatedButton.icon(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                              Dimensions
+                                                                  .paddingSizeSmall,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        label:
+                                                            Text("refresh".tr),
+                                                        icon: const Icon(
+                                                            Icons.refresh),
+                                                        onPressed: () async {
+                                                          print(
+                                                              "getCategoriesWithStoreList called");
+                                                          await Get.find<
+                                                                  StoreController>()
+                                                              .getCategoriesWithStoreList(
+                                                                  reload: true);
+                                                        },
+                                                      ),
+                                                    ],
                                                   ),
                                                 );
                                               }

@@ -28,6 +28,7 @@ class PickMapScreen extends StatefulWidget {
   final GoogleMapController? googleMapController;
   final Function(AddressModel address)? onPicked;
   final bool fromLandingPage;
+
   const PickMapScreen({
     super.key,
     required this.fromSignUp,
@@ -273,15 +274,19 @@ class _PickMapScreenState extends State<PickMapScreen> {
                     bottom: 80,
                     right: Dimensions.paddingSizeLarge,
                     child: FloatingActionButton(
-                      mini: true,
+                      // mini: true,
+                      mini: false,
                       backgroundColor: Theme.of(context).cardColor,
                       onPressed: () =>
                           Get.find<LocationController>().checkPermission(() {
                         Get.find<LocationController>().getCurrentLocation(false,
                             mapController: _mapController);
                       }),
-                      child: Icon(Icons.my_location,
-                          color: Theme.of(context).primaryColor),
+                      child: Icon(
+                        Icons.location_on_rounded,
+                        size: 40,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
                   ),
                   Positioned(
@@ -301,9 +306,9 @@ class _PickMapScreenState extends State<PickMapScreen> {
                                   locationController.loading)
                               ? null
                               : () {
-                        // RouteHelper.getStoreRoute(id: 38,page: 'store');
-                                   _onPickAddressButtonPressed(
-                                       locationController);
+                                  // RouteHelper.getStoreRoute(id: 38,page: 'store');
+                                  _onPickAddressButtonPressed(
+                                      locationController);
                                 },
                     ),
                   ),

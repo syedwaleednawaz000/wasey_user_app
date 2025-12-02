@@ -121,8 +121,8 @@ class HomeController extends GetxController implements GetxService {
       }
     }
     // --- ADD THIS CALL TO THE END OF THE METHOD ---
-    log("getCategoriesWithStoreList called");
-    await Get.find<StoreController>().getCategoriesWithStoreList(reload);
+    log("getCategoriesWithStoreList called inside homeController ");
+    await Get.find<StoreController>().getCategoriesWithStoreList(reload: reload);
     // ---------------------------------------------
   }
 

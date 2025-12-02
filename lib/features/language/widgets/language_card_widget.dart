@@ -36,21 +36,27 @@ class LanguageCardWidget extends StatelessWidget {
       },
       child: Container(
         height: 70,
+        margin: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
         padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
         decoration: !fromWeb
             ? BoxDecoration(
                 color: localizationController.selectedLanguageIndex == index
                     ? Theme.of(context)
                         .primaryColor
-                        .withAlpha((0.05 * 255).toInt())
-                    : null,
+                        .withAlpha((0.2 * 255).toInt())
+                    : Theme.of(context)
+                        .disabledColor
+                        .withAlpha((0.1 * 255).toInt()),
                 borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
                 border: localizationController.selectedLanguageIndex == index
                     ? Border.all(
                         color: Theme.of(context)
                             .primaryColor
                             .withAlpha((0.2 * 255).toInt()))
-                    : null,
+                    :Border.all(
+                    color: Theme.of(context)
+                        .disabledColor
+                        .withAlpha((0.1 * 255).toInt())),
               )
             : BoxDecoration(
                 color: localizationController.selectedLanguageIndex == index
@@ -85,7 +91,13 @@ class LanguageCardWidget extends StatelessWidget {
                       color: Theme.of(context).primaryColor,
                       size: 25,
                     )
-                  : const SizedBox(),
+                  : Icon(
+                Icons.circle_outlined,
+                color: Theme.of(context)
+                    .disabledColor
+                    .withAlpha((0.4 * 255).toInt()),
+                size: 25,
+              ),
             ]),
       ),
     );
