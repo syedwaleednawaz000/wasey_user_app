@@ -25,7 +25,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.showCart = false,
       this.leadingIcon,
       this.onVegFilterTap,
-      this.type});
+      this.type,
+      });
 
   @override
   Widget build(BuildContext context) {
