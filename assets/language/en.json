@@ -1,8 +1,10 @@
 {
+  "refresh": "Refresh",
+  "you_can_pick_up_your_order": "You can pick up your order from the restaurant",
+  "delivery_currently_unavailable": "Delivery is currently unavailable",
   "please_login_to_track_orders": "Please login to track your orders",
   "featured_restaurants": "Featured Restaurants",
-  "newly_added_restaurants": "Newly Added Restaurants"
-,
+  "newly_added_restaurants": "Newly Added Restaurants",
   "manage_cards": "Manage Cards",
   "done": "Done",
   "delete_card": "Delete Card",
@@ -13,9 +15,8 @@
   "default_card_updated": "Default card updated",
   "newly_added_stores": "Newly Added Stores",
   "newest": "Newest",
-  "offers": "Offers"
-,
-"select_month": "Month",
+  "offers": "Offers",
+  "select_month": "Month",
   "year": "Year",
   "card_expired": "Card has expired",
   "invalid_year": "Invalid year",
@@ -1434,5 +1435,4 @@
   "location_permission_message": "We use your location to show nearby restaurants and provide accurate delivery.",
   "location_permission_allow": "Allow",
   "location_permission_cancel": "Cancel"
-
 }

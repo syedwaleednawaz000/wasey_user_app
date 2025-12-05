@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
+import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:sixam_mart/features/auth/widgets/auth_dialog_widget.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/home/controllers/home_controller.dart';
@@ -36,18 +37,39 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Theme.of(context).cardColor,
+            size: 24,
+          ),
+        ),
+        title: Text(
+          "menu".tr,
+          style: STCMedium.copyWith(
+            fontSize: Dimensions.fontSizeLarge,
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).cardColor,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
       backgroundColor: Theme.of(context).cardColor,
       body: GetBuilder<ProfileController>(builder: (profileController) {
         final bool isLoggedIn = AuthHelper.isLoggedIn();
 
         return Column(children: [
+          // const BackButton(),
           Container(
             decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             child: Padding(
               padding: const EdgeInsets.only(
                 left: Dimensions.paddingSizeExtremeLarge,
                 right: Dimensions.paddingSizeExtremeLarge,
-                top: 50,
+                // top: 50,
                 bottom: Dimensions.paddingSizeExtremeLarge,
               ),
               child: Row(
@@ -93,8 +115,9 @@ class _MenuScreenState extends State<MenuScreen> {
                                         ? '${profileController.userInfoModel?.fName ?? ''} ${profileController.userInfoModel?.lName ?? ''}'
                                         : 'guest_user'.tr,
                                     style: STCBold.copyWith(
-                                        fontSize: Dimensions.fontSizeExtraLarge,
-                                        color: Theme.of(context).cardColor),
+                                      fontSize: Dimensions.fontSizeExtraLarge,
+                                      color: Theme.of(context).cardColor,
+                                    ),
                                   ),
                             SizedBox(
                                 height: isLoggedIn &&
@@ -215,8 +238,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           isButtonActive: Get.isDarkMode,
                           isMenuScreen: true,
                           onTap: () {
-                            Get.find<ThemeController>()
-                                .toggleTheme();
+                            Get.find<ThemeController>().toggleTheme();
                           }),
                     ]),
                   )
@@ -573,7 +595,8 @@ class _MenuScreenState extends State<MenuScreen> {
                                       .clearSharedData();
                                   Get.find<HomeController>()
                                       .forcefullyNullCashBackOffers();
-                                  Get.offAllNamed(RouteHelper.getInitialRoute());
+                                  Get.offAllNamed(
+                                      RouteHelper.getInitialRoute());
                                 }),
                             useSafeArea: false);
                       } else {
@@ -589,7 +612,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     },
                     child: Text(
                       AuthHelper.isLoggedIn() ? 'logout'.tr : 'sign_in'.tr,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

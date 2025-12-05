@@ -29,6 +29,7 @@ class AccessLocationScreen extends StatefulWidget {
   final bool fromSignUp;
   final bool fromHome;
   final String? route;
+
   const AccessLocationScreen(
       {super.key,
       required this.fromSignUp,
@@ -49,8 +50,6 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
       Get.find<AddressController>().getAddressList();
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -184,21 +183,27 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
                                 child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Image.asset(Images.deliveryLocation,
-                                          height: 220),
+                                      Image.asset(
+                                        Images.deliveryLocation,
+                                        height: 220,
+                                      ),
                                       const SizedBox(
-                                          height: Dimensions.paddingSizeLarge),
+                                        height: Dimensions.paddingSizeLarge,
+                                      ),
                                       Text(
-                                          'find_stores_and_items'
-                                              .tr
-                                              .toUpperCase(),
-                                          textAlign: TextAlign.center,
-                                          style: STCMedium.copyWith(
-                                              fontSize: Dimensions
-                                                  .fontSizeExtraLarge)),
+                                        'find_stores_and_items'
+                                            .tr
+                                            .toUpperCase(),
+                                        textAlign: TextAlign.center,
+                                        style: STCMedium.copyWith(
+                                          fontSize:
+                                              Dimensions.fontSizeExtraLarge,
+                                        ),
+                                      ),
                                       Padding(
                                         padding: const EdgeInsets.all(
-                                            Dimensions.paddingSizeLarge),
+                                          Dimensions.paddingSizeLarge,
+                                        ),
                                         child: Text(
                                           'by_allowing_location_access'.tr,
                                           textAlign: TextAlign.center,
@@ -233,8 +238,12 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
 class BottomButton extends StatelessWidget {
   final bool fromSignUp;
   final String? route;
-  const BottomButton(
-      {super.key, required this.fromSignUp, required this.route});
+
+  const BottomButton({
+    super.key,
+    required this.fromSignUp,
+    required this.route,
+  });
 
   void showLocationPermissionExplanation(VoidCallback onContinue) {
     Get.defaultDialog(
@@ -250,8 +259,6 @@ class BottomButton extends StatelessWidget {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -260,20 +267,24 @@ class BottomButton extends StatelessWidget {
             child: Column(children: [
               CustomButton(
                 buttonText: 'user_current_location'.tr,
-
-
                 onPressed: () {
                   showLocationPermissionExplanation(() async {
                     Get.find<LocationController>().checkPermission(() async {
-                      Get.dialog(const CustomLoaderWidget(),
-                          barrierDismissible: false);
+                      Get.dialog(
+                        const CustomLoaderWidget(),
+                        barrierDismissible: false,
+                      );
 
-                      AddressModel address = await Get.find<LocationController>()
-                          .getCurrentLocation(true);
+                      AddressModel address =
+                          await Get.find<LocationController>()
+                              .getCurrentLocation(true);
 
                       ZoneResponseModel response =
-                      await Get.find<LocationController>()
-                          .getZone(address.latitude, address.longitude, false);
+                          await Get.find<LocationController>().getZone(
+                        address.latitude,
+                        address.longitude,
+                        false,
+                      );
 
                       if (response.isSuccess) {
                         Get.find<LocationController>().saveAddressAndNavigate(
@@ -296,20 +307,25 @@ class BottomButton extends StatelessWidget {
                                       fromSignUp: fromSignUp,
                                       canRoute: route != null,
                                       fromAddAddress: false,
-                                      route: route ?? RouteHelper.accessLocation,
+                                      route:
+                                          route ?? RouteHelper.accessLocation,
                                     ));
                               });
                         } else {
-                          Get.toNamed(RouteHelper.getPickMapRoute(
-                              route ?? RouteHelper.accessLocation, route != null));
+                          Get.toNamed(
+                            RouteHelper.getPickMapRoute(
+                              route ?? RouteHelper.accessLocation,
+                              route != null,
+                            ),
+                          );
                           showCustomSnackBar(
-                              'service_not_available_in_current_location'.tr);
+                            'service_not_available_in_current_location'.tr,
+                          );
                         }
                       }
                     });
                   });
                 }
-
 
                 // onPressed: () async {
                 //   Get.find<LocationController>().checkPermission(() async {

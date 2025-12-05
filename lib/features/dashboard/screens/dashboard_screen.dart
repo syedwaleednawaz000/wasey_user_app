@@ -65,52 +65,6 @@ class DashboardScreenState extends State<DashboardScreen> {
   late bool _isLogin;
   bool active = false;
 
-  Future<void> _checkAndShowWorkingHoursPopup() async {
-    final hasShown = false; // Or use SharedPreferences
-
-    if (!hasShown && mounted) {
-      log("working hours triggered");
-
-      final controller = Get.find<TimeSlotController>();
-
-      // Wait for data to load
-      await controller.fetchTimeSlots();
-
-      // Now it's safe to access
-      log("Weekly Pickup: ${controller.timeSlot?.weeklyPickupTimeSlots}");
-
-      if (controller.timeSlot != null) {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => const WorkingHoursBottomSheet(),
-        );
-      } else {
-        log("No time slot data available");
-      }
-    }
-  }
-
-  // Future<void> _checkAndShowWorkingHoursPopup() async {
-  //   // final prefs = await SharedPreferences.getInstance();
-  //   final hasShown = false;//prefs.getBool('has_shown_working_hours_popup') ?? false;
-  //
-  //   if (!hasShown && mounted) {
-  //     log("working hours triggered");
-  //     // await prefs.setBool('has_shown_working_hours_popup', true);
-  //     await Get.find<TimeSlotController>().fetchTimeSlots(); // Trigger fetch
-  //     log("Weekly Pickup: ${Get.find<TimeSlotController>().timeSlot?.weeklyPickupTimeSlots}");
-  //     showModalBottomSheet(
-  //       context: context,
-  //       isScrollControlled: true,
-  //       backgroundColor: Colors.transparent,
-  //
-  //       builder: (_) => const WorkingHoursBottomSheet(),
-  //     );
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -145,8 +99,12 @@ class DashboardScreenState extends State<DashboardScreen> {
       const MenuScreen()
     ];
 
-    Future.delayed(const Duration(seconds: 1), () {
-      _checkAndShowWorkingHoursPopup();
+    Future.delayed(const Duration(seconds: 2), () {
+      Get.find<TimeSlotController>().checkAndShowWorkingHoursPopup(
+        context: context,
+        mounted: mounted,
+      );
+      // _checkAndShowWorkingHoursPopup(context: context, mounted: mounted);
     });
   }
 

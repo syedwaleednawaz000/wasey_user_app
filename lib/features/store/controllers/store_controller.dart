@@ -173,7 +173,7 @@ class StoreController extends GetxController implements GetxService {
 
   bool get isLoadingCategoriesWithStores => _isLoadingCategoriesWithStores;
 
-  Future<void> getCategoriesWithStoreList(bool reload) async {
+  Future<void> getCategoriesWithStoreList({required bool reload}) async {
     if (_categoryWithStoreList == null || reload) {
       _isLoadingCategoriesWithStores = true;
       update();
