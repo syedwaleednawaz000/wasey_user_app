@@ -147,7 +147,7 @@ class CheckoutController extends GetxController implements GetxService {
 
   double? get extraCharge => _extraCharge;
 
-  String? _orderType = 'delivery';
+  String? _orderType = 'take_away';
 
   String? get orderType => _orderType;
 

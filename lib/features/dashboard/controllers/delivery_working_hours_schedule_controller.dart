@@ -22,11 +22,11 @@ class TimeSlotController extends GetxController {
 
   String? get error => _error.value;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchTimeSlots();
-  }
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   // fetchTimeSlots();
+  // }
 
   Future<void> fetchTimeSlots() async {
     try {

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:sixam_mart/features/checkout/widgets/guest_create_account.dart';
+import 'package:sixam_mart/features/dashboard/controllers/delivery_working_hours_schedule_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
@@ -27,6 +28,7 @@ import 'package:sixam_mart/features/store/widgets/camera_button_sheet_widget.dar
 import 'dart:io';
 import 'package:sixam_mart/features/checkout/widgets/note_prescription_section.dart';
 
+import '../../../helper/price_converter.dart';
 import '../domain/models/delivery_charges_data_model.dart';
 
 class TopSection extends StatelessWidget {
@@ -64,6 +66,7 @@ class TopSection extends StatelessWidget {
   final String deliveryChargeForView;
   final double badWeatherCharge;
   final double extraChargeForToolTip;
+  final bool isDeliveryActive;
 
   const TopSection({
     super.key,
@@ -101,6 +104,7 @@ class TopSection extends StatelessWidget {
     required this.deliveryChargeForView,
     required this.badWeatherCharge,
     required this.extraChargeForToolTip,
+    this.isDeliveryActive = true,
   });
 
   @override
@@ -331,167 +335,167 @@ class TopSection extends StatelessWidget {
                       extraChargeForToolTip: extraChargeForToolTip,
                     )
                   : SizedBox(
-                    height: 120,
-                    width: double.infinity,
-                    child: Row(children: [
-                      Get.find<SplashController>()
-                                      .configModel!
-                                      .homeDeliveryStatus ==
-                                  1 &&
-                              checkoutController.store!.delivery!
-                          ? Expanded(
-                              child: DeliveryOptionButtonWidget(
-                                value: 'delivery',
-                                title: 'delivery'.tr,
-                                isNewUI: true,
-                                charge: checkoutController.orderType ==
-                                        "delivery"
-                                    ? deliveryCharge
-                                    : 0.00,
-                                isFree:
-                                    checkoutController.store!.freeDelivery,
-                                fromWeb: true,
-                                total: total,
-                                deliveryChargeForView:
-                                    checkoutController.orderType ==
-                                            "delivery"
-                                        ? deliveryChargeForView
-                                        : "free".tr,
-                                badWeatherCharge: badWeatherCharge,
-                                extraChargeForToolTip:
-                                    extraChargeForToolTip,
-                              ),
-                            )
-                          : const SizedBox(),
-                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                      Get.find<SplashController>()
-                                      .configModel!
-                                      .takeawayStatus ==
-                                  1 &&
-                              checkoutController.store!.takeAway!
-                          ? Expanded(
-                              child: DeliveryOptionButtonWidget(
-                                value: 'take_away',
-                                title: 'pickup'.tr,
-                                charge: deliveryCharge,
-                                isNewUI: true,
-                                isFree: true,
-                                fromWeb: true,
-                                total: total,
-                                deliveryChargeForView:
-                                    deliveryChargeForView,
-                                badWeatherCharge: badWeatherCharge,
-                                extraChargeForToolTip:
-                                    extraChargeForToolTip,
-                              ),
-                            )
-                          : const SizedBox(),
-                    ]),
-                  ),
-              checkoutController.orderType == "delivery"
-                  ? Obx(() {
-                      // <-- Add Obx here to listen to controller's reactive variables
-                      return checkoutController.deliveryChargesList.isNotEmpty
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 12),
-                                Text("delivery_charge".tr, style: STCMedium),
-                                SizedBox(
-                                  // color: Colors.green,
-                                  height: 70,
-                                  width: double.infinity,
-                                  child: ListView.builder(
-                                      itemCount: checkoutController
-                                          .deliveryChargesList.length,
-                                      scrollDirection: Axis.horizontal,
-                                      shrinkWrap: true,
-                                      // padding: const EdgeInsets.symmetric(
-                                      //     horizontal: 4),
-                                      physics: const BouncingScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        final DeliveryChargeData chargeItem =
-                                            checkoutController
-                                                .deliveryChargesList[index];
-                                        final bool isSelected = checkoutController
-                                                .currentSelectedDeliveryChargesData
-                                                .value
-                                                ?.id ==
-                                            chargeItem.id;
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4.0),
-                                          child: InkWell(
-                                            onTap: () {
-                                              // ALWAYS allow tap
-                                              checkoutController
-                                                  .toggleSelectedChargesCity(
-                                                      chargeItem);
-                                            },
-                                            child: Chip(
-                                              backgroundColor: isSelected
-                                                  ? Theme.of(context)
-                                                      .primaryColor
-                                                  : Theme.of(context)
-                                                      .chipTheme
-                                                      .backgroundColor,
-                                              // Use theme default if not selected
-                                              labelPadding: isSelected
-                                                  ? const EdgeInsets.only(
-                                                      left: 8,
-                                                      right:
-                                                          4) // Adjust padding for icon
-                                                  : null,
-                                              label: Text(
-                                                chargeItem.city,
-                                                style: TextStyle(
-                                                  fontWeight: isSelected
-                                                      ? FontWeight.bold
-                                                      : FontWeight.normal,
-                                                  color: isSelected
-                                                      ? Colors.white
-                                                      : Theme.of(context)
-                                                          .textTheme
-                                                          .bodyLarge
-                                                          ?.color, // Adjust for theme
-                                                ),
-                                              ),
-                                              // Conditionally add a check icon if selected
-                                              avatar: isSelected
-                                                  ? const Icon(
-                                                      Icons.check,
-                                                      size: 16,
-                                                      color: Colors.white,
-                                                    )
-                                                  : null,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                  // Or your preferred chip shape
-                                                  side: BorderSide(
-                                                    color: isSelected
-                                                        ? Theme.of(context)
-                                                            .primaryColor
-                                                        : Colors.grey,
-                                                    // Example border
-                                                    width: 1,
-                                                  )),
-                                            ),
-                                          ),
-                                        );
-                                      }),
+                      height: 120,
+                      width: double.infinity,
+                      child: Row(children: [
+                        ((Get.find<SplashController>()
+                                        .configModel!
+                                        .homeDeliveryStatus ==
+                                    1 &&
+                                checkoutController.store!.delivery!) && isDeliveryActive)
+                            ? Expanded(
+                                child: DeliveryOptionButtonWidget(
+                                  value: 'delivery',
+                                  title: 'delivery'.tr,
+                                  isNewUI: true,
+                                  charge:
+                                      checkoutController.orderType == "delivery"
+                                          ? deliveryCharge
+                                          : 0.00,
+                                  isFree:
+                                      checkoutController.store!.freeDelivery,
+                                  fromWeb: true,
+                                  total: total,
+                                  deliveryChargeForView:
+                                      checkoutController.orderType == "delivery"
+                                          ? deliveryChargeForView
+                                          : "free".tr,
+                                  badWeatherCharge: badWeatherCharge,
+                                  extraChargeForToolTip: extraChargeForToolTip,
                                 ),
-                              ],
-                            )
-                          : const SizedBox.shrink();
-                    })
-                  : const SizedBox.shrink()
+                              )
+                            : const SizedBox(),
+                        SizedBox(
+                          width: isDeliveryActive
+                              ? Dimensions.paddingSizeSmall
+                              : 0,
+                        ),
+                        Get.find<SplashController>()
+                                        .configModel!
+                                        .takeawayStatus ==
+                                    1 &&
+                                checkoutController.store!.takeAway!
+                            ? Expanded(
+                                child: DeliveryOptionButtonWidget(
+                                  value: 'take_away',
+                                  title: 'pickup'.tr,
+                                  charge: deliveryCharge,
+                                  isNewUI: true,
+                                  isFree: true,
+                                  fromWeb: true,
+                                  total: total,
+                                  deliveryChargeForView: deliveryChargeForView,
+                                  badWeatherCharge: badWeatherCharge,
+                                  extraChargeForToolTip: extraChargeForToolTip,
+                                ),
+                              )
+                            : const SizedBox(),
+                      ]),
+                    ),
+              // checkoutController.orderType == "delivery"
+              //     ? Obx(() {
+              //         // <-- Add Obx here to listen to controller's reactive variables
+              //         return checkoutController.deliveryChargesList.isNotEmpty
+              //             ? Column(
+              //                 crossAxisAlignment: CrossAxisAlignment.start,
+              //                 children: [
+              //                   const SizedBox(height: 12),
+              //                   Text("delivery_charge".tr, style: STCMedium),
+              //                   SizedBox(
+              //                     // color: Colors.green,
+              //                     height: 70,
+              //                     width: double.infinity,
+              //                     child: ListView.builder(
+              //                         itemCount: checkoutController
+              //                             .deliveryChargesList.length,
+              //                         scrollDirection: Axis.horizontal,
+              //                         shrinkWrap: true,
+              //                         // padding: const EdgeInsets.symmetric(
+              //                         //     horizontal: 4),
+              //                         physics: const BouncingScrollPhysics(),
+              //                         itemBuilder: (context, index) {
+              //                           final DeliveryChargeData chargeItem =
+              //                               checkoutController
+              //                                   .deliveryChargesList[index];
+              //                           final bool isSelected = checkoutController
+              //                                   .currentSelectedDeliveryChargesData
+              //                                   .value
+              //                                   ?.id ==
+              //                               chargeItem.id;
+              //                           return Padding(
+              //                             padding: const EdgeInsets.symmetric(
+              //                                 horizontal: 4.0),
+              //                             child: InkWell(
+              //                               onTap: () {
+              //                                 // ALWAYS allow tap
+              //                                 checkoutController
+              //                                     .toggleSelectedChargesCity(
+              //                                         chargeItem);
+              //                               },
+              //                               child: Chip(
+              //                                 backgroundColor: isSelected
+              //                                     ? Theme.of(context)
+              //                                         .primaryColor
+              //                                     : Theme.of(context)
+              //                                         .chipTheme
+              //                                         .backgroundColor,
+              //                                 // Use theme default if not selected
+              //                                 labelPadding: isSelected
+              //                                     ? const EdgeInsets.only(
+              //                                         left: 8,
+              //                                         right:
+              //                                             4) // Adjust padding for icon
+              //                                     : null,
+              //                                 label: Text(
+              //                                   chargeItem.city,
+              //                                   style: TextStyle(
+              //                                     fontWeight: isSelected
+              //                                         ? FontWeight.bold
+              //                                         : FontWeight.normal,
+              //                                     color: isSelected
+              //                                         ? Colors.white
+              //                                         : Theme.of(context)
+              //                                             .textTheme
+              //                                             .bodyLarge
+              //                                             ?.color, // Adjust for theme
+              //                                   ),
+              //                                 ),
+              //                                 // Conditionally add a check icon if selected
+              //                                 avatar: isSelected
+              //                                     ? const Icon(
+              //                                         Icons.check,
+              //                                         size: 16,
+              //                                         color: Colors.white,
+              //                                       )
+              //                                     : null,
+              //                                 shape: RoundedRectangleBorder(
+              //                                     borderRadius:
+              //                                         BorderRadius.circular(6),
+              //                                     // Or your preferred chip shape
+              //                                     side: BorderSide(
+              //                                       color: isSelected
+              //                                           ? Theme.of(context)
+              //                                               .primaryColor
+              //                                           : Colors.grey,
+              //                                       // Example border
+              //                                       width: 1,
+              //                                     )),
+              //                               ),
+              //                             ),
+              //                           );
+              //                         }),
+              //                   ),
+              //                 ],
+              //               )
+              //             : const SizedBox.shrink();
+              //       })
+              //     : const SizedBox.shrink()
             ],
           ),
         ),
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
-        /*///Delivery_fee
+        //Delivery_fee
         !takeAway && !isGuestLoggedIn ? Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text('${'delivery_charge'.tr}: '),
           Text(
@@ -500,7 +504,7 @@ class TopSection extends StatelessWidget {
             textDirection: TextDirection.ltr,
           ),
         ])) : const SizedBox(),
-        SizedBox(height: !takeAway && !isGuestLoggedIn ? Dimensions.paddingSizeLarge : 0),*/
+        SizedBox(height: !takeAway && !isGuestLoggedIn ? Dimensions.paddingSizeLarge : 0),
 
         ///delivery section
         DeliverySection(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
 import 'package:sixam_mart/common/widgets/custom_tool_tip_widget.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../util/images.dart';
+import '../../dashboard/controllers/delivery_working_hours_schedule_controller.dart';
 
 class DeliveryOptionButtonWidget extends StatefulWidget {
   final String value;
@@ -46,15 +49,71 @@ class _DeliveryOptionButtonWidgetState
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 200), () {
-      Get.find<CheckoutController>().setOrderType(
-          Get.find<SplashController>().configModel!.homeDeliveryStatus == 1 &&
-                  Get.find<CheckoutController>().store!.delivery!
-              ? 'delivery'
-              : 'take_away',
-          notify: true);
+    // Schedule the logic to run after the first frame is built.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // 1. Get controller instances once.
+      final checkoutController = Get.find<CheckoutController>();
+      final timeSlotController = Get.find<TimeSlotController>();
+      final splashController = Get.find<SplashController>();
+
+      bool isDeliveryActive = true; // Assume delivery is active by default.
+      await timeSlotController.fetchTimeSlots();
+      // 3. Check the delivery system status from the fetched time slots.
+      if (timeSlotController.timeSlot != null) {
+        isDeliveryActive =
+            timeSlotController.timeSlot!.deliverySlotSystemEnabled ?? true;
+      }
+
+      // 4. Determine the correct order type based on all conditions.
+      // This logic is now much cleaner and easier to read.
+      bool canDeliver = splashController.configModel!.homeDeliveryStatus == 1 &&
+          checkoutController.store!.delivery! &&
+          isDeliveryActive;
+
+      String orderType = canDeliver ? 'delivery' : 'take_away';
+
+      // 5. Set the order type. This is now safe to call.
+      checkoutController.setOrderType(orderType, notify: true);
+      log("Initial order type set to: $orderType");
     });
   }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //
+  //   bool? _isDeliveryActive;
+  //
+  //   //For new incorporation if delivery is off then not show delivery in screen
+  //   if (Get.find<TimeSlotController>().timeSlot != null) {
+  //     _isDeliveryActive =
+  //         Get.find<TimeSlotController>().timeSlot!.deliverySlotSystemEnabled;
+  //     if (!_isDeliveryActive) {
+  //       Get.find<CheckoutController>().setOrderType("take_away");
+  //       log("order type Set to take_away");
+  //     }
+  //   } else {
+  //     Get.find<TimeSlotController>().fetchTimeSlots();
+  //     if (Get.find<TimeSlotController>().timeSlot != null) {
+  //       _isDeliveryActive =
+  //           Get.find<TimeSlotController>().timeSlot!.deliverySlotSystemEnabled;
+  //       if (!_isDeliveryActive) {
+  //         Get.find<CheckoutController>().setOrderType("take_away");
+  //         log("order type Set to take_away");
+  //       }
+  //     }
+  //   }
+  //
+  //   Future.delayed(const Duration(milliseconds: 200), () {
+  //     Get.find<CheckoutController>().setOrderType(
+  //         ((Get.find<SplashController>().configModel!.homeDeliveryStatus == 1 &&
+  //             Get.find<CheckoutController>().store!.delivery!) &&
+  //             !_isDeliveryActive!)
+  //             ? 'delivery'
+  //             : 'take_away',
+  //         notify: true);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
