@@ -115,7 +115,7 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  deliverySlotMessage ?? "deliveryTemporarilyClosed",
+                  deliverySlotMessage ?? "",
                   // !isDeliverySystemEnable && !isPickupSystemEnable
                   //     ? "deliveryTemporarilyClosed".tr
                   //     : !isPickupSystemEnable && isDeliverySystemEnable
