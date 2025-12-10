@@ -100,6 +100,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     ];
 
     Future.delayed(const Duration(seconds: 2), () {
+
       Get.find<TimeSlotController>().checkAndShowWorkingHoursPopup(
         context: context,
         mounted: mounted,

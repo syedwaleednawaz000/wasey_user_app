@@ -324,6 +324,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                   distance: checkoutController.distance,
                   extraCharge: checkoutController.extraCharge,
                 );
+                log("DeliveryCharges from _calculateOriginalDeliveryCharge: $originalCharge");
+
                 // if (checkoutController
                 //         .currentSelectedDeliveryChargesData.value !=
                 //     null) {
@@ -343,6 +345,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                         orderAmount: orderAmount,
                       )
                     : 0.00;
+                log("DeliveryCharges from _calculateDeliveryCharge: $_deliveryCharge");
+                log("DeliveryCharges from distance: ${checkoutController.distance}");
+                log("DeliveryCharges from extraCharges: ${checkoutController.extraCharge}");
+                log("DeliveryCharges from orderAmount: ${orderAmount}");
                 // }
 
                 if (checkoutController.orderType != 'take_away' &&
@@ -2504,9 +2510,13 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     ZoneData? zoneData;
     if (store != null) {
       for (ZoneData zData in address.zoneData!) {
+        log("zoneID: ${zData.id}");
         for (Modules m in zData.modules!) {
+          log("moduleName: ${m.moduleName}");
           if (m.id == Get.find<SplashController>().module!.id &&
               m.pivot!.zoneId == store.zoneId) {
+            log("Data moduleID: ${m.moduleName}");
+            log("moduleData: ${m.pivot!.toJson().toString()}");
             moduleData = m.pivot;
             break;
           }
@@ -2527,6 +2537,11 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       perKmCharge = store.perKmShippingCharge!;
       minimumCharge = store.minimumShippingCharge!;
       maximumCharge = store.maximumShippingCharge;
+      log("store Data:");
+      log("per KM in store: $perKmCharge");
+      log("minimumCharge in store: $minimumCharge");
+      log("maximumShippingCharge in store: $maximumCharge");
+
     } else if (store != null &&
         distance != null &&
         distance != -1 &&
@@ -2534,6 +2549,11 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       perKmCharge = moduleData.perKmShippingCharge!;
       minimumCharge = moduleData.minimumShippingCharge!;
       maximumCharge = moduleData.maximumShippingCharge;
+      log("Module Data:");
+      log("module zoneID: ${moduleData.zoneId}");
+      log("perKmCharge in module: $perKmCharge");
+      log("minimumShippingCharge in module: $minimumCharge");
+      log("maximumShippingCharge in module: $maximumCharge");
     }
     if (store != null && distance != null) {
       deliveryCharge = distance * perKmCharge;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../helper/address_helper.dart';
 import '../../../util/dimensions.dart';
 import '../../../util/styles.dart';
+import '../../location/domain/models/zone_response_model.dart';
 import '../controllers/delivery_working_hours_schedule_controller.dart';
 
 class WorkingHoursBottomSheet extends StatefulWidget {
@@ -14,6 +16,13 @@ class WorkingHoursBottomSheet extends StatefulWidget {
 
 class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
   bool _isExpanded = false;
+  String? deliverySlotMessage;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +41,27 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
         final bool pickupHoursAvailable = slot.isPickupAvailableNow;
         final bool isDeliverySystemEnable = slot.deliverySlotSystemEnabled;
         final bool isPickupSystemEnable = slot.pickupSlotSystemEnabled;
+        // Explicitly define the type as nullable (ZoneData?)
+        ZoneData? currentZoneData;
+
+        // Get the user's address data
+        final address = AddressHelper.getUserAddressFromSharedPref();
+
+        // Safely check if the address and zoneData exist before searching
+        if (address != null && address.zoneData != null) {
+          try {
+            currentZoneData = address.zoneData!.firstWhere(
+              (data) => data.id == slot.zoneId,
+            );
+          } catch (e) {
+            // firstWhere throws an error if no element is found, so we catch it
+            // and currentZoneData remains null, which is the desired outcome.
+          }
+        }
+
+        // Now you can safely get the message if currentZoneData is not null
+        // The property seems to be 'deliveryUnavailableMessage' in your model
+        deliverySlotMessage = currentZoneData?.deliverySlotMessage;
 
         return Container(
           decoration: const BoxDecoration(
@@ -80,6 +110,19 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
                       onPressed: () => Get.back(),
                     ),
                   ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  deliverySlotMessage ?? "deliveryTemporarilyClosed",
+                  // !isDeliverySystemEnable && !isPickupSystemEnable
+                  //     ? "deliveryTemporarilyClosed".tr
+                  //     : !isPickupSystemEnable && isDeliverySystemEnable
+                  //         ? "deliveryAvailableNow".tr
+                  //         : "deliveryNotAvailable".tr,
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                  textAlign: TextAlign.center,
                 ),
               ),
               Padding(

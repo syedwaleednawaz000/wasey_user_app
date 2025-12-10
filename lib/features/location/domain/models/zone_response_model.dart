@@ -24,6 +24,7 @@ class ZoneData {
   double? increaseDeliveryFee;
   int? increaseDeliveryFeeStatus;
   String? increaseDeliveryFeeMessage;
+  String? deliverySlotMessage;
   List<Modules>? modules;
 
   ZoneData({
@@ -35,6 +36,7 @@ class ZoneData {
     this.increaseDeliveryFee,
     this.increaseDeliveryFeeStatus,
     this.increaseDeliveryFeeMessage,
+    this.deliverySlotMessage,
     this.modules,
   });
 
@@ -47,6 +49,7 @@ class ZoneData {
     increaseDeliveryFee = json['increased_delivery_fee']?.toDouble();
     increaseDeliveryFeeStatus = json['increased_delivery_fee_status'];
     increaseDeliveryFeeMessage = json['increase_delivery_charge_message'];
+    deliverySlotMessage = json['delivery_slot_message'];
     if (json['modules'] != null) {
       modules = <Modules>[];
       json['modules'].forEach((v) {
@@ -65,6 +68,7 @@ class ZoneData {
     data['increased_delivery_fee'] = increaseDeliveryFee;
     data['increased_delivery_fee_status'] = increaseDeliveryFeeStatus;
     data['increase_delivery_charge_message'] = increaseDeliveryFeeMessage;
+    data['delivery_slot_message'] = deliverySlotMessage;
     if (modules != null) {
       data['modules'] = modules!.map((v) => v.toJson()).toList();
     }
