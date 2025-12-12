@@ -468,9 +468,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 Text(
                                                   AuthHelper.isLoggedIn()
                                                       ? AddressHelper
-                                                              .getUserAddressFromSharedPref()!
-                                                          .addressType!
-                                                          .tr
+                                                                  .getUserAddressFromSharedPref()!
+                                                              .addressType!
+                                                              .tr ??
+                                                          ""
                                                       : 'your_location'.tr,
                                                   style: STCMedium.copyWith(
                                                       color: Theme.of(context)
@@ -487,8 +488,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Flexible(
                                                     child: Text(
                                                       AddressHelper
-                                                              .getUserAddressFromSharedPref()!
-                                                          .address!,
+                                                                  .getUserAddressFromSharedPref()!
+                                                              .address!
+                                                              .isNotEmpty
+                                                          ? AddressHelper
+                                                                  .getUserAddressFromSharedPref()!
+                                                              .address!
+                                                          : "",
                                                       style: STCRegular.copyWith(
                                                           color: Theme.of(
                                                                   context)

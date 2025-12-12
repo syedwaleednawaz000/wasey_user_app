@@ -32,6 +32,7 @@ class TimeSlotResponse {
 class ZoneTimeSlot {
   final int zoneId;
   final String zoneName;
+  final String deliverySlotMessage;
   final String currentDay;
   final bool pickupSlotSystemEnabled;
   final bool deliverySlotSystemEnabled;
@@ -45,6 +46,7 @@ class ZoneTimeSlot {
   ZoneTimeSlot({
     required this.zoneId,
     required this.zoneName,
+    required this.deliverySlotMessage,
     required this.currentDay,
     required this.pickupSlotSystemEnabled,
     required this.deliverySlotSystemEnabled,
@@ -60,6 +62,7 @@ class ZoneTimeSlot {
     return ZoneTimeSlot(
       zoneId: json['zone_id'] as int,
       zoneName: json['zone_name']?.toString() ?? '',
+      deliverySlotMessage: json['delivery_slot_message']?.toString() ?? '',
       currentDay: json['current_day']?.toString() ?? '',
       pickupSlotSystemEnabled: json['pickup_slot_system_enabled'] == true,
       deliverySlotSystemEnabled: json['delivery_slot_system_enabled'] == true,

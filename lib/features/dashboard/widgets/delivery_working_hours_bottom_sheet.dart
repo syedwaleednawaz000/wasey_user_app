@@ -16,13 +16,6 @@ class WorkingHoursBottomSheet extends StatefulWidget {
 
 class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
   bool _isExpanded = false;
-  String? deliverySlotMessage;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,32 +34,38 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
         final bool pickupHoursAvailable = slot.isPickupAvailableNow;
         final bool isDeliverySystemEnable = slot.deliverySlotSystemEnabled;
         final bool isPickupSystemEnable = slot.pickupSlotSystemEnabled;
+        String deliverySlotMessage = slot.deliverySlotMessage;
+
         // Explicitly define the type as nullable (ZoneData?)
         ZoneData? currentZoneData;
 
         // Get the user's address data
-        final address = AddressHelper.getUserAddressFromSharedPref();
+        // final address = AddressHelper.getUserAddressFromSharedPref();
 
         // Safely check if the address and zoneData exist before searching
-        if (address != null && address.zoneData != null) {
-          try {
-            currentZoneData = address.zoneData!.firstWhere(
-              (data) => data.id == slot.zoneId,
-            );
-          } catch (e) {
-            // firstWhere throws an error if no element is found, so we catch it
-            // and currentZoneData remains null, which is the desired outcome.
-          }
-        }
+        // if (address != null && address.zoneData != null) {
+        //
+        //   try {
+        //     currentZoneData = address.zoneData!.firstWhere(
+        //       (data) => data.id == slot. zoneId,
+        //     );
+        //   } catch (e) {
+        //     // firstWhere throws an error if no element is found, so we catch it
+        //     // and currentZoneData remains null, which is the desired outcome.
+        //   }
+        // }
 
         // Now you can safely get the message if currentZoneData is not null
         // The property seems to be 'deliveryUnavailableMessage' in your model
-        deliverySlotMessage = currentZoneData?.deliverySlotMessage;
+        // deliverySlotMessage = currentZoneData?.deliverySlotMessage;
+        // deliverySlotMessage = address?.zoneData?[1].deliverySlotMessage;
 
         return Container(
           decoration: const BoxDecoration(
             color: Colors.black54,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
