@@ -94,7 +94,9 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
+            // Enable code shrinking, obfuscation, and optimization
             minifyEnabled true
+            // Use ProGuard rules to keep necessary classes (especially for Google Maps)
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

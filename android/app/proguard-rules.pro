@@ -66,3 +66,91 @@
 -keepclasseswithmembernames,includedescriptorclasses class * {
     native <methods>;
 }
+
+# =============================================================================
+# Firebase
+# =============================================================================
+
+# Firebase Crashlytics
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+-keep class com.google.firebase.crashlytics.** { *; }
+-dontwarn com.google.firebase.crashlytics.**
+
+# Firebase Messaging
+-keep class com.google.firebase.messaging.** { *; }
+-dontwarn com.google.firebase.messaging.**
+
+# Firebase Common
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+
+# Keep Firebase model classes
+-keep class com.google.firebase.firestore.** { *; }
+
+# =============================================================================
+# Facebook SDK
+# =============================================================================
+
+-keep class com.facebook.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn com.facebook.**
+
+# Keep Facebook classes
+-keep class com.facebook.share.** { *; }
+-keep class com.facebook.login.** { *; }
+
+# =============================================================================
+# Flutter Plugins
+# =============================================================================
+
+# Flutter plugins that use reflection
+-keep class io.flutter.plugins.** { *; }
+-keep class io.flutter.embedding.** { *; }
+
+# Keep plugin registrant
+-keep class io.flutter.plugins.GeneratedPluginRegistrant { *; }
+
+# =============================================================================
+# Geolocator Plugin
+# =============================================================================
+
+-keep class com.baseflow.geolocator.** { *; }
+-dontwarn com.baseflow.geolocator.**
+
+# =============================================================================
+# Additional optimizations for release builds
+# =============================================================================
+
+# Keep enum classes
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# Keep Serializable classes
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+# Keep R class
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
+# Don't warn about missing classes (optional libraries)
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-dontwarn org.conscrypt.**
+
+# Preserve all annotation information
+-keepattributes *Annotation*,InnerClasses
+
+# Keep custom exceptions
+-keep public class * extends java.lang.Exception
