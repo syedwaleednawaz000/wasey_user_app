@@ -1,4 +1,4 @@
-package com.waseyuser.app
+package com.waseyapp.user
 
 import io.flutter.embedding.android.FlutterActivity
 
