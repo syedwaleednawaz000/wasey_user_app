@@ -14,6 +14,8 @@ import 'package:sixam_mart/features/store/domain/services/store_service_interfac
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
+import '../models/category_with_stores.dart';
+
 class StoreService implements StoreServiceInterface {
   final StoreRepositoryInterface storeRepositoryInterface;
   StoreService({required this.storeRepositoryInterface});
@@ -27,6 +29,7 @@ class StoreService implements StoreServiceInterface {
   Future<List<Store>?> getPopularStoreList(String type, {required DataSourceEnum source}) async {
     return await storeRepositoryInterface.getList(isPopularStoreList: true, type: type, source: source);
   }
+
 
   @override
   Future<List<Store>?> getLatestStoreList(String type, {required DataSourceEnum source}) async {

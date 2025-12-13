@@ -4,25 +4,29 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:flutter/material.dart';
 
 final STCRegular = TextStyle(
-  fontFamily: AppConstants.fontFamily,
+  // fontFamily: AppConstants.fontFamilyIBMPlexSansArabic,
+  fontFamily: AppConstants.fontFamilyAlmarai,
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSizeDefault,
 );
 
 final STCMedium = TextStyle(
-  fontFamily: AppConstants.fontFamily,
+  // fontFamily: AppConstants.fontFamilyIBMPlexSansArabic,
+  fontFamily: AppConstants.fontFamilyAlmarai,
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontSizeDefault,
 );
 
 final STCBold = TextStyle(
-  fontFamily: AppConstants.fontFamily,
+  // fontFamily: AppConstants.fontFamilyIBMPlexSansArabic,
+  fontFamily: AppConstants.fontFamilyAlmarai,
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontSizeDefault,
 );
 
 final STCBlack = TextStyle(
-  fontFamily: AppConstants.fontFamily,
+  // fontFamily: AppConstants.fontFamilyIBMPlexSansArabic,
+  fontFamily: AppConstants.fontFamilyAlmarai,
   fontWeight: FontWeight.w900,
   fontSize: Dimensions.fontSizeDefault,
 );

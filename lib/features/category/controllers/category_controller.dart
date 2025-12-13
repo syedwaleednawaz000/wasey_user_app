@@ -8,6 +8,10 @@ import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/category/domain/services/category_service_interface.dart';
 
+import '../../../helper/module_helper.dart';
+import '../../../util/app_constants.dart';
+import '../../splash/controllers/splash_controller.dart';
+
 class CategoryController extends GetxController implements GetxService {
   final CategoryServiceInterface categoryServiceInterface;
 
@@ -89,13 +93,33 @@ class CategoryController extends GetxController implements GetxService {
 
   void setSelectedCategoryStores({required String selectedCatId}) {
     log("Selected catId for filtering stores: $selectedCatId");
-    _selectedCatId = selectedCatId; // Assuming _selectedCatId is a member of CategoryController
+    _selectedCatId =
+        selectedCatId; // Assuming _selectedCatId is a member of CategoryController
 
     final StoreController storeController = Get.find<StoreController>();
     List<Store> newFilteredStores = [];
-    try{
+    try {
       isLoadingSelectedStores.value = true;
-      if (storeController.storeModel != null &&
+      if ((ModuleHelper.getModule()!.id!.toString() ==
+              AppConstants.restaurantModuleId) &&
+          storeController.categoryWithStoreList != null) {
+        newFilteredStores = storeController.categoryWithStoreList!
+            .where((category) {
+              return category.cId.toString() == selectedCatId;
+            })
+            .first
+            .stores!;
+        selectCatStoreList?.clear();
+        selectCatStoreList?.addAll(newFilteredStores);
+        // If using RxList, .assignAll() is often better for reactivity:
+        // selectCatStoreList.assignAll(newFilteredStores);
+
+        // Option B: Add to existing (if that's the desired behavior, handle duplicates if needed)
+        // this.selectCatStoreList?.addAll(newFilteredStores); // Ensure this.selectCatStoreList is initialized
+
+        log('Filtered with new Stores Count: ${selectCatStoreList?.length}'); // Log the final list
+        log('Filtered with new Stores Names: ${selectCatStoreList?.map((s) => s.name ?? "N/A").toList()}');
+      } else if (storeController.storeModel != null &&
           storeController.storeModel!.stores != null &&
           storeController.storeModel!.stores!.isNotEmpty) {
         newFilteredStores = storeController.storeModel!.stores!.where((store) {
@@ -113,22 +137,20 @@ class CategoryController extends GetxController implements GetxService {
         // Option B: Add to existing (if that's the desired behavior, handle duplicates if needed)
         // this.selectCatStoreList?.addAll(newFilteredStores); // Ensure this.selectCatStoreList is initialized
 
-        print(
-            'Filtered Stores Count: ${selectCatStoreList?.length}'); // Log the final list
-        print(
-            'Filtered Stores Names: ${selectCatStoreList?.map((s) => s.name ?? "N/A").toList()}');
+        log('Filtered Stores Count: ${selectCatStoreList?.length}'); // Log the final list
+        log('Filtered Stores Names: ${selectCatStoreList?.map((s) => s.name ?? "N/A").toList()}');
       } else {
-        print(
-            'Source store model or stores list is null/empty. Clearing filtered stores.');
+        log('Source store model or stores list is null/empty. Clearing filtered stores.');
         selectCatStoreList?.clear(); // Clear if source is invalid
         // If using RxList:
         // selectCatStoreList.clear();
       }
-    }catch(e){
-      print("Error updating selected stores: $e");
-      selectedStoresErrorMessage.value = "error_loading_stores".tr; // Set generic error message
+    } catch (e) {
+      log("Error updating selected stores: $e");
+      selectedStoresErrorMessage.value =
+          "error_loading_stores".tr; // Set generic error message
       selectCatStoreList?.clear(); // Clea
-    }finally{
+    } finally {
       isLoadingSelectedStores.value = false;
     }
 

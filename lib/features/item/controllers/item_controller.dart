@@ -25,6 +25,8 @@ import 'package:sixam_mart/common/widgets/item_bottom_sheet.dart';
 import 'package:sixam_mart/features/item/screens/item_details_screen.dart';
 import 'package:sixam_mart/features/item/domain/services/item_service_interface.dart';
 
+import '../../language/controllers/language_controller.dart';
+
 class ItemController extends GetxController implements GetxService {
   final ItemServiceInterface itemServiceInterface;
 
@@ -526,6 +528,7 @@ class ItemController extends GetxController implements GetxService {
     _collapseVariation[index] = !_collapseVariation[index];
     update();
   }
+
   void setNewCartVariationIndex(int index, int i, Item item) {
     _selectedVariations = itemServiceInterface.setNewCartVariationIndex(
         index, i, item.foodVariations!, _selectedVariations);
@@ -600,8 +603,7 @@ class ItemController extends GetxController implements GetxService {
       item.storeDiscount == 0 ? item.discountType : 'percent';
 
   void navigateToItemPage(Item? item, BuildContext context,
-      {bool inStore = false, bool isCampaign = false})
-  {
+      {bool inStore = false, bool isCampaign = false}) {
     if (Get.find<SplashController>()
             .configModel!
             .moduleConfig!
@@ -633,11 +635,8 @@ class ItemController extends GetxController implements GetxService {
     }
   }
 
-
-
   void itemDirectlyAddToCart(Item? item, BuildContext context,
-      {bool inStore = false, bool isCampaign = false})
-  {
+      {bool inStore = false, bool isCampaign = false}) {
     if (((item!.foodVariations != null && item.foodVariations!.isEmpty) &&
             item.moduleType == AppConstants.food) ||
         (item.variations != null &&
@@ -672,6 +671,7 @@ class ItemController extends GetxController implements GetxService {
         '',
         null,
         ModuleHelper.getModuleConfig(item.moduleType).newVariation! ? [] : null,
+        null,
         1,
         [],
         [],
@@ -747,6 +747,7 @@ class ItemController extends GetxController implements GetxService {
 
   // Add a map to store slice selections
   var sliceSelections = <String, int>{}.obs;
+
   // @override
   // void onInit() {
   //   super.onInit();
@@ -780,7 +781,8 @@ class ItemController extends GetxController implements GetxService {
   }
 
   // Method to set slice selection
-  void setSliceSelection(int variationIndex, int optionIndex, int sliceValue, Item item) {
+  void setSliceSelection(
+      int variationIndex, int optionIndex, int sliceValue, Item item) {
     String key = '$variationIndex-$optionIndex';
     sliceSelections[key] = sliceValue;
     sliceSelections.refresh(); // Notify listeners
@@ -790,13 +792,14 @@ class ItemController extends GetxController implements GetxService {
   }
 
   String getSliceName(int sliceValue) {
+    final bool ltr = Get.find<LocalizationController>().isLtr;
     switch (sliceValue) {
       case 1:
-        return 'Full';
+        return ltr ? 'full'.tr : 'right'.tr;
       case 2:
-        return 'Left';
+        return 'left'.tr;
       case 3:
-        return 'Right';
+        return ltr ? 'right'.tr : 'full'.tr;
       default:
         return '';
     }
@@ -806,45 +809,45 @@ class ItemController extends GetxController implements GetxService {
     // Simple check - you might want to customize this based on your app's logic
     // This could check category, tags, or a specific property indicating it's a pizza
     return item.name?.toLowerCase().contains('pizza') == true ||
-        item.categoryIds?.contains('pizza_category') == true; // Adjust as needed
+        item.categoryIds?.contains('pizza_category') ==
+            true; // Adjust as needed
   }
 
-
 // void setNewCartVariationIndex(int index, int i, Item item) {
-  //   _selectedVariations = itemServiceInterface.setNewCartVariationIndex(
-  //       index, i, item.foodVariations!, _selectedVariations);
-  //
-  //   // When a variation option is selected for pizza, set default slice to full
-  //   if (isPizzaItem(item) && _selectedVariations[index][i] == true) {
-  //     setSliceSelection(index, i, 1, item);
-  //   }
-  //
-  //   setExistInCart(item, _selectedVariations);
-  //   update();
-  // }
-  //
-  // // Helper method to check if item is a pizza
-  // bool isPizzaItem(Item item) {
-  //   // You might want to use a more specific check here
-  //   // For example: check category, tags, or specific item properties
-  //   return item.moduleType == 'food' &&
-  //       item.categoryIds != null &&
-  //       item.categoryIds!.isNotEmpty;
-  //   // Or use a more specific condition based on your app's logic
-  // }
-  //
-  // // Method to get slice selection for a specific variation option
-  // int getSliceSelection(int variationIndex, int optionIndex) {
-  //   String key = '$variationIndex-$optionIndex';
-  //   return sliceSelections[key] ?? 0; // 0 means no selection
-  // }
-  //
-  // // Method to set slice selection
-  // void setSliceSelection(int variationIndex, int optionIndex, int sliceValue, Item item) {
-  //   String key = '$variationIndex-$optionIndex';
-  //   sliceSelections[key] = sliceValue;
-  //
-  //   // If you need to update the price or other properties based on slice selection
-  //   // updateTotalPrice(item);
-  // }
+//   _selectedVariations = itemServiceInterface.setNewCartVariationIndex(
+//       index, i, item.foodVariations!, _selectedVariations);
+//
+//   // When a variation option is selected for pizza, set default slice to full
+//   if (isPizzaItem(item) && _selectedVariations[index][i] == true) {
+//     setSliceSelection(index, i, 1, item);
+//   }
+//
+//   setExistInCart(item, _selectedVariations);
+//   update();
+// }
+//
+// // Helper method to check if item is a pizza
+// bool isPizzaItem(Item item) {
+//   // You might want to use a more specific check here
+//   // For example: check category, tags, or specific item properties
+//   return item.moduleType == 'food' &&
+//       item.categoryIds != null &&
+//       item.categoryIds!.isNotEmpty;
+//   // Or use a more specific condition based on your app's logic
+// }
+//
+// // Method to get slice selection for a specific variation option
+// int getSliceSelection(int variationIndex, int optionIndex) {
+//   String key = '$variationIndex-$optionIndex';
+//   return sliceSelections[key] ?? 0; // 0 means no selection
+// }
+//
+// // Method to set slice selection
+// void setSliceSelection(int variationIndex, int optionIndex, int sliceValue, Item item) {
+//   String key = '$variationIndex-$optionIndex';
+//   sliceSelections[key] = sliceValue;
+//
+//   // If you need to update the price or other properties based on slice selection
+//   // updateTotalPrice(item);
+// }
 }

@@ -23,11 +23,17 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0.0'
 }
 
+//def keystoreProperties = new Properties()
+//def keystorePropertiesFile = rootProject.file('key.properties')
+//if (keystorePropertiesFile.exists()) {
+//    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+//}
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
+
 
 android {
     namespace "com.waseyuser.app"
@@ -48,12 +54,11 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.waseyuser.app"
-        minSdkVersion 23
+        minSdkVersion 23 //flutter.minSdkVersion
         targetSdkVersion 35
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 4
+        versionName "1.0.2"
         multiDexEnabled true
-        
     }
     
 
@@ -78,16 +83,21 @@ android {
 //               }
 //
 //    }
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+    }
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // For now, it uses the debug signing config so `flutter run --release` works.
-            signingConfig signingConfigs.debug
-
-            ndk {
-                // Includes symbol files
-                debugSymbolLevel 'FULL'
-            }
+            signingConfig signingConfigs.release
+            // Enable code shrinking, obfuscation, and optimization
+            minifyEnabled true
+            // Use ProGuard rules to keep necessary classes (especially for Google Maps)
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -98,7 +108,16 @@ flutter {
 }
 
 dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
-    implementation "com.google.firebase:firebase-messaging:23.4.1"
+    // Google Maps SDK for Android
+    implementation 'com.google.android.gms:play-services-maps:17.0.0' // Ensure it's the correct version
+    implementation 'com.google.android.gms:play-services-location:17.0.0' // For location services
+
+    // Firebase Messaging SDK (ensure correct version)
+    implementation 'com.google.firebase:firebase-messaging:23.4.1'
+
+    // Facebook SDK (latest stable version)
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+
+    // Core library desugaring (for modern Java 8+ APIs support)
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 }

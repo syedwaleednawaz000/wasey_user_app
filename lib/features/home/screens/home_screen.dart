@@ -19,6 +19,7 @@ import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
 import 'package:sixam_mart/features/flash_sale/controllers/flash_sale_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
+import 'package:sixam_mart/features/menu/screens/menu_screen.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
@@ -47,6 +48,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/home/widgets/module_view.dart';
 import 'package:sixam_mart/features/parcel/screens/parcel_category_screen.dart';
+
+import '../../coupon/domain/models/coupon_model.dart';
+import '../../dashboard/widgets/bottom_nav_item_widget.dart';
+import '../../store/domain/models/category_with_stores.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -101,8 +106,6 @@ class HomeScreen extends StatefulWidget {
     await Get.find<SplashController>().getModules();
     // await Get.find<SplashController>().getStoredModule();
 
-
-
     if (Get.find<SplashController>().module == null &&
         Get.find<SplashController>().configModel!.module == null) {
       Get.find<BannerController>().getFeaturedBanner();
@@ -130,6 +133,9 @@ class HomeScreen extends StatefulWidget {
             Get.find<ItemController>().commonConditions![0].id!, false);
       }
     }
+    print("getCategoriesWithStoreList called");
+    await Get.find<StoreController>()
+        .getCategoriesWithStoreList(reload: reload);
   }
 
   @override
@@ -148,12 +154,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     // splashController.switchModule(1, true);
-    setModuleRestaurant();
-    Get.find<SplashController>().getStoredModule();
+    // setModuleRestaurant();
+    // Get.find<SplashController>().getStoredModule();
 
-    print("splashController.switchModule(0, true); executed");
+    // print("splashController.switchModule(0, true); executed");
 
-    HomeScreen.loadData(false).then((value) {
+    Get.find<HomeController>().loadHomeData(false).then((value) {
       Get.find<SplashController>().getReferBottomSheetStatus();
 
       if ((Get.find<ProfileController>().userInfoModel?.isValidForDiscount ??
@@ -187,19 +193,21 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
     });
-    Get.find<HomeController>().setModuleRestaurant();
+    // Get.find<HomeController>().setModuleRestaurant();
   }
 
-  setModuleRestaurant() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString("moduleId", "2");
-    splashController.switchModule(1, true);
-    print("ModuleID is Set to: ${sharedPreferences.getString("moduleId")}");
-    print("Module setting to 1////////////////////////////////////////");
-    await sharedPreferences.setString(
-        AppConstants.moduleId, AppConstants.restaurantModuleId);
-    print("Module settled to ${sharedPreferences.getString(AppConstants.moduleId)}////////////////////////////////////////");
-  }
+  //
+  // setModuleRestaurant() async {
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   sharedPreferences.setString("moduleId", "2");
+  //   splashController.switchModule(1, true);
+  //   print("ModuleID is Set to: ${sharedPreferences.getString("moduleId")}");
+  //   print("Module setting to 1////////////////////////////////////////");
+  //   await sharedPreferences.setString(
+  //       AppConstants.moduleId, AppConstants.restaurantModuleId);
+  //   print(
+  //       "Module settled to ${sharedPreferences.getString(AppConstants.moduleId)}////////////////////////////////////////");
+  // }
 
   @override
   void dispose() {
@@ -250,8 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // splashController.switchModule(1, true);
         Get.find<HomeController>().setModuleRestaurant();
       }
-      bool showMobileModule =
-      !ResponsiveHelper.isDesktop(context) &&
+      bool showMobileModule = !ResponsiveHelper.isDesktop(context) &&
           splashController.module == null &&
           splashController.configModel!.module == null;
 
@@ -282,6 +289,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: RefreshIndicator(
                     onRefresh: () async {
                       splashController.setRefreshing(true);
+                      print("getCategoriesWithStoreList called");
+                      await Get.find<StoreController>()
+                          .getCategoriesWithStoreList(reload: true);
                       if (Get.find<SplashController>().module != null) {
                         await Get.find<LocationController>().syncZoneData();
                         await Get.find<BannerController>().getBannerList(true);
@@ -394,6 +404,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                     //                 .color),
                                     //       )
                                     //     : const SizedBox(),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Get.to(const MenuScreen());
+                                      },
+                                      child: SizedBox(
+                                        width: 45,
+                                        // color: Colors.red,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.menu,
+                                            ),
+                                            Text(
+                                              "menu".tr,
+                                              style: STCRegular.copyWith(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium!
+                                                    .color!,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                     SizedBox(
                                         width: (splashController.module !=
                                                     null &&
@@ -430,9 +468,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 Text(
                                                   AuthHelper.isLoggedIn()
                                                       ? AddressHelper
-                                                              .getUserAddressFromSharedPref()!
-                                                          .addressType!
-                                                          .tr
+                                                                  .getUserAddressFromSharedPref()!
+                                                              .addressType!
+                                                              .tr ??
+                                                          ""
                                                       : 'your_location'.tr,
                                                   style: STCMedium.copyWith(
                                                       color: Theme.of(context)
@@ -449,8 +488,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Flexible(
                                                     child: Text(
                                                       AddressHelper
-                                                              .getUserAddressFromSharedPref()!
-                                                          .address!,
+                                                                  .getUserAddressFromSharedPref()!
+                                                              .address!
+                                                              .isNotEmpty
+                                                          ? AddressHelper
+                                                                  .getUserAddressFromSharedPref()!
+                                                              .address!
+                                                          : "",
                                                       style: STCRegular.copyWith(
                                                           color: Theme.of(
                                                                   context)
@@ -462,49 +506,59 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           TextOverflow.ellipsis,
                                                     ),
                                                   ),
-                                                  Icon(Icons.expand_more,
-                                                      color: Theme.of(context)
-                                                          .disabledColor,
-                                                      size: 18),
+                                                  Icon(
+                                                    Icons.expand_more,
+                                                    color: Theme.of(context)
+                                                        .disabledColor,
+                                                    size: 18,
+                                                  ),
                                                 ]),
                                               ]);
                                         }),
                                       ),
                                     )),
-                                    InkWell(
-                                      child: GetBuilder<NotificationController>(
-                                          builder: (notificationController) {
-                                        return Stack(children: [
-                                          Icon(CupertinoIcons.bell,
-                                              size: 25,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .color),
-                                          notificationController.hasNotification
-                                              ? Positioned(
-                                                  top: 0,
-                                                  right: 0,
-                                                  child: Container(
-                                                    height: 10,
-                                                    width: 10,
-                                                    decoration: BoxDecoration(
-                                                      color: Theme.of(context)
-                                                          .primaryColor,
-                                                      shape: BoxShape.circle,
-                                                      border: Border.all(
-                                                          width: 1,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .cardColor),
-                                                    ),
-                                                  ))
-                                              : const SizedBox(),
-                                        ]);
-                                      }),
-                                      onTap: () => Get.toNamed(
-                                          RouteHelper.getNotificationRoute()),
+                                    IconButton(
+                                      onPressed: () => Get.toNamed(
+                                          // RouteHelper.getSearchStoreItemRoute(
+                                          //   Get.find<StoreController>().store!.id,
+                                          // ),
+                                          RouteHelper.search),
+                                      icon: const Icon(Icons.search_outlined),
                                     ),
+                                    // InkWell(
+                                    //   child: GetBuilder<NotificationController>(
+                                    //       builder: (notificationController) {
+                                    //     return Stack(children: [
+                                    //       Icon(CupertinoIcons.bell,
+                                    //           size: 25,
+                                    //           color: Theme.of(context)
+                                    //               .textTheme
+                                    //               .bodyLarge!
+                                    //               .color),
+                                    //       notificationController.hasNotification
+                                    //           ? Positioned(
+                                    //               top: 0,
+                                    //               right: 0,
+                                    //               child: Container(
+                                    //                 height: 10,
+                                    //                 width: 10,
+                                    //                 decoration: BoxDecoration(
+                                    //                   color: Theme.of(context)
+                                    //                       .primaryColor,
+                                    //                   shape: BoxShape.circle,
+                                    //                   border: Border.all(
+                                    //                       width: 1,
+                                    //                       color:
+                                    //                           Theme.of(context)
+                                    //                               .cardColor),
+                                    //                 ),
+                                    //               ))
+                                    //           : const SizedBox(),
+                                    //     ]);
+                                    //   }),
+                                    //   onTap: () => Get.toNamed(
+                                    //       RouteHelper.getNotificationRoute()),
+                                    // ),
                                   ]),
                                 )),
                                 actions: const [SizedBox()],
@@ -514,9 +568,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Center(
                                     child: SizedBox(
                                   width: Dimensions.webMaxWidth,
-                                  child:
-                                  !showMobileModule ?
-                                  Column(
+                                  child: !showMobileModule
+                                      ? Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
@@ -531,6 +584,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ? const PharmacyHomeScreen()
                                                       : isFood
                                                           ? const FoodHomeScreen()
+                                                          // ? Text("data")
                                                           : isShop
                                                               ? const ShopHomeScreen()
                                                               : const SizedBox(),
@@ -546,7 +600,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       key: _headerKey,
                                       pinned: true,
                                       delegate: SliverDelegate(
-                                        height: 85,
+                                        height: 50,
                                         callback: (val) {
                                           searchBgShow = val;
                                         },
@@ -557,52 +611,249 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               SliverToBoxAdapter(
                                   child: !showMobileModule
-                                      ? Center(
-                                          child: GetBuilder<StoreController>(
-                                              builder: (storeController) {
-                                            return Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: ResponsiveHelper
-                                                          .isDesktop(context)
-                                                      ? 0
-                                                      : 100),
-                                              child: PaginatedListView(
-                                                scrollController:
-                                                    _scrollController,
-                                                totalSize: storeController
-                                                    .storeModel?.totalSize,
-                                                offset: storeController
-                                                    .storeModel?.offset,
-                                                onPaginate:
-                                                    (int? offset) async =>
-                                                        await storeController
-                                                            .getStoreList(
-                                                                offset!, false),
-                                                itemView: ItemsView(
-                                                  isStore: true,
-                                                  items: null,
-                                                  isFoodOrGrocery:
-                                                      (isFood || isGrocery),
-                                                  stores: storeController
-                                                      .storeModel?.stores,
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: ResponsiveHelper
-                                                            .isDesktop(context)
-                                                        ? Dimensions
-                                                            .paddingSizeExtraSmall
-                                                        : Dimensions
-                                                            .paddingSizeSmall,
-                                                    vertical: ResponsiveHelper
-                                                            .isDesktop(context)
-                                                        ? Dimensions
-                                                            .paddingSizeExtraSmall
-                                                        : Dimensions
-                                                            .paddingSizeDefault,
+                                      ? Column(
+                                          children: [
+                                            GetBuilder<StoreController>(
+                                                builder: (storeController) {
+                                              if (storeController
+                                                  .isLoadingCategoriesWithStores) {
+                                                return const Padding(
+                                                  padding: EdgeInsets.all(
+                                                      Dimensions
+                                                          .paddingSizeDefault),
+                                                  child: Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
                                                   ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
+                                                );
+                                              }
+
+                                              if (storeController
+                                                          .categoryWithStoreList ==
+                                                      null ||
+                                                  storeController
+                                                      .categoryWithStoreList!
+                                                      .isEmpty) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    Dimensions
+                                                        .paddingSizeDefault,
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      const SizedBox(
+                                                        height: Dimensions
+                                                            .paddingSizeDefault,
+                                                      ),
+                                                      Center(
+                                                        child: Text(
+                                                          'no_categories_with_stores_found_yet'
+                                                              .tr,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: Dimensions
+                                                            .paddingSizeDefault,
+                                                      ),
+                                                      ElevatedButton.icon(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                              Dimensions
+                                                                  .paddingSizeSmall,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        label:
+                                                            Text("refresh".tr),
+                                                        icon: const Icon(
+                                                            Icons.refresh),
+                                                        onPressed: () async {
+                                                          print(
+                                                              "getCategoriesWithStoreList called");
+                                                          await Get.find<
+                                                                  StoreController>()
+                                                              .getCategoriesWithStoreList(
+                                                                  reload: true);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }
+                                              return ListView.builder(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: storeController
+                                                    .categoryWithStoreList!
+                                                    .length,
+                                                itemBuilder: (context, index) {
+                                                  CategoryWithStores
+                                                      categoryWithStore =
+                                                      storeController
+                                                              .categoryWithStoreList![
+                                                          index];
+
+                                                  return categoryWithStore
+                                                          .stores!.isEmpty
+                                                      ? const SizedBox.shrink()
+                                                      : Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              // Display the category name
+                                                              child: Text(
+                                                                categoryWithStore
+                                                                        .cName ??
+                                                                    '',
+                                                                style: STCBold
+                                                                    .copyWith(
+                                                                        fontSize:
+                                                                            20),
+                                                              ),
+                                                            ),
+
+                                                            ItemsView(
+                                                              isStore: true,
+                                                              items: null,
+                                                              isFromHome: true,
+                                                              isFoodOrGrocery:
+                                                                  (isFood ||
+                                                                      isGrocery),
+                                                              stores:
+                                                                  categoryWithStore
+                                                                      .stores,
+                                                              // storeController
+                                                              //     .storeModel?.stores,
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: ResponsiveHelper
+                                                                        .isDesktop(
+                                                                            context)
+                                                                    ? Dimensions
+                                                                        .paddingSizeExtraSmall
+                                                                    : Dimensions
+                                                                        .paddingSizeSmall,
+                                                                vertical: ResponsiveHelper
+                                                                        .isDesktop(
+                                                                            context)
+                                                                    ? Dimensions
+                                                                        .paddingSizeExtraSmall
+                                                                    : Dimensions
+                                                                        .paddingSizeDefault,
+                                                              ),
+                                                            )
+                                                            // Create a horizontal list for the stores in this category
+                                                            // SizedBox(
+                                                            //   height: 220,
+                                                            //   // Adjust height as needed
+                                                            //   child: ListView.builder(
+                                                            //     scrollDirection:
+                                                            //         Axis.horizontal,
+                                                            //     shrinkWrap: true,
+                                                            //     itemCount:
+                                                            //         categoryWithStore
+                                                            //                 .stores
+                                                            //                 ?.length ??
+                                                            //             0,
+                                                            //     itemBuilder: (context,
+                                                            //         storeIndex) {
+                                                            //       final store =
+                                                            //           categoryWithStore
+                                                            //                   .stores![
+                                                            //               storeIndex];
+                                                            //       // Use your existing StoreWidget to display the store
+                                                            //       return Padding(
+                                                            //         padding:
+                                                            //             const EdgeInsets
+                                                            //                 .symmetric(
+                                                            //                 horizontal:
+                                                            //                     8.0),
+                                                            //         child: Text(store
+                                                            //             .name
+                                                            //             .toString()),
+                                                            //       );
+                                                            //     },
+                                                            //   ),
+                                                            // ),
+                                                          ],
+                                                        );
+                                                },
+                                              );
+                                            }),
+                                            const SizedBox(height: 200),
+                                            // Center(
+                                            //   child:
+                                            //       GetBuilder<StoreController>(
+                                            //           builder:
+                                            //               (storeController) {
+                                            //     return Padding(
+                                            //       padding: EdgeInsets.only(
+                                            //           bottom: ResponsiveHelper
+                                            //                   .isDesktop(
+                                            //                       context)
+                                            //               ? 0
+                                            //               : 100),
+                                            //       child: PaginatedListView(
+                                            //         scrollController:
+                                            //             _scrollController,
+                                            //         totalSize: storeController
+                                            //             .storeModel?.totalSize,
+                                            //         offset: storeController
+                                            //             .storeModel?.offset,
+                                            //         onPaginate: (int?
+                                            //                 offset) async =>
+                                            //             await storeController
+                                            //                 .getStoreList(
+                                            //                     offset!, false),
+                                            //         itemView: ItemsView(
+                                            //           isStore: true,
+                                            //           items: null,
+                                            //           isFoodOrGrocery:
+                                            //               (isFood || isGrocery),
+                                            //           stores: storeController
+                                            //               .storeModel?.stores,
+                                            //           padding:
+                                            //               EdgeInsets.symmetric(
+                                            //             horizontal: ResponsiveHelper
+                                            //                     .isDesktop(
+                                            //                         context)
+                                            //                 ? Dimensions
+                                            //                     .paddingSizeExtraSmall
+                                            //                 : Dimensions
+                                            //                     .paddingSizeSmall,
+                                            //             vertical: ResponsiveHelper
+                                            //                     .isDesktop(
+                                            //                         context)
+                                            //                 ? Dimensions
+                                            //                     .paddingSizeExtraSmall
+                                            //                 : Dimensions
+                                            //                     .paddingSizeDefault,
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //     );
+                                            //   }),
+                                            // ),
+                                          ],
                                         )
                                       : const SizedBox()),
                             ],

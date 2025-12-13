@@ -77,6 +77,7 @@ class ApiClient extends GetxService {
     header.addAll({
       'Content-Type': 'application/json; charset=UTF-8',
       // AppConstants.zoneId: zoneIDs != null ? jsonEncode([3, 2]) : '',
+      // AppConstants.zoneId: jsonEncode([2]) ,//zoneIDs != null ? jsonEncode([3]) : '',
       AppConstants.zoneId: zoneIDs != null ? jsonEncode(zoneIDs) : '',
       ///this will add in ride module
       // AppConstants.operationAreaId: operationIds != null ? jsonEncode(operationIds) : '',
@@ -108,8 +109,6 @@ class ApiClient extends GetxService {
             headers: headers ?? _mainHeaders,
           )
           .timeout(Duration(seconds: timeoutInSeconds));
-      final data = jsonDecode(response.body);
-      log("response : response ${data.toString()}");
       return handleResponse(response, uri, handleError);
     } catch (e) {
       if (kDebugMode) {

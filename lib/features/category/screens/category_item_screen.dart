@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
 import 'package:sixam_mart/features/category/controllers/category_controller.dart';
@@ -9,6 +10,7 @@ import 'package:sixam_mart/features/home/widgets/category_pop_up.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -22,8 +24,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../common/models/module_model.dart';
+import '../../../util/app_constants.dart';
 import '../../home/widgets/category_view.dart';
 import '../../language/controllers/language_controller.dart';
+import '../../store/controllers/store_controller.dart';
 import '../../store/screens/store_screen.dart';
 import '../domain/models/category_model.dart';
 
@@ -44,11 +48,14 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
   final ScrollController storeScrollController = ScrollController();
   TabController? _tabController;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool? showRestaurantText = ModuleHelper.getModule()!.id!.toString() ==
+      AppConstants.restaurantModuleId;
 
   @override
   void initState() {
     super.initState();
-
+    showRestaurantText = ModuleHelper.getModule()!.id!.toString() ==
+        AppConstants.restaurantModuleId;
     _tabController = TabController(length: 2, initialIndex: 0, vsync: this);
     // Get.find<CategoryController>().getSubCategoryList(widget.categoryID);
 
@@ -447,11 +454,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                               tabs: [
                                 // ← اجعل "المطاعم / المتاجر" أول تبويب
                                 Tab(
-                                  text: Get.find<SplashController>()
-                                          .configModel!
-                                          .moduleConfig!
-                                          .module!
-                                          .showRestaurantText!
+                                  text: showRestaurantText!
                                       ? 'restaurants'.tr
                                       : 'stores'.tr,
                                 ),
@@ -528,11 +531,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                       isStore: true,
                                       items: null,
                                       stores: stores,
-                                      noDataText: Get.find<SplashController>()
-                                              .configModel!
-                                              .moduleConfig!
-                                              .module!
-                                              .showRestaurantText!
+                                      noDataText: showRestaurantText!
                                           ? 'no_category_restaurant_found'.tr
                                           : 'no_category_store_found'.tr,
                                     ),
@@ -775,7 +774,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                 //     ]),
                 //   ),
                 : SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     child: Column(
                       children: [
                         Row(
@@ -790,9 +789,9 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                           itemCount: catController
                                               .categoryList!.length,
                                           padding: const EdgeInsets.only(
-                                              left: Dimensions.paddingSizeSmall,
-                                              top: Dimensions
-                                                  .paddingSizeDefault),
+                                            left: Dimensions.paddingSizeSmall,
+                                            top: Dimensions.paddingSizeDefault,
+                                          ),
                                           physics:
                                               const BouncingScrollPhysics(),
                                           scrollDirection: Axis.horizontal,
@@ -800,6 +799,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                             final String catId = catController
                                                 .categoryList![index].id
                                                 .toString();
+
                                             return Padding(
                                               padding: const EdgeInsets.only(
                                                   bottom: Dimensions
@@ -809,12 +809,31 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                                   top: Dimensions
                                                       .paddingSizeDefault),
                                               child: InkWell(
-                                                onTap: () {
+                                                onTap: () async {
                                                   catController
                                                       .setSelectedCategoryStores(
                                                     selectedCatId:
                                                         catId.toString(),
                                                   );
+                                                  SharedPreferences
+                                                      sharedPreferences =
+                                                      await SharedPreferences
+                                                          .getInstance();
+                                                  final moduleID =
+                                                      sharedPreferences
+                                                              .getString(
+                                                                  "moduleId") ??
+                                                          '2';
+                                                  // log("current module id is: $moduleID");
+                                                  log(showRestaurantText!
+                                                      ? "true"
+                                                      : "false");
+                                                  log(ModuleHelper.getModule()!
+                                                          .id!
+                                                          .toString() +
+                                                      AppConstants
+                                                          .restaurantModuleId);
+
                                                   // changeSelectedCategory(
                                                   //   categoryId:
                                                   //       catId.toString(),
@@ -839,7 +858,6 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                                 // },
                                                 child: Container(
                                                   // color: Colors.green,
-
                                                   width: 80,
                                                   child: Column(children: [
                                                     Container(
@@ -925,13 +943,12 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                                             .categoryList![
                                                                 index]
                                                             .name!,
-                                                        style:
-                                                            STCMedium.copyWith(
+                                                        style: STCBold.copyWith(
                                                           fontWeight: (index ==
                                                                   selectedCat)
                                                               ? FontWeight.bold
                                                               : null,
-                                                          fontSize: 11,
+                                                          // fontSize: 11,
                                                           color: catId ==
                                                                   catController
                                                                       .selectedCatId
@@ -940,11 +957,12 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                                                   .primaryColor
                                                               : null,
                                                         ),
-                                                        maxLines: Get.find<
-                                                                    LocalizationController>()
-                                                                .isLtr
-                                                            ? 2
-                                                            : 1,
+                                                        maxLines: 1,
+                                                        // Get.find<
+                                                        //             LocalizationController>()
+                                                        //         .isLtr
+                                                        //     ? 1
+                                                        //     : 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
                                                         textAlign:
@@ -1036,10 +1054,13 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0, vertical: 8.0),
                                     child: Text(
-                                      "stores_title".tr, // Localized title
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18, // Slightly larger title
+                                      showRestaurantText!
+                                          ? 'restaurants'.tr
+                                          : 'stores_title'.tr,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: STCBold.copyWith(
+                                        fontSize: 18,
                                       ),
                                     ),
                                   ),
@@ -1087,7 +1108,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                         catController
                                             .selectCatStoreList!.isNotEmpty) {
                                       // Data is available and not empty, show the GridView
-                                      return Container(
+                                      return SizedBox(
                                         width: double.infinity,
                                         child: GridView.builder(
                                           itemCount: catController
@@ -1130,33 +1151,47 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                               ),
                                               child: InkWell(
                                                 // Make card tappable
-                                                onTap: (){
+                                                onTap: () {
                                                   if (store != null) {
                                                     log("I am in store is not null...........");
-                                                  if (Get.find<SplashController>().moduleList != null) {
-                                              log("I am in store module list is not null...........");
+                                                    if (Get.find<
+                                                                SplashController>()
+                                                            .moduleList !=
+                                                        null) {
+                                                      log("I am in store module list is not null...........");
 
-                                              for (ModuleModel module
-                                              in Get.find<SplashController>().moduleList!) {
-                                                if (module.id == store!.moduleId) {
-                                                  log("i am in for if statement ...........");
+                                                      for (ModuleModel module
+                                                          in Get.find<
+                                                                  SplashController>()
+                                                              .moduleList!) {
+                                                        if (module.id ==
+                                                            store!.moduleId) {
+                                                          log("i am in for if statement ...........");
 
-                                                  Get.find<SplashController>().setModule(module);
-                                                  break;
-                                                }
-                                              }
-                                            }
-                                            log("Store Id is: ${store!.id.toString()}");
-                                            Get.toNamed(
-                                              RouteHelper.getStoreRoute(id: store!.id, page: 'item'),
-                                              arguments: StoreScreen(
-                                                store: store,
-                                                fromModule: false,
-                                                isNewSuperMarket: store.moduleId == 1 ? true:false,
-                                              ),
-                                            );
-                                          }
-                                            },
+                                                          Get.find<
+                                                                  SplashController>()
+                                                              .setModule(
+                                                                  module);
+                                                          break;
+                                                        }
+                                                      }
+                                                    }
+                                                    log("Store Id is: ${store!.id.toString()}");
+                                                    Get.toNamed(
+                                                      RouteHelper.getStoreRoute(
+                                                          id: store!.id,
+                                                          page: 'item'),
+                                                      arguments: StoreScreen(
+                                                        store: store,
+                                                        fromModule: false,
+                                                        isNewSuperMarket:
+                                                            store.moduleId == 1
+                                                                ? true
+                                                                : false,
+                                                      ),
+                                                    );
+                                                  }
+                                                },
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
@@ -1320,8 +1355,9 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                         height:
                                             200, // Give some height to the message
                                         alignment: Alignment.center,
-                                        child: Text("no_stores_match_filter"
-                                            .tr), // Message for empty filtered list
+                                        child: Text(
+                                          "no_stores_match_filter".tr,
+                                        ), // Message for empty filtered list
                                       );
                                     }
                                   }),

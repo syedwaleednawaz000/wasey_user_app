@@ -130,7 +130,8 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
                     const SizedBox(
                         height: Dimensions.paddingSizeExtremeLarge),
                     CustomTextField(
-                      titleText: 'ex_jhon'.tr,
+                      // titleText: 'ex_jhon'.tr,
+                      titleText: "",
                       labelText: 'user_name'.tr,
                       showLabelText: true,
                       required: true,

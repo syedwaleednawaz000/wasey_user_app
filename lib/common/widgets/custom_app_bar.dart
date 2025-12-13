@@ -16,6 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Function(String value)? onVegFilterTap;
   final String? type;
   final String? leadingIcon;
+
   const CustomAppBar(
       {super.key,
       required this.title,
@@ -24,7 +25,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.showCart = false,
       this.leadingIcon,
       this.onVegFilterTap,
-      this.type});
+      this.type,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).textTheme.bodyLarge!.color)),
             centerTitle: true,
+
             leading: backButton
                 ? IconButton(
                     icon: leadingIcon != null

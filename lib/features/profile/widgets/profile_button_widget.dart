@@ -10,6 +10,8 @@ class ProfileButtonWidget extends StatelessWidget {
   final Function onTap;
   final Color? color;
   final String? iconImage;
+  final bool isMenuScreen;
+
   const ProfileButtonWidget(
       {super.key,
       this.icon,
@@ -17,7 +19,8 @@ class ProfileButtonWidget extends StatelessWidget {
       required this.onTap,
       this.isButtonActive,
       this.color,
-      this.iconImage});
+      this.iconImage,
+      this.isMenuScreen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -25,29 +28,40 @@ class ProfileButtonWidget extends StatelessWidget {
       onTap: onTap as void Function()?,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: Dimensions.paddingSizeSmall,
-          vertical: isButtonActive != null
-              ? Dimensions.paddingSizeExtraSmall
-              : Dimensions.paddingSizeDefault,
+          horizontal: isMenuScreen ? 0 : Dimensions.paddingSizeSmall,
+          vertical: isMenuScreen
+              ? 0
+              : isButtonActive != null
+                  ? Dimensions.paddingSizeExtraSmall
+                  : Dimensions.paddingSizeDefault,
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-          border: Border.all(color: Theme.of(context).primaryColor, width: 0.1),
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).primaryColor.withAlpha((0.1 * 255).toInt()),
-                spreadRadius: 1,
-                blurRadius: 5)
-          ],
+          borderRadius: isMenuScreen
+              ? null
+              : BorderRadius.circular(Dimensions.radiusDefault),
+          border: isMenuScreen
+              ? null
+              : Border.all(color: Theme.of(context).primaryColor, width: 0.1),
+          boxShadow: isMenuScreen
+              ? null
+              : [
+                  BoxShadow(
+                      color: Theme.of(context)
+                          .primaryColor
+                          .withAlpha((0.1 * 255).toInt()),
+                      spreadRadius: 1,
+                      blurRadius: 5)
+                ],
         ),
         child: Row(children: [
           iconImage != null
               ? Image.asset(iconImage!, height: 18, width: 25)
               : Icon(icon,
-                  size: 25,
-                  color:
-                      color ?? Theme.of(context).textTheme.bodyMedium!.color),
+                  size: isMenuScreen ? 16 : 25,
+                  color: isMenuScreen
+                      ? null
+                      : color ?? Theme.of(context).textTheme.bodyMedium!.color),
           const SizedBox(width: Dimensions.paddingSizeSmall),
           Expanded(child: Text(title, style: STCRegular)),
           isButtonActive != null
@@ -57,8 +71,9 @@ class ProfileButtonWidget extends StatelessWidget {
                     value: isButtonActive!,
                     activeTrackColor: Theme.of(context).primaryColor,
                     onChanged: (bool? value) => onTap(),
-                    inactiveTrackColor:
-                        Theme.of(context).primaryColor.withAlpha((0.5 * 255).toInt()),
+                    inactiveTrackColor: Theme.of(context)
+                        .primaryColor
+                        .withAlpha((0.5 * 255).toInt()),
                   ),
                 )
               : const SizedBox()

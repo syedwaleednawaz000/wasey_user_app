@@ -19,8 +19,11 @@ import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../../util/images.dart';
+
 class BannerView extends StatefulWidget {
   final bool isFeatured;
+
   const BannerView({super.key, required this.isFeatured});
 
   @override
@@ -62,136 +65,154 @@ class _BannerViewState extends State<BannerView> {
           ? bannerController.featuredBannerDataList
           : bannerController.bannerDataList;
 
-      return (bannerList != null && bannerList.isEmpty)
-          ? const SizedBox()
-          : Container(
+      return Container(
         width: screenWidth,
         padding: const EdgeInsets.only(top: Dimensions.paddingSizeDefault),
-        child: bannerList != null
+        child: (bannerList != null && bannerList.isNotEmpty)
             ? Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Stack(
-              children: [
-                CarouselSlider.builder(
-                  options: CarouselOptions(
-                    autoPlay: true,
-                    enlargeCenterPage: false,
-                    viewportFraction: 1.0,
-                    autoPlayInterval: const Duration(seconds: 4),
-                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                    pauseAutoPlayOnTouch: true,
-                    onPageChanged: (index, reason) {
-                      bannerController.setCurrentIndex(index, true, contextForPrecache: context);
-                    },
-                    height: bannerHeight,
-                  ),
-                  itemCount: bannerList.length,
-                  itemBuilder: (context, index, _) {
-                    return InkWell(
-                      onTap: () async {
-                        var data = bannerDataList![index];
-                        if (data is Item) {
-                          Get.find<ItemController>().navigateToItemPage(data, context);
-                        } else if (data is Store) {
-                          if (widget.isFeatured &&
-                              (AddressHelper.getUserAddressFromSharedPref()?.zoneData?.isNotEmpty ?? false)) {
-                            for (ModuleModel module in Get.find<SplashController>().moduleList!) {
-                              if (module.id == data.moduleId) {
-                                Get.find<SplashController>().setModule(module);
-                                break;
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Stack(
+                    children: [
+                      CarouselSlider.builder(
+                        options: CarouselOptions(
+                          autoPlay: true,
+                          enlargeCenterPage: false,
+                          viewportFraction: 1.0,
+                          autoPlayInterval: const Duration(seconds: 4),
+                          autoPlayAnimationDuration:
+                              const Duration(milliseconds: 800),
+                          pauseAutoPlayOnTouch: true,
+                          onPageChanged: (index, reason) {
+                            bannerController.setCurrentIndex(index, true,
+                                contextForPrecache: context);
+                          },
+                          height: bannerHeight,
+                        ),
+                        itemCount: bannerList.length,
+                        itemBuilder: (context, index, _) {
+                          return InkWell(
+                            onTap: () async {
+                              var data = bannerDataList![index];
+                              if (data is Item) {
+                                Get.find<ItemController>()
+                                    .navigateToItemPage(data, context);
+                              } else if (data is Store) {
+                                if (widget.isFeatured &&
+                                    (AddressHelper
+                                                .getUserAddressFromSharedPref()
+                                            ?.zoneData
+                                            ?.isNotEmpty ??
+                                        false)) {
+                                  for (ModuleModel module
+                                      in Get.find<SplashController>()
+                                          .moduleList!) {
+                                    if (module.id == data.moduleId) {
+                                      Get.find<SplashController>()
+                                          .setModule(module);
+                                      break;
+                                    }
+                                  }
+                                  ZoneData zoneData = AddressHelper
+                                          .getUserAddressFromSharedPref()!
+                                      .zoneData!
+                                      .firstWhere((z) => z.id == data.zoneId);
+                                  Modules module = zoneData.modules!
+                                      .firstWhere((m) => m.id == data.moduleId);
+                                  Get.find<SplashController>().setModule(
+                                    ModuleModel(
+                                      id: module.id,
+                                      moduleName: module.moduleName,
+                                      moduleType: module.moduleType,
+                                      themeId: module.themeId,
+                                      storesCount: module.storesCount,
+                                    ),
+                                  );
+                                }
+                                Get.toNamed(
+                                  RouteHelper.getStoreRoute(
+                                    id: data.id,
+                                    page:
+                                        widget.isFeatured ? 'module' : 'banner',
+                                  ),
+                                  arguments: StoreScreen(
+                                      store: data,
+                                      fromModule: widget.isFeatured),
+                                );
+                              } else if (data is BasicCampaignModel) {
+                                Get.toNamed(
+                                    RouteHelper.getBasicCampaignRoute(data));
+                              } else {
+                                String url = data;
+                                if (await canLaunchUrlString(url)) {
+                                  await launchUrlString(url,
+                                      mode: LaunchMode.externalApplication);
+                                } else {
+                                  showCustomSnackBar('unable_to_found_url'.tr);
+                                }
                               }
-                            }
-                            ZoneData zoneData = AddressHelper.getUserAddressFromSharedPref()!.zoneData!
-                                .firstWhere((z) => z.id == data.zoneId);
-                            Modules module = zoneData.modules!.firstWhere((m) => m.id == data.moduleId);
-                            Get.find<SplashController>().setModule(
-                              ModuleModel(
-                                id: module.id,
-                                moduleName: module.moduleName,
-                                moduleType: module.moduleType,
-                                themeId: module.themeId,
-                                storesCount: module.storesCount,
-                              ),
-                            );
-                          }
-                          Get.toNamed(
-                            RouteHelper.getStoreRoute(
-                              id: data.id,
-                              page: widget.isFeatured ? 'module' : 'banner',
-                            ),
-                            arguments: StoreScreen(store: data, fromModule: widget.isFeatured),
-                          );
-                        } else if (data is BasicCampaignModel) {
-                          Get.toNamed(RouteHelper.getBasicCampaignRoute(data));
-                        } else {
-                          String url = data;
-                          if (await canLaunchUrlString(url)) {
-                            await launchUrlString(url, mode: LaunchMode.externalApplication);
-                          } else {
-                            showCustomSnackBar('unable_to_found_url'.tr);
-                          }
-                        }
-                      },
-                      child: SizedBox(
-                        width: screenWidth,
-                        height: bannerHeight,
-                        child: GetBuilder<SplashController>(
-                          builder: (splashController) {
-                            return CustomImage(
-                              image: '${bannerList[index]}',
-                              fit: BoxFit.fill,
+                            },
+                            child: SizedBox(
                               width: screenWidth,
                               height: bannerHeight,
-                              placeholder: 'assets/image/placeholder.jpg',
-                              // fadeInDuration: const Duration(milliseconds: 500),
-                            );
-                          },
-                        ),
+                              child: GetBuilder<SplashController>(
+                                builder: (splashController) {
+                                  return CustomImage(
+                                    image: '${bannerList[index]}',
+                                    fit: BoxFit.fill,
+                                    width: screenWidth,
+                                    height: bannerHeight,
+                                    placeholder: Images.placeholder,
+                                    // fadeInDuration: const Duration(milliseconds: 500),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                Positioned(
-                  top: 20,
-                  left: 0,
-                  right: 0,
-                  child: GetBuilder<BannerController>(builder: (controller) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(bannerList.length, (index) {
-                        return Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: controller.currentIndex == index
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.5),
-                          ),
-                        );
-                      }),
-                    );
-                  }),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-          ],
-        )
+                      Positioned(
+                        top: 20,
+                        left: 0,
+                        right: 0,
+                        child:
+                            GetBuilder<BannerController>(builder: (controller) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(bannerList.length, (index) {
+                              return Container(
+                                width: 8,
+                                height: 8,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: controller.currentIndex == index
+                                      ? Colors.white
+                                      : Colors.white.withOpacity(0.5),
+                                ),
+                              );
+                            }),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              )
             : Shimmer(
-          duration: const Duration(seconds: 2),
-          enabled: bannerList == null,
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-              color: Colors.grey[300],
-            ),
-            height: bannerHeight,
-          ),
-        ),
+                duration: const Duration(seconds: 2),
+                enabled: bannerList == null,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                    color: Colors.grey[300],
+                  ),
+                  height: bannerHeight,
+                ),
+              ),
       );
     });
   }

@@ -37,6 +37,7 @@ import 'package:universal_html/html.dart' as html;
 
 import '../../../common/models/module_model.dart';
 import '../../payment/screens/DirectPaymentScreen.dart';
+import '../../payment/screens/tranzila_web_payment_screen.dart';
 import '../domain/models/delivery_charges_data_model.dart';
 
 class CheckoutController extends GetxController implements GetxService {
@@ -55,12 +56,12 @@ class CheckoutController extends GetxController implements GetxService {
   final FocusNode floorNode = FocusNode();
 
   String? countryDialCode =
-  Get.find<AuthController>().getUserCountryCode().isNotEmpty
-      ? Get.find<AuthController>().getUserCountryCode()
-      : CountryCode.fromCountryCode(
-      Get.find<SplashController>().configModel!.country!)
-      .dialCode ??
-      Get.find<LocalizationController>().locale.countryCode;
+      Get.find<AuthController>().getUserCountryCode().isNotEmpty
+          ? Get.find<AuthController>().getUserCountryCode()
+          : CountryCode.fromCountryCode(
+                      Get.find<SplashController>().configModel!.country!)
+                  .dialCode ??
+              Get.find<LocalizationController>().locale.countryCode;
 
   bool _isLoading = false;
 
@@ -146,7 +147,7 @@ class CheckoutController extends GetxController implements GetxService {
 
   double? get extraCharge => _extraCharge;
 
-  String? _orderType = 'delivery';
+  String? _orderType = 'take_away';
 
   String? get orderType => _orderType;
 
@@ -186,9 +187,9 @@ class CheckoutController extends GetxController implements GetxService {
   var deliveryChargesList = <DeliveryChargeData>[].obs;
   var isLoadingDeliveryCharges = false.obs;
   var currentActiveModuleId =
-  Rxn<int>(); // To hold and react to module ID changes
+      Rxn<int>(); // To hold and react to module ID changes
   var currentSelectedDeliveryChargesData =
-  Rxn<DeliveryChargeData>(); // To hold and react to module ID changes
+      Rxn<DeliveryChargeData>(); // To hold and react to module ID changes
 
   void toggleSelectedChargesCity(DeliveryChargeData cityId) {
     currentSelectedDeliveryChargesData.value = cityId;
@@ -265,7 +266,7 @@ class CheckoutController extends GetxController implements GetxService {
 
       if (response.statusCode == 200 && response.body != null) {
         DeliveryChargesResponse deliveryChargesResponse =
-        DeliveryChargesResponse.fromJson(response.body);
+            DeliveryChargesResponse.fromJson(response.body);
         log("=========ResponseData");
         log(response.body.toString());
 
@@ -274,7 +275,7 @@ class CheckoutController extends GetxController implements GetxService {
           // deliveryChargesList.assignAll(deliveryChargesResponse.data);
           List<DeliveryChargeData> filteredData = deliveryChargesResponse.data
               .where((chargeData) =>
-          chargeData.moduleId == int.parse(moduleIdString!))
+                  chargeData.moduleId == int.parse(moduleIdString!))
               .toList();
           if (deliveryChargesResponse.data.isNotEmpty &&
               filteredData.isNotEmpty) {
@@ -493,37 +494,37 @@ class CheckoutController extends GetxController implements GetxService {
       if (response.statusCode == 200 && response.body['status'] == 'OK') {
         if (isDuration) {
           _distance = DistanceModel.fromJson(response.body)
-              .rows![0]
-              .elements![0]
-              .duration!
-              .value! /
+                  .rows![0]
+                  .elements![0]
+                  .duration!
+                  .value! /
               3600;
         } else {
           _distance = DistanceModel.fromJson(response.body)
-              .rows![0]
-              .elements![0]
-              .distance!
-              .value! /
+                  .rows![0]
+                  .elements![0]
+                  .distance!
+                  .value! /
               1000;
         }
       } else {
         if (!isDuration) {
           _distance = Geolocator.distanceBetween(
-            originLatLng.latitude,
-            originLatLng.longitude,
-            destinationLatLng.latitude,
-            destinationLatLng.longitude,
-          ) /
+                originLatLng.latitude,
+                originLatLng.longitude,
+                destinationLatLng.latitude,
+                destinationLatLng.longitude,
+              ) /
               1000;
         }
       }
     } catch (e) {
       if (!isDuration) {
         _distance = Geolocator.distanceBetween(
-            originLatLng.latitude,
-            originLatLng.longitude,
-            destinationLatLng.latitude,
-            destinationLatLng.longitude) /
+                originLatLng.latitude,
+                originLatLng.longitude,
+                destinationLatLng.latitude,
+                destinationLatLng.longitude) /
             1000;
       }
     }
@@ -547,7 +548,7 @@ class CheckoutController extends GetxController implements GetxService {
     }
     setPaymentMethod(-1);
     if ((Get.find<ProfileController>().userInfoModel!.walletBalance! <
-        totalPrice) &&
+            totalPrice) &&
         (Get.find<ProfileController>().userInfoModel!.walletBalance! != 0.0)) {
       Get.dialog(
         PartialPayDialogWidget(isPartialPay: true, totalPrice: totalPrice),
@@ -609,7 +610,7 @@ class CheckoutController extends GetxController implements GetxService {
     String orderID = '';
     String userID = '';
     Response response =
-    await checkoutServiceInterface.placeOrder(placeOrderBody, multiParts);
+        await checkoutServiceInterface.placeOrder(placeOrderBody, multiParts);
     _isLoading = false;
     if (response.statusCode == 200) {
       String? message = response.body['message'];
@@ -761,19 +762,24 @@ class CheckoutController extends GetxController implements GetxService {
       //   }
       // }
       if (paymentMethodIndex == 2) {
-        // الانتقال مباشرة لصفحة الدفع المباشر
-        Get.to(() => DirectPaymentScreen(
-          orderId: orderID,
-          // <<-- استخدمي orderId هنا، ليس orderID
-          customerID: Get.find<ProfileController>().userInfoModel?.id ??
-              (userID.isNotEmpty ? int.parse(userID) : 0),
-          orderType: orderType,
-          amount: amount,
-          isCashOnDeliveryActive: isCashOnDeliveryActive,
-          paymentMethod: digitalPaymentName,
-          guestID: userID.isNotEmpty ? userID : AuthHelper.getGuestId(),
-          contactNumber: contactNumber,
-        ));
+        // if (digitalPaymentName != null && digitalPaymentName!.isNotEmpty) {
+        //   if (digitalPaymentName!.toLowerCase() == 'tranzila') {
+        //     log("Digital payment is Tranzila, navigating to WebView screen.");
+        //     Get.to(() => TranzilaWebPaymentScreen(orderID: orderID));
+        //   }
+        // } else {
+          Get.to(() => DirectPaymentScreen(
+                orderId: orderID,
+                customerID: Get.find<ProfileController>().userInfoModel?.id ??
+                    (userID.isNotEmpty ? int.parse(userID) : 0),
+                orderType: orderType,
+                amount: amount,
+                isCashOnDeliveryActive: isCashOnDeliveryActive,
+                paymentMethod: digitalPaymentName,
+                guestID: userID.isNotEmpty ? userID : AuthHelper.getGuestId(),
+                contactNumber: contactNumber,
+              ));
+        // }
       } else {
         double total = ((amount / 100) *
             Get.find<SplashController>()
@@ -787,7 +793,7 @@ class CheckoutController extends GetxController implements GetxService {
           Get.offNamed(RouteHelper.getInitialRoute());
           Future.delayed(
               const Duration(seconds: 2),
-                  () => Get.dialog(Center(
+              () => Get.dialog(Center(
                   child: SizedBox(
                       height: 350,
                       width: 500,

@@ -8,6 +8,7 @@ import 'package:sixam_mart/common/widgets/custom_text_field.dart';
 class NoteAndPrescriptionSection extends StatelessWidget {
   final CheckoutController checkoutController;
   final int? storeId;
+
   const NoteAndPrescriptionSection({
     super.key,
     required this.checkoutController,
@@ -16,43 +17,47 @@ class NoteAndPrescriptionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('note_for_restaurant'.tr, style: STCMedium),
-      const SizedBox(height: Dimensions.paddingSizeSmall),
-      CustomTextField(
-        controller: checkoutController.noteController,
-        titleText: 'please_provide_extra_napkin'.tr,
-        showLabelText: false,
-        maxLines: 3,
-        inputType: TextInputType.multiline,
-        inputAction: TextInputAction.done,
-        capitalization: TextCapitalization.sentences,
-      ),
-      const SizedBox(height: Dimensions.paddingSizeLarge),
+    return Padding(
+      padding:
+          const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('note_for_restaurant'.tr, style: STCMedium),
+        const SizedBox(height: Dimensions.paddingSizeSmall),
+        CustomTextField(
+          controller: checkoutController.noteController,
+          titleText: 'please_provide_extra_napkin'.tr,
+          showLabelText: false,
+          maxLines: 3,
+          inputType: TextInputType.multiline,
+          inputAction: TextInputAction.done,
+          capitalization: TextCapitalization.sentences,
+        ),
+        const SizedBox(height: Dimensions.paddingSizeLarge),
 
-      /*storeId == null && Get.find<SplashController>().configModel!.moduleConfig!.module!.orderAttachment! ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Text('prescription'.tr, style: STCMedium),
-            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+        /*storeId == null && Get.find<SplashController>().configModel!.moduleConfig!.module!.orderAttachment! ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Text('prescription'.tr, style: STCMedium),
+              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-            Text(
-              '(${'max_size_2_mb'.tr})',
-              style: STCRegular.copyWith(
-                fontSize: Dimensions.fontSizeExtraSmall,
-                color: Theme.of(context).colorScheme.error,
+              Text(
+                '(${'max_size_2_mb'.tr})',
+                style: STCRegular.copyWith(
+                  fontSize: Dimensions.fontSizeExtraSmall,
+                  color: Theme.of(context).colorScheme.error,
+                ),
               ),
-            ),
-          ]),
-          const SizedBox(height: Dimensions.paddingSizeSmall),
+            ]),
+            const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          ImagePickerWidget(
-            image: '', rawFile: checkoutController.rawAttachment,
-            onTap: () => checkoutController.pickImage(),
-          ),
-        ],
-      ) : const SizedBox(),*/
-    ]);
+            ImagePickerWidget(
+              image: '', rawFile: checkoutController.rawAttachment,
+              onTap: () => checkoutController.pickImage(),
+            ),
+          ],
+        ) : const SizedBox(),*/
+      ]),
+    );
   }
 }

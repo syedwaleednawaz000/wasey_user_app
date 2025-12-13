@@ -1,6 +1,12 @@
 class Images {
-  static const String logo = 'assets/image/logo.png';
-  static const String placeholder = 'assets/image/placeholder.jpg';
+  static const String logo = 'assets/image/logo_black.png';
+  static const String app_icon = 'assets/image/app_icon_logo.png';
+  static const String placeholder = 'assets/image/logo_black.png';
+  // static const String placeholder = 'assets/image/placeholder.jpg';
+  static const String market = 'assets/image/market.png';
+  static const String restaurants = 'assets/image/resturants.png';
+  static const String myOrders = 'assets/image/my-orders.png';
+  static const String myCarts = 'assets/image/cart.png';
   static const String notificationPlaceholder = 'assets/image/notification_placeholder.jpg';
   static const String arabic = 'assets/image/arabic.png';
   static const String bengali = 'assets/image/bangla.png';
@@ -16,6 +22,10 @@ class Images {
   static const String onboard_2 = 'assets/image/onboard_2.png';
   static const String onboard_3 = 'assets/image/onboard_3.png';
   static const String restaurantMarker = 'assets/image/restaurant_marker.png';
+  static const String deliveryClicked = 'assets/image/delivery-clicked.png';
+  static const String deliveryNotClicked = 'assets/image/delivery-not-clicked.png';
+  static const String pickupClicked = 'assets/image/pickup-clicked.png';
+  static const String pickupNotClicked = 'assets/image/pickup-not-clicked.png';
   static const String deliveryManMarker = 'assets/image/delivery_man_marker.png';
   static const String user = 'assets/image/user.png';
   static const String aboutUs = 'assets/image/about_us.png';
