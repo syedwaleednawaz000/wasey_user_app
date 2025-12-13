@@ -113,6 +113,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 onEnter: (event) => onEntered(true),
                 onExit: (event) => onEntered(false),
                 child: GoogleMap(
+                  mapType: MapType.normal,
                   initialCameraPosition: CameraPosition(target: LatLng(
                     double.parse(track.deliveryAddress!.latitude!), double.parse(track.deliveryAddress!.longitude!),
                   ), zoom: 16),

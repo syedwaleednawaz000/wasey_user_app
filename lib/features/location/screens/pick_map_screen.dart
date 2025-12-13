@@ -128,6 +128,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                             borderRadius:
                                 BorderRadius.circular(Dimensions.radiusDefault),
                             child: GoogleMap(
+                              mapType: MapType.normal,
                               initialCameraPosition: CameraPosition(
                                 target: widget.fromAddAddress
                                     ? LatLng(
@@ -222,6 +223,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                 )
               : Stack(children: [
                   GoogleMap(
+                    mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
                       target: widget.fromAddAddress
                           ? LatLng(locationController.position.latitude,

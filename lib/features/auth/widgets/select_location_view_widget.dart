@@ -256,6 +256,7 @@ class _SelectLocationViewWidgetState extends State<SelectLocationViewWidget> {
                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                 child: Stack(clipBehavior: Clip.none, children: [
                   GoogleMap(
+                    mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
                       target: LatLng(
                         double.parse(Get.find<SplashController>()
