@@ -60,7 +60,7 @@ android {
         versionName "1.0.2"
         multiDexEnabled true
     }
-    
+
 
 //    signingConfigs {
 //        release {
@@ -118,9 +118,7 @@ dependencies {
 
     // Firebase Messaging SDK (ensure correct version)
     implementation 'com.google.firebase:firebase-messaging:23.4.1'
-    // Google Play Core (for Flutter deferred components)
-    // Using the monolithic library to avoid version conflicts
-    implementation 'com.google.android.play:core:1.10.3'
+
 
     // Facebook SDK (latest stable version)
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
