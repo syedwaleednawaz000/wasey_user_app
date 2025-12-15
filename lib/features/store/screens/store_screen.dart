@@ -40,6 +40,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/store/widgets/store_details_screen_shimmer_widget.dart';
 
+import '../../../helper/store_schedule_checker.dart';
 import '../widgets/bottom_cart_widget.dart';
 
 class StoreScreen extends StatefulWidget {
@@ -395,25 +396,32 @@ class _StoreScreenState extends State<StoreScreen> {
                                           ),
                                         ),
                                         const SizedBox(height: 3),
-                                        Align(
-                                          alignment: ltr
-                                              ? Alignment.topLeft
-                                              : Alignment.topRight,
-                                          child: Text(
-                                            ((store.open == 1) &&
-                                                    (store.active == 1))
-                                                ? 'status_open'.tr
-                                                : store.active == -1
-                                                    ? "temporarily_closed_label".tr
-                                                    : "closed_now".tr,
-                                            style: TextStyle(
-                                              color: ((store.open == 1) &&
-                                                      (store.active == 1))
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                              fontSize: 11,
+                                        Row(
+                                          children: [
+                                            Align(
+                                              alignment: ltr
+                                                  ? Alignment.topLeft
+                                                  : Alignment.topRight,
+                                              child: Text(
+                                                ((isStoreOpen(store
+                                                            .schedules!)) &&
+                                                        (store.active == 1))
+                                                    ? 'status_open'.tr
+                                                    : store.active == -1
+                                                        ? "temporarily_closed_label"
+                                                            .tr
+                                                        : "closed_now".tr,
+                                                style: TextStyle(
+                                                  color: ((isStoreOpen(store
+                                                      .schedules!))  &&
+                                                          (store.active == 1))
+                                                      ? Colors.green
+                                                      : Colors.red,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                         Divider(
                                           color: Theme.of(context).dividerColor,

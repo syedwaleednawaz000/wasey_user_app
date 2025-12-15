@@ -32,6 +32,7 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import '../../../api/api_checker.dart';
 import '../../../api/api_client.dart';
+import '../../../helper/store_schedule_checker.dart';
 import '../domain/models/category_with_stores.dart';
 import 'package:http/http.dart' as http;
 
@@ -74,6 +75,7 @@ class StoreController extends GetxController implements GetxService {
   // ItemNewApiModel? get storeItemModel => _storeItemModel;
   // REPLACE them with this reactive version:
   final Rx<ItemNewApiModel?> rxStoreItemModel = Rx(null);
+
   ItemNewApiModel? get storeItemModel => rxStoreItemModel.value;
 
   ItemModel? _storeSearchItemModel;
@@ -710,8 +712,11 @@ class StoreController extends GetxController implements GetxService {
     }
     update();
   }
-  Future<void> getStoreItemList(int? storeID, int offset, String type, bool notify) async {
-    if (offset == 1 || rxStoreItemModel.value == null) { // Use reactive variable here
+
+  Future<void> getStoreItemList(
+      int? storeID, int offset, String type, bool notify) async {
+    if (offset == 1 || rxStoreItemModel.value == null) {
+      // Use reactive variable here
       _type = type;
       rxStoreItemModel.value = null; // Use .value to assign
       if (notify) {
@@ -719,7 +724,8 @@ class StoreController extends GetxController implements GetxService {
       }
     }
 
-    ItemNewApiModel? storeItemModelResult = await storeServiceInterface.getStoreItemListNewAPI(storeID, offset);
+    ItemNewApiModel? storeItemModelResult =
+        await storeServiceInterface.getStoreItemListNewAPI(storeID, offset);
 
     if (storeItemModelResult != null) {
       if (offset == 1) {
@@ -732,14 +738,14 @@ class StoreController extends GetxController implements GetxService {
     } else {
       // If the API fails, make sure to set it to a non-null but empty model if needed, or handle null state in UI
       if (offset == 1) {
-        rxStoreItemModel.value = ItemNewApiModel(categories: []); // Ensures it's not null
+        rxStoreItemModel.value =
+            ItemNewApiModel(categories: []); // Ensures it's not null
       }
     }
 
     // The 'update()' call is no longer strictly necessary for reactive variables, but good to keep for GetBuilders
     update();
   }
-
 
   // Future<void> getStoreItemList(
   //     int? storeID, int offset, String type, bool notify) async {
@@ -866,7 +872,10 @@ class StoreController extends GetxController implements GetxService {
     return false;
   }
 
-  bool isOpenNow(Store store) => store.open == 1 && store.active == 1;
+  // bool isOpenNow(Store store) => store.open == 1 && store.active == 1;
+  bool isOpenNow(Store store) => ((isStoreOpen(store.schedules!)) &&
+      (store.active == 1) &&
+      (store.storeOpeningTime != "close"));
 
   double? getDiscount(Store store) =>
       store.discount != null ? store.discount!.discount : 0;

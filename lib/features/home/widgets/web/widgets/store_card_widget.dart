@@ -25,6 +25,7 @@ import 'package:sixam_mart/common/widgets/not_available_widget.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
 
 import '../../../../../helper/date_converter.dart';
+import '../../../../../helper/store_schedule_checker.dart';
 
 class StoreCardWidget extends StatelessWidget {
   final Store? store;
@@ -36,8 +37,9 @@ class StoreCardWidget extends StatelessWidget {
     double? discount = store!.discount != null ? store!.discount!.discount : 0;
     String? discountType =
         store!.discount != null ? store!.discount!.discountType : 'percent';
-    bool isAvailable =
-        store!.storeOpeningTime != 'closed' && store!.active == 1;
+    bool isAvailable =((isStoreOpen(store!.schedules!)) &&
+        (store?.active == 1) &&
+        (store?.storeOpeningTime != "close"));
     return OnHover(
       isItem: true,
       child: TextHover(builder: (hovered) {
@@ -206,7 +208,7 @@ class StoreCardWidget extends StatelessWidget {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: Dimensions.paddingSizeExtraSmall,
+                        horizontal: 3,
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -432,14 +434,13 @@ class StoreCardWidget extends StatelessWidget {
                           ),
                           Container(
                             margin: EdgeInsets.only(
-                              right: Get.find<LocalizationController>().isLtr
-                                  ? 0
-                                  : 4,
-                              left: Get.find<LocalizationController>().isLtr
-                                  ? 4
-                                  : 0,
-                              top: 3
-                            ),
+                                right: Get.find<LocalizationController>().isLtr
+                                    ? 0
+                                    : 4,
+                                left: Get.find<LocalizationController>().isLtr
+                                    ? 4
+                                    : 0,
+                                top: 3),
                             padding: const EdgeInsets.only(
                               left: Dimensions.paddingSizeExtraSmall,
                               right: Dimensions.paddingSizeExtraSmall,
@@ -450,29 +451,46 @@ class StoreCardWidget extends StatelessWidget {
                               borderRadius: BorderRadius.circular(
                                 Dimensions.radiusDefault,
                               ),
-                              color: store!.storeOpeningTime == 'closed'
-                                  ? Colors.red.withOpacity(.9)
-                                  : store!.active == 0
-                                      ? Colors.red.withOpacity(.9)
-                                      : store!.active == -1
+                              color: store != null
+                                  ? ((isStoreOpen(store!.schedules!)) &&
+                                          (store?.active == 1) &&
+                                          (store?.storeOpeningTime != "close"))
+                                      ? Colors.green.withOpacity(.8)
+                                      : store?.active == -1
                                           ? Colors.orangeAccent.withOpacity(.8)
-                                          : store!.active == 1
-                                              ? Colors.green.withOpacity(.8)
-                                              : Theme.of(context).disabledColor,
+                                          : Colors.red.withOpacity(.9)
+                                  : Theme.of(context).disabledColor,
+                              // store!.storeOpeningTime == 'closed'
+                              //     ? Colors.red.withOpacity(.9)
+                              //     : store!.active == 0
+                              //         ? Colors.red.withOpacity(.9)
+                              //         : store!.active == -1
+                              //             ? Colors.orangeAccent.withOpacity(.8)
+                              //             : store!.active == 1
+                              //                 ? Colors.green.withOpacity(.8)
+                              //                 : Theme.of(context).disabledColor,
                             ),
                             child: Text(
                               store != null
-                                  ? store!.storeOpeningTime ==
-                                          'closed' // أولاً نتحقق إذا خارج ساعات العمل
-                                      ? 'closed_now'.tr
-                                      : store!.active == 0
-                                          ? 'temporarily_closed_label'.tr
-                                          : store!.active == -1
-                                              ? 'busy'.tr
-                                              : store!.active == 1
-                                                  ? 'open'.tr
-                                                  : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
-                                  : 'closed_now'.tr,
+                                  ? ((isStoreOpen(store!.schedules!)) &&
+                                          (store?.active == 1) &&
+                                          (store?.storeOpeningTime != "close"))
+                                      ? 'open'.tr
+                                      : store?.active == -1
+                                          ? "busy".tr
+                                          : "closed_now".tr
+                                  : "",
+                              // ? store!.storeOpeningTime ==
+                              //         'closed' // أولاً نتحقق إذا خارج ساعات العمل
+                              //     ? 'closed_now'.tr
+                              //     : store!.active == 0
+                              //         ? 'temporarily_closed_label'.tr
+                              //         : store!.active == -1
+                              //             ? 'busy'.tr
+                              //             : store!.active == 1
+                              //                 ? 'open'.tr
+                              //                 : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
+                              // : 'closed_now'.tr,
                               // : 'not_available_now_break'.tr,
                               style: STCBold.copyWith(
                                 fontSize: Dimensions.fontSizeExtraSmall,

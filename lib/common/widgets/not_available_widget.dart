@@ -5,6 +5,8 @@ import 'package:sixam_mart/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../helper/store_schedule_checker.dart';
+
 class NotAvailableWidget extends StatelessWidget {
   final double fontSize;
   final bool isStore;
@@ -35,17 +37,39 @@ class NotAvailableWidget extends StatelessWidget {
                 : BorderRadius.vertical(top: Radius.circular(radius!)),
             color: Colors.black.withAlpha((0.6 * 255).toInt())),
         child: Text(
+          // isStore
+          //     ? store != null
+          //         ? store!.storeOpeningTime == 'closed'
+          //             ? 'closed_now'.tr // "مغلق الآن"
+          //             : store!.active == -1 // ثم نتحقق إذا مغلق مؤقتاً
+          //                 ? 'temporarily_closed_label'.tr // "مغلق مؤقتًا"
+          //                 : store!.storeOpeningTime != 'closed'
+          //                     ? '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
+          //                     : 'open'.tr
+          //         : 'closed'.tr
+          //     : 'not_available_now_break'.tr,
+          // isStore
+          //     ? store != null
+          //         ? store!.storeOpeningTime == 'closed'
+          //             ? 'closed_now'.tr
+          //             : store!.active == -1
+          //                 ? 'temporarily_closed'.tr
+          //                 : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
+          //         : 'closed_now'.tr
+          //     : 'not_available_now_break'.tr,
           isStore
               ? store != null
-                  ? store!.storeOpeningTime == 'closed'
-                      ? 'closed_now'.tr // "مغلق الآن"
-                      : store!.active == -1 // ثم نتحقق إذا مغلق مؤقتاً
-                          ? 'temporarily_closed_label'.tr // "مغلق مؤقتًا"
-                          : store!.storeOpeningTime != 'closed'
-                              ? '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
-                              : 'open'.tr
-                  : 'closed'.tr
+                  ? (store!.active == 0)
+                      ? 'closed_now'.tr
+                      : (store!.active == -1)
+                          ? 'temporarily_closed'.tr
+                          : (store!.storeOpeningTime == 'closed')
+                              ? 'closed_now'.tr
+                              : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
+                                  .tr
+                  : 'closed_now'.tr
               : 'not_available_now_break'.tr,
+
           textAlign: TextAlign.center,
           style: STCMedium.copyWith(color: Colors.white, fontSize: fontSize),
         ),
@@ -90,15 +114,15 @@ class NotAvailableWidget extends StatelessWidget {
 //                 : BorderRadius.vertical(top: Radius.circular(radius!)),
 //             color: Colors.black.withAlpha((0.6 * 255).toInt())),
 //        child: Text(
-//   isStore
-//       ? store != null
-//           ? store!.storeOpeningTime == 'closed' // أولاً نتحقق إذا خارج ساعات العمل
-//               ? 'closed_now'.tr // "مغلق الآن"
-//               : store!.active != 1 // ثم نتحقق إذا مغلق مؤقتاً
-//                   ? 'temporarily_closed'.tr // "مغلق مؤقتًا"
-//                   : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
-//           : 'closed_now'.tr
-//       : 'not_available_now_break'.tr,
+// isStore
+// ? store != null
+// ? store!.storeOpeningTime == 'closed'
+// ? 'closed_now'.tr
+//     : store!.active == -1
+// ? 'temporarily_closed'.tr
+//     : '${'closed_now'.tr} ${'(${'open_at'.tr} ${DateConverter.convertRestaurantOpenTime(store!.storeOpeningTime!)})'}'
+//     : 'closed_now'.tr
+//     : 'not_available_now_break'.tr,
 //   textAlign: TextAlign.center,
 //   style: STCMedium.copyWith(color: Colors.white, fontSize: fontSize),
 // ),

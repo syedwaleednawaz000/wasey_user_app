@@ -593,7 +593,9 @@ class ItemController extends GetxController implements GetxService {
 
   bool isAvailable(Item item) {
     return DateConverter.isAvailable(
-        item.availableTimeStarts, item.availableTimeEnds);
+      item.availableTimeStarts ?? "",
+      item.availableTimeEnds ?? "",
+    );
   }
 
   double? getDiscount(Item item) =>
