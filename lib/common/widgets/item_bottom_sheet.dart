@@ -141,8 +141,9 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(
-          top: GetPlatform.isWeb ? 0 : 30,
-          bottom: widget.item!.foodVariations!.isEmpty ? Get.height * 0.2 : 0),
+        // top: GetPlatform.isWeb ? 0 : Get.height*.05,
+        bottom: widget.item!.foodVariations!.isEmpty ? Get.height * 0.2 : Get.height * 0.05,
+      ),
       decoration: BoxDecoration(
         color: Colors.transparent,
         // color: Colors.green,
@@ -266,7 +267,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                   bottom: Get.size.height * .04,
                   left: Dimensions.paddingSizeDefault),
               child: SingleChildScrollView(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   const SizedBox(height: Dimensions.paddingSizeDefault),
                   Column(
@@ -307,15 +308,16 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                                 : 140,
                                         height:
                                             ResponsiveHelper.isMobile(context)
-                                                ? Get.size.width * .6
+                                                ? Get.size.height * .25
                                                 : 140,
                                         fit: BoxFit.fill,
                                       ),
                                     ),
                                     DiscountTag(
-                                        discount: initialDiscount,
-                                        discountType: discountType,
-                                        fromTop: 20),
+                                      discount: initialDiscount,
+                                      discountType: discountType,
+                                      fromTop: 20,
+                                    ),
                                   ]),
                                 ),
                                 const SizedBox(height: 12),
