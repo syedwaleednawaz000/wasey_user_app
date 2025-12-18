@@ -30,6 +30,7 @@ import 'package:sixam_mart/features/checkout/widgets/note_prescription_section.d
 
 import '../../../helper/price_converter.dart';
 import '../domain/models/delivery_charges_data_model.dart';
+import 'city_selector_widget.dart';
 
 class TopSection extends StatelessWidget {
   final CheckoutController checkoutController;
@@ -493,6 +494,10 @@ class TopSection extends StatelessWidget {
             ],
           ),
         ),
+        
+        // City Selector - Horizontal Scrolling
+        CitySelectorWidget(checkoutController: checkoutController),
+        
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
         //Delivery_fee

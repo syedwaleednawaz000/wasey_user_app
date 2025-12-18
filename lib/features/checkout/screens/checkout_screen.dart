@@ -318,38 +318,48 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                         .additionalChargeStatus!
                     ? Get.find<SplashController>().configModel!.additionCharge!
                     : 0;
-                double originalCharge = _calculateOriginalDeliveryCharge(
-                  store: checkoutController.store,
-                  address: AddressHelper.getUserAddressFromSharedPref()!,
-                  distance: checkoutController.distance,
-                  extraCharge: checkoutController.extraCharge,
-                );
-                log("DeliveryCharges from _calculateOriginalDeliveryCharge: $originalCharge");
+                
+                // ===== KM-BASED DELIVERY CHARGES (COMMENTED) =====
+                // double originalCharge = _calculateOriginalDeliveryCharge(
+                //   store: checkoutController.store,
+                //   address: AddressHelper.getUserAddressFromSharedPref()!,
+                //   distance: checkoutController.distance,
+                //   extraCharge: checkoutController.extraCharge,
+                // );
+                // log("DeliveryCharges from _calculateOriginalDeliveryCharge: $originalCharge");
+                //
+                // _deliveryCharge = checkoutController.orderType == "delivery"
+                //     ? _calculateDeliveryCharge(
+                //         store: checkoutController.store,
+                //         address: AddressHelper.getUserAddressFromSharedPref()!,
+                //         distance: checkoutController.distance,
+                //         extraCharge: checkoutController.extraCharge,
+                //         orderType: checkoutController.orderType!,
+                //         orderAmount: orderAmount,
+                //       )
+                //     : 0.00;
+                // log("DeliveryCharges from _calculateDeliveryCharge: $_deliveryCharge");
+                // log("DeliveryCharges from distance: ${checkoutController.distance}");
+                // log("DeliveryCharges from extraCharges: ${checkoutController.extraCharge}");
+                // log("DeliveryCharges from orderAmount: ${orderAmount}");
+                // ===== END KM-BASED DELIVERY CHARGES =====
 
-                // if (checkoutController
-                //         .currentSelectedDeliveryChargesData.value !=
-                //     null) {
-                _deliveryCharge = checkoutController.orderType == "delivery"
-                    // ? double.parse(checkoutController
-                    //     .currentSelectedDeliveryChargesData
-                    //     .value!
-                    //     .deliveryChargesMin
-                    //     .toString())
-                    // :
-                    ? _calculateDeliveryCharge(
-                        store: checkoutController.store,
-                        address: AddressHelper.getUserAddressFromSharedPref()!,
-                        distance: checkoutController.distance,
-                        extraCharge: checkoutController.extraCharge,
-                        orderType: checkoutController.orderType!,
-                        orderAmount: orderAmount,
-                      )
-                    : 0.00;
-                log("DeliveryCharges from _calculateDeliveryCharge: $_deliveryCharge");
-                log("DeliveryCharges from distance: ${checkoutController.distance}");
-                log("DeliveryCharges from extraCharges: ${checkoutController.extraCharge}");
-                log("DeliveryCharges from orderAmount: ${orderAmount}");
-                // }
+                // ===== CITY-WISE DELIVERY CHARGES (ACTIVE) =====
+                if (checkoutController.currentSelectedDeliveryChargesData.value != null) {
+                  _deliveryCharge = checkoutController.orderType == "delivery"
+                      ? double.parse(checkoutController
+                          .currentSelectedDeliveryChargesData
+                          .value!
+                          .deliveryChargesMin
+                          .toString())
+                      : 0.00;
+                  log("DeliveryCharges from city-wise (min): $_deliveryCharge");
+                  log("Selected city: ${checkoutController.currentSelectedDeliveryChargesData.value!.city}");
+                } else {
+                  _deliveryCharge = 0.00;
+                  log("DeliveryCharges: No city-wise data available, defaulting to 0");
+                }
+                // ===== END CITY-WISE DELIVERY CHARGES =====
 
                 if (checkoutController.orderType != 'take_away' &&
                     checkoutController.store != null) {
@@ -442,7 +452,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                               child: TopSection(
                                                 checkoutController:
                                                     checkoutController,
-                                                charge: originalCharge,
+                                                charge: _deliveryCharge ?? 0.00,
                                                 deliveryCharge:
                                                     checkoutController
                                                                 .orderType ==
@@ -1401,7 +1411,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                             isDeliveryActive: _isDeliveryActive,
                                             checkoutController:
                                                 checkoutController,
-                                            charge: originalCharge,
+                                            charge: _deliveryCharge ?? 0.00,
                                             deliveryCharge:
                                                 (_deliveryCharge ?? 0.00),
                                             addressList: addressList,
@@ -2555,7 +2565,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       log("minimumShippingCharge in module: $minimumCharge");
       log("maximumShippingCharge in module: $maximumCharge");
     }
-    if (store != null && distance != null) {
+    if (store != null && distance != null && distance != -1) {
       deliveryCharge = distance * perKmCharge;
 
       if (deliveryCharge < minimumCharge) {

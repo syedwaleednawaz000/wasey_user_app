@@ -157,6 +157,7 @@
   "rating": "تصنيف",
   "popularity": "شهرة",
   "delivery_charge": "سعر التوصيل",
+  "select_delivery_city": "اختر مدينة التوصيل",
   "filter_by": "تصفية حسب",
   "currently_available_items": "العناصر المتوفرة حاليا",
   "discounted_items": "العناصر المخفضة",

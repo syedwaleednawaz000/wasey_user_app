@@ -155,6 +155,7 @@
   "rating": "Rating",
   "popularity": "Popularity",
   "delivery_charge": "Delivery Charge",
+  "select_delivery_city": "Select Delivery City",
   "filter_by": "Filter by",
   "currently_available_items": "Currently Available Items",
   "discounted_items": "Discounted Items",
