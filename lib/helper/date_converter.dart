@@ -91,8 +91,9 @@ class DateConverter {
     }else {
       currentTime = Get.find<SplashController>().currentTime;
     }
-    DateTime start0 = start != null ? DateFormat('HH:mm').parse(start) : DateTime(currentTime.year);
-    DateTime end0 = end != null ? DateFormat('HH:mm').parse(end) : DateTime(currentTime.year, currentTime.month, currentTime.day, 23, 59, 59);
+    // Handle empty strings the same as null values to prevent parsing errors
+    DateTime start0 = (start != null && start.isNotEmpty) ? DateFormat('HH:mm').parse(start) : DateTime(currentTime.year);
+    DateTime end0 = (end != null && end.isNotEmpty) ? DateFormat('HH:mm').parse(end) : DateTime(currentTime.year, currentTime.month, currentTime.day, 23, 59, 59);
     DateTime startTime = DateTime(currentTime.year, currentTime.month, currentTime.day, start0.hour, start0.minute, start0.second);
     DateTime endTime = DateTime(currentTime.year, currentTime.month, currentTime.day, end0.hour, end0.minute, end0.second);
     if(endTime.isBefore(startTime)) {

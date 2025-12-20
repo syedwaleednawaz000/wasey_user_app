@@ -113,6 +113,11 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     Get.find<CheckoutController>().couponController.text = '';
 
     //For new incorporation if delivery is off then not show delivery in screen
+    // Check if TimeSlotController is registered, if not register it
+    if (!Get.isRegistered<TimeSlotController>()) {
+      Get.lazyPut(() => TimeSlotController(apiClient: Get.find()));
+    }
+    
     await Get.find<TimeSlotController>().fetchTimeSlots();
     if (Get.find<TimeSlotController>().timeSlot != null) {
       _isDeliveryActive =

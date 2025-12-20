@@ -51,6 +51,11 @@ class _DeliveryOptionButtonWidgetState
 
     // Schedule the logic to run after the first frame is built.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Check if TimeSlotController is registered, if not register it
+      if (!Get.isRegistered<TimeSlotController>()) {
+        Get.lazyPut(() => TimeSlotController(apiClient: Get.find()));
+      }
+      
       // 1. Get controller instances once.
       final checkoutController = Get.find<CheckoutController>();
       final timeSlotController = Get.find<TimeSlotController>();
