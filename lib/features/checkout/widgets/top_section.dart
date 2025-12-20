@@ -340,10 +340,11 @@ class TopSection extends StatelessWidget {
                       width: double.infinity,
                       child: Row(children: [
                         ((Get.find<SplashController>()
-                                        .configModel!
-                                        .homeDeliveryStatus ==
-                                    1 &&
-                                checkoutController.store!.delivery!) && isDeliveryActive)
+                                            .configModel!
+                                            .homeDeliveryStatus ==
+                                        1 &&
+                                    checkoutController.store!.delivery!) &&
+                                isDeliveryActive)
                             ? Expanded(
                                 child: DeliveryOptionButtonWidget(
                                   value: 'delivery',
@@ -494,22 +495,40 @@ class TopSection extends StatelessWidget {
             ],
           ),
         ),
-        
+
         // City Selector - Horizontal Scrolling
-        CitySelectorWidget(checkoutController: checkoutController),
-        
-        const SizedBox(height: Dimensions.paddingSizeSmall),
+        checkoutController.cityWiseChargeStatus.value != null
+            ? (checkoutController.cityWiseChargeStatus.value!.status)
+                ? Column(
+                    children: [
+                      CitySelectorWidget(
+                          checkoutController: checkoutController),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                    ],
+                  )
+                : const SizedBox.shrink()
+            : const SizedBox.shrink(),
 
         //Delivery_fee
-        !takeAway && !isGuestLoggedIn ? Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text('${'delivery_charge'.tr}: '),
-          Text(
-            checkoutController.store!.freeDelivery! ? 'free'.tr
-                : checkoutController.distance != -1 ? PriceConverter.convertPrice(charge) : 'calculating'.tr,
-            textDirection: TextDirection.ltr,
-          ),
-        ])) : const SizedBox(),
-        SizedBox(height: !takeAway && !isGuestLoggedIn ? Dimensions.paddingSizeLarge : 0),
+        !takeAway && !isGuestLoggedIn
+            ? Center(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('${'delivery_charge'.tr}: '),
+                Text(
+                  checkoutController.store!.freeDelivery!
+                      ? 'free'.tr
+                      : checkoutController.distance != -1
+                          ? PriceConverter.convertPrice(charge)
+                          : 'calculating'.tr,
+                  textDirection: TextDirection.ltr,
+                ),
+              ]))
+            : const SizedBox(),
+        SizedBox(
+            height: !takeAway && !isGuestLoggedIn
+                ? Dimensions.paddingSizeLarge
+                : 0),
 
         ///delivery section
         DeliverySection(
