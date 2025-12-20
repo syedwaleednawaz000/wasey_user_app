@@ -73,7 +73,14 @@ class ApiClient extends GetxService {
         AppConstants.moduleId:
             '${moduleID ?? ModuleModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.cacheModuleId)!)).id}'
       });
+    } else {
+      // If module ID is empty or null, set default to 2 (restaurant - first tab)
+      log("moduleID is empty/null, setting default to 2 (restaurant)");
+      header.addAll({
+        AppConstants.moduleId: '2'
+      });
     }
+    
     header.addAll({
       'Content-Type': 'application/json; charset=UTF-8',
       // AppConstants.zoneId: zoneIDs != null ? jsonEncode([3, 2]) : '',
