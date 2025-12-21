@@ -129,18 +129,23 @@ class SplashController extends GetxController implements GetxService {
     SplashController splashController = Get.find();
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String? _storedModuleId =
-        sharedPreferences.getString("moduleId") ?? '2';
-
-    // If we have a stored module ID, automatically switch to that module
-    if (_storedModuleId != null) {
-      if (_storedModuleId == '1') {
-        splashController.switchModule(0, true);
-      } else {
-        splashController.switchModule(1, true);
-      }
+    String? _storedModuleId = sharedPreferences.getString("moduleId");
+    
+    // If no module is stored, set default to 2 (restaurant - first tab)
+    if (_storedModuleId == null || _storedModuleId.isEmpty) {
+      _storedModuleId = '2';
+      await sharedPreferences.setString("moduleId", "2");
+      debugPrint('getStoredModule: No module stored, setting default to 2 (restaurant)');
     }
-    debugPrint('getStoredModule:  _storedModuleId: $_storedModuleId');
+
+    // Switch to the appropriate module based on stored module ID
+    if (_storedModuleId == '1') {
+      splashController.switchModule(0, true);  // Market at index 0
+      debugPrint('getStoredModule: Switched to Market (moduleId=1, index=0)');
+    } else {
+      splashController.switchModule(1, true);  // Restaurant at index 1
+      debugPrint('getStoredModule: Switched to Restaurant (moduleId=2, index=1)');
+    }
   }
 
   Future<void> _handleConfigResponse(

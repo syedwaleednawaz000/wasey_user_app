@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/banner/controllers/banner_controller.dart';
 import 'package:sixam_mart/features/category/controllers/category_controller.dart';
@@ -23,13 +24,15 @@ class MarketController extends GetxController implements GetxService {
       update(); // Show loading indicator immediately on forced reload
     }
 
-    // --- Key Action: Set the Module to Food/Restaurant ---
-    // This is the most important part. We ensure we are in the correct module.
-    // The '1' is the index in your module list. Adjust if 'Restaurant' is at a different index.
+    // --- Key Action: Set the Module to Market/Supermarket ---
+    // Set module ID to 1 for market in SharedPreferences
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString("moduleId", "1");
+    // Switch to module index 0 (market/supermarket)
     splashController.switchModule(0, true);
-    log("MarketController: Switched module to Restaurant/Food.");
+    log("MarketController: Set moduleId=1 and switched to index 0 (Market)");
 
-    // --- Now, load only the data needed for the FOOD module ---
+    // --- Now, load only the data needed for the MARKET module ---
     await Get.find<BannerController>().getBannerList(reload);
     await Get.find<CategoryController>().getCategoryList(reload);
     await Get.find<StoreController>().getPopularStoreList(reload, 'all', false);
