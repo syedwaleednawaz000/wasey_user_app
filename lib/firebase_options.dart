@@ -27,14 +27,14 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -45,33 +45,6 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyDggBaoaQz5P5IJ3XCzN-aYaE9bZ8EYGJg',
-    appId: '1:244302597623:web:a525c1333cee36f2a432f2',
-    messagingSenderId: '244302597623',
-    projectId: 'wasey-6462d',
-    authDomain: 'wasey-6462d.firebaseapp.com',
-    storageBucket: 'wasey-6462d.firebasestorage.app',
-    measurementId: 'G-S20BG289HZ',
-  );
-
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB1MYFwj3Mbd8bqAMXxcOWSbUy6e6Rt9fM',
-    appId: '1:244302597623:android:b0e9e0a8e49beb76a432f2',
-    messagingSenderId: '244302597623',
-    projectId: 'wasey-6462d',
-    storageBucket: 'wasey-6462d.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA67nIIB3uzl_Ix4shL4A6pVZHrGgN06-k',
-    appId: '1:244302597623:ios:87d4a02a3f538733a432f2',
-    messagingSenderId: '244302597623',
-    projectId: 'wasey-6462d',
-    storageBucket: 'wasey-6462d.firebasestorage.app',
-    iosBundleId: 'com.waseyuser.app',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDggBaoaQz5P5IJ3XCzN-aYaE9bZ8EYGJg',
     appId: '1:244302597623:web:2f0f167eb22d8b24a432f2',
     messagingSenderId: '244302597623',
     projectId: 'wasey-6462d',
@@ -79,4 +52,33 @@ class DefaultFirebaseOptions {
     storageBucket: 'wasey-6462d.firebasestorage.app',
     measurementId: 'G-DWJZ8NGTYY',
   );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyB1MYFwj3Mbd8bqAMXxcOWSbUy6e6Rt9fM',
+    appId: '1:244302597623:android:3288879e88ee13cba432f2',
+    messagingSenderId: '244302597623',
+    projectId: 'wasey-6462d',
+    storageBucket: 'wasey-6462d.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyA67nIIB3uzl_Ix4shL4A6pVZHrGgN06-k',
+    appId: '1:244302597623:ios:d223d50f5a580345a432f2',
+    messagingSenderId: '244302597623',
+    projectId: 'wasey-6462d',
+    storageBucket: 'wasey-6462d.firebasestorage.app',
+    iosClientId: '244302597623-66g4h5p3fa0nlb01tv4jlnh5k3erfban.apps.googleusercontent.com',
+    iosBundleId: 'com.waseyapp.user',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDggBaoaQz5P5IJ3XCzN-aYaE9bZ8EYGJg',
+    appId: '1:244302597623:web:5f601a1e106cbce9a432f2',
+    messagingSenderId: '244302597623',
+    projectId: 'wasey-6462d',
+    authDomain: 'wasey-6462d.firebaseapp.com',
+    storageBucket: 'wasey-6462d.firebasestorage.app',
+    measurementId: 'G-QEFJQTWSE2',
+  );
+
 }

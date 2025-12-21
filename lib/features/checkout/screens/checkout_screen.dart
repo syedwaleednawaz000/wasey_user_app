@@ -400,9 +400,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 //   // ===== END KM-BASED DELIVERY CHARGES =====
                 // }
                 // Determine if city-wise delivery charge is active and should be used
-                bool useCityWiseCharge =
-                    checkoutController.cityWiseChargeStatus.value?.status ??
-                        false;
+                bool useCityWiseCharge = checkoutController.cityWiseChargeStatus.value?.status ?? false;
 
                 if (checkoutController.orderType == "delivery") {
                   if (useCityWiseCharge &&
