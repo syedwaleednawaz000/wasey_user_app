@@ -35,6 +35,8 @@ class StoreItemWidget extends StatelessWidget {
   final bool isCampaign;
   final bool isFeatured;
   final bool fromCartSuggestion;
+  final int storeStatus;
+
 
   const StoreItemWidget(
       {super.key,
@@ -46,7 +48,9 @@ class StoreItemWidget extends StatelessWidget {
       this.inStore = false,
       this.isCampaign = false,
       this.isFeatured = false,
-      this.fromCartSuggestion = false});
+      this.fromCartSuggestion = false,
+      this.storeStatus = 1,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +136,14 @@ class StoreItemWidget extends StatelessWidget {
                   }
                 }
               }
-              Get.find<ItemController>().navigateToItemPage(item, context,
-                  inStore: inStore, isCampaign: isCampaign);
+
+              Get.find<ItemController>().navigateToItemPage(
+                item,
+                context,
+                inStore: inStore,
+                isCampaign: isCampaign,
+                storeStatus: storeStatus,
+              );
             }
           },
           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
@@ -297,7 +307,7 @@ class StoreItemWidget extends StatelessWidget {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
-                                             "price_label".tr,
+                                              "price_label".tr,
                                               style: STCMedium.copyWith(
                                                   fontSize: Dimensions
                                                       .fontSizeExtraSmall),
@@ -318,7 +328,8 @@ class StoreItemWidget extends StatelessWidget {
                                               style: STCMedium.copyWith(
                                                 fontSize: Dimensions
                                                     .fontSizeExtraSmall,
-                                              color: Theme.of(context).primaryColor,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
                                               ),
                                               textDirection: TextDirection.ltr,
                                             ),

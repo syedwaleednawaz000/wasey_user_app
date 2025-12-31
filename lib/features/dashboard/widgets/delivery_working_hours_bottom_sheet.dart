@@ -34,7 +34,11 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
         final bool pickupHoursAvailable = slot.isPickupAvailableNow;
         final bool isDeliverySystemEnable = slot.deliverySlotSystemEnabled;
         final bool isPickupSystemEnable = slot.pickupSlotSystemEnabled;
-        String deliverySlotMessage = slot.deliverySlotMessage;
+        final String deliverySlotMessage =
+            (slot.deliverySlotMessage.isNotEmpty &&
+                    slot.deliverySlotMessage != "")
+                ? slot.deliverySlotMessage
+                : "you_can_pick_up_your_order".tr;
 
         // Explicitly define the type as nullable (ZoneData?)
         ZoneData? currentZoneData;
@@ -114,20 +118,7 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  deliverySlotMessage ?? "",
-                  // !isDeliverySystemEnable && !isPickupSystemEnable
-                  //     ? "deliveryTemporarilyClosed".tr
-                  //     : !isPickupSystemEnable && isDeliverySystemEnable
-                  //         ? "deliveryAvailableNow".tr
-                  //         : "deliveryNotAvailable".tr,
-                  style: const TextStyle(fontSize: 14, color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  "you_can_pick_up_your_order".tr,
+                  deliverySlotMessage,
                   // !isDeliverySystemEnable && !isPickupSystemEnable
                   //     ? "deliveryTemporarilyClosed".tr
                   //     : !isPickupSystemEnable && isDeliverySystemEnable

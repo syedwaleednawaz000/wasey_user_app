@@ -29,6 +29,8 @@ import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../helper/store_schedule_checker.dart';
+
 class ItemWidget extends StatelessWidget {
   final Item? item;
   final Store? store;
@@ -74,7 +76,7 @@ class ItemWidget extends StatelessWidget {
         genericName += name;
       }
     }
-    if (isStore && store != null ) {
+    if (isStore && store != null) {
       discount = store!.discount != null ? store!.discount!.discount : 0;
       discountType =
           store!.discount != null ? store!.discount!.discountType : 'percent';
@@ -113,6 +115,7 @@ class ItemWidget extends StatelessWidget {
                   log("I am in if...");
 
                   if (store != null) {
+                    log("store != null");
                     if (isFeatured &&
                         Get.find<SplashController>().moduleList != null) {
                       for (ModuleModel module
@@ -123,6 +126,7 @@ class ItemWidget extends StatelessWidget {
                         }
                       }
                     }
+                    log("RouteHelper.getStoreRoute");
                     Get.toNamed(
                       RouteHelper.getStoreRoute(
                           id: store!.id, page: isFeatured ? 'module' : 'item'),
@@ -147,8 +151,20 @@ class ItemWidget extends StatelessWidget {
                     }
                   }
                   log("I am in navigating to item page...");
-                  Get.find<ItemController>().navigateToItemPage(item, context,
-                      inStore: inStore, isCampaign: isCampaign);
+                  int storeStatus = ((isStoreOpen(store!.schedules!)) &&
+                          (store?.active == 1) &&
+                          (store?.storeOpeningTime != "close"))
+                      ? 1
+                      : store?.active == -1
+                          ? -1
+                          : 0;
+                  Get.find<ItemController>().navigateToItemPage(
+                    item,
+                    context,
+                    inStore: inStore,
+                    isCampaign: isCampaign,
+                    storeStatus: storeStatus,
+                  );
                 }
               },
               radius: Dimensions.radiusDefault,
@@ -192,7 +208,7 @@ class ItemWidget extends StatelessWidget {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                                ( store != null && (isStore || isCornerTag!))
+                                (store != null && (isStore || isCornerTag!))
                                     ? DiscountTag(
                                         discount: discount,
                                         discountType: discountType,

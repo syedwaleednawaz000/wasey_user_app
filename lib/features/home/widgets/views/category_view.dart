@@ -785,17 +785,19 @@ class FoodCategoryShimmer extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       scrollDirection: Axis.horizontal,
-      padding:
-          const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+      padding: const EdgeInsets.symmetric(
+        vertical: Dimensions.paddingSizeDefault,
+      ),
       itemCount: 8,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(
-              bottom: Dimensions.paddingSizeDefault,
-              left: Dimensions.paddingSizeDefault,
-              top: Dimensions.paddingSizeDefault),
+            bottom: Dimensions.paddingSizeDefault,
+            left: Dimensions.paddingSizeDefault,
+            top: Dimensions.paddingSizeDefault,
+          ),
           child: SizedBox(
-            width: 90, // ← أكبر من السابق
+            width: 90,
             child: Column(
               children: [
                 ClipOval(
@@ -803,10 +805,8 @@ class FoodCategoryShimmer extends StatelessWidget {
                     duration: const Duration(seconds: 2),
                     enabled: true,
                     child: Container(
-                      height: 90, // ← أكبر دائرة
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(
-                          bottom: Dimensions.paddingSizeSmall),
+                      height: 90,
+                      width: 90, // Match the SizedBox width for a perfect circle
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Theme.of(context).shadowColor,
@@ -815,14 +815,16 @@ class FoodCategoryShimmer extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
-                Expanded(
-                  child: Shimmer(
-                    duration: const Duration(seconds: 2),
-                    enabled: true,
-                    child: Container(
-                      height: 16, // ← نص أطول
-                      width: 70, // ← عرض أوسع
+                // --- CORRECTED PART: REMOVED EXPANDED ---
+                Shimmer(
+                  duration: const Duration(seconds: 2),
+                  enabled: true,
+                  child: Container(
+                    height: 16,
+                    width: 70,
+                    decoration: BoxDecoration(
                       color: Theme.of(context).shadowColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                     ),
                   ),
                 ),
@@ -835,6 +837,71 @@ class FoodCategoryShimmer extends StatelessWidget {
   }
 }
 
+
+// class FoodCategoryShimmer extends StatelessWidget {
+//   final CategoryController categoryController;
+//
+//   const FoodCategoryShimmer({super.key, required this.categoryController});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView.builder(
+//       physics: const NeverScrollableScrollPhysics(),
+//       shrinkWrap: true,
+//       scrollDirection: Axis.horizontal,
+//       padding: const EdgeInsets.symmetric(
+//         vertical: Dimensions.paddingSizeDefault,
+//       ),
+//       itemCount: 8,
+//       itemBuilder: (context, index) {
+//         return Padding(
+//           padding: const EdgeInsets.only(
+//             bottom: Dimensions.paddingSizeDefault,
+//             left: Dimensions.paddingSizeDefault,
+//             top: Dimensions.paddingSizeDefault,
+//           ),
+//           child: SizedBox(
+//             width: 90, // ← أكبر من السابق
+//             child: Column(
+//               children: [
+//                 ClipOval(
+//                   child: Shimmer(
+//                     duration: const Duration(seconds: 2),
+//                     enabled: true,
+//                     child: Container(
+//                       height: 90, // ← أكبر دائرة
+//                       width: double.infinity,
+//                       margin: const EdgeInsets.only(
+//                         bottom: Dimensions.paddingSizeSmall,
+//                       ),
+//                       decoration: BoxDecoration(
+//                         shape: BoxShape.circle,
+//                         color: Theme.of(context).shadowColor,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(height: Dimensions.paddingSizeSmall),
+//                 Expanded(
+//                   child: Shimmer(
+//                     duration: const Duration(seconds: 2),
+//                     enabled: true,
+//                     child: Container(
+//                       height: 16, // ← نص أطول
+//                       width: 70, // ← عرض أوسع
+//                       color: Theme.of(context).shadowColor,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+// }
+
 class PharmacyCategoryShimmer extends StatelessWidget {
   final CategoryController categoryController;
 
@@ -846,15 +913,17 @@ class PharmacyCategoryShimmer extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       scrollDirection: Axis.horizontal,
-      padding:
-          const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+      padding: const EdgeInsets.symmetric(
+        vertical: Dimensions.paddingSizeDefault,
+      ),
       itemCount: 8,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(
-              bottom: Dimensions.paddingSizeDefault,
-              left: Dimensions.paddingSizeDefault,
-              top: Dimensions.paddingSizeDefault),
+            bottom: Dimensions.paddingSizeDefault,
+            left: Dimensions.paddingSizeDefault,
+            top: Dimensions.paddingSizeDefault,
+          ),
           child: Shimmer(
             duration: const Duration(seconds: 2),
             enabled: true,
@@ -870,7 +939,8 @@ class PharmacyCategoryShimmer extends StatelessWidget {
                     height: 60,
                     width: double.infinity,
                     margin: const EdgeInsets.only(
-                        bottom: Dimensions.paddingSizeSmall),
+                      bottom: Dimensions.paddingSizeSmall,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(100),

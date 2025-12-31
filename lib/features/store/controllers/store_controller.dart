@@ -191,10 +191,11 @@ class StoreController extends GetxController implements GetxService {
         Response response = await apiClient.getData(uri);
 
         if (response.statusCode == 200) {
+          log("Stores API Response: ${response.body}");
           _categoryWithStoreList = [];
+          _categoryWithStoreList?.clear();
           response.body.forEach((categoryJson) {
-            _categoryWithStoreList!
-                .add(CategoryWithStores.fromJson(categoryJson));
+            _categoryWithStoreList?.add(CategoryWithStores.fromJson(categoryJson));
           });
           log("SUCCESS: Fetched and parsed categories with stores.");
         } else {

@@ -24,6 +24,7 @@ class StoreItemView extends StatefulWidget {
   final bool inStorePage;
   final bool isFeatured;
   final bool? isFoodOrGrocery;
+  final int storeStatus;
 
   const StoreItemView(
       {super.key,
@@ -38,7 +39,10 @@ class StoreItemView extends StatefulWidget {
         this.inStorePage = false,
         this.isFeatured = false,
         this.isFoodOrGrocery = true,
-        this.categoryId});
+        this.categoryId,
+        this.storeStatus = 1,
+
+      });
 
   @override
   State<StoreItemView> createState() => _StoreItemViewState();
@@ -80,6 +84,8 @@ class _StoreItemViewState extends State<StoreItemView> {
             itemBuilder: (context, index) {
               return StoreItemWidget(
                 isStore: widget.isStore,
+                storeStatus: widget.storeStatus,
+
                 item:
                 widget.isStore ? null : widget.items![index],
                 isFeatured: widget.isFeatured,

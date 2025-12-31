@@ -289,12 +289,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: RefreshIndicator(
                     onRefresh: () async {
                       splashController.setRefreshing(true);
-                      print("getCategoriesWithStoreList called");
-                      await Get.find<StoreController>()
-                          .getCategoriesWithStoreList(reload: true);
                       if (Get.find<SplashController>().module != null) {
                         await Get.find<LocationController>().syncZoneData();
                         await Get.find<BannerController>().getBannerList(true);
+                        print("getCategoriesWithStoreList called");
+                        await Get.find<StoreController>()
+                            .getCategoriesWithStoreList(reload: true);
                         if (isGrocery) {
                           await Get.find<FlashSaleController>()
                               .getFlashSale(true, true);
@@ -348,6 +348,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                         await Get.find<StoreController>()
                             .getFeaturedStoreList();
+                        print("getCategoriesWithStoreList called");
+                        await Get.find<StoreController>()
+                            .getCategoriesWithStoreList(reload: true);
                       }
                       splashController.setRefreshing(false);
                     },
@@ -461,18 +464,40 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         child: GetBuilder<LocationController>(
                                             builder: (locationController) {
+                                          String? addressType;
+                                          String? address;
+                                          if (AuthHelper.isLoggedIn()) {
+                                            // if (AddressHelper
+                                            //         .getUserAddressFromSharedPref() !=
+                                            //     null) {
+                                            addressType = (AddressHelper
+                                                            .getUserAddressFromSharedPref()
+                                                        ?.addressType)
+                                                    ?.tr ??
+                                                "";
+                                            address = (AddressHelper
+                                                            .getUserAddressFromSharedPref()
+                                                        ?.address)
+                                                    ?.tr ??
+                                                "";
+                                          } else {
+                                            addressType = 'your_location'.tr;
+                                            address = "";
+                                          }
+                                          address = (AddressHelper
+                                                          .getUserAddressFromSharedPref()
+                                                      ?.address !=
+                                                  null)
+                                              ? AddressHelper
+                                                      .getUserAddressFromSharedPref()
+                                                  ?.address
+                                              : "";
                                           return Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  AuthHelper.isLoggedIn()
-                                                      ? AddressHelper
-                                                                  .getUserAddressFromSharedPref()!
-                                                              .addressType!
-                                                              .tr ??
-                                                          ""
-                                                      : 'your_location'.tr,
+                                                  addressType.tr,
                                                   style: STCMedium.copyWith(
                                                       color: Theme.of(context)
                                                           .textTheme
@@ -487,14 +512,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 Row(children: [
                                                   Flexible(
                                                     child: Text(
-                                                      AddressHelper
-                                                                  .getUserAddressFromSharedPref()!
-                                                              .address!
-                                                              .isNotEmpty
-                                                          ? AddressHelper
-                                                                  .getUserAddressFromSharedPref()!
-                                                              .address!
-                                                          : "",
+                                                      address ?? "",
                                                       style: STCRegular.copyWith(
                                                           color: Theme.of(
                                                                   context)

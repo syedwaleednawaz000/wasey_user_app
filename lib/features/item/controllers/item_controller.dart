@@ -604,8 +604,13 @@ class ItemController extends GetxController implements GetxService {
   String? getDiscountType(Item item) =>
       item.storeDiscount == 0 ? item.discountType : 'percent';
 
-  void navigateToItemPage(Item? item, BuildContext context,
-      {bool inStore = false, bool isCampaign = false}) {
+  void navigateToItemPage(
+    Item? item,
+    BuildContext context, {
+    bool inStore = false,
+    bool isCampaign = false,
+    int storeStatus = 1,
+  }) {
     if (Get.find<SplashController>()
             .configModel!
             .moduleConfig!
@@ -614,26 +619,42 @@ class ItemController extends GetxController implements GetxService {
         item!.moduleType == 'food') {
       log("I am in if...");
 
+      log("storeStatus: $storeStatus");
+
       ResponsiveHelper.isMobile(context)
           ? Get.bottomSheet(
               ItemBottomSheet(
-                  item: item, inStorePage: inStore, isCampaign: isCampaign),
+                item: item,
+                inStorePage: inStore,
+                isCampaign: isCampaign,
+                storeStatus: storeStatus,
+              ),
               backgroundColor: Colors.transparent,
               isScrollControlled: true,
             )
           : Get.dialog(
               Dialog(
-                  child: ItemBottomSheet(
-                      item: item,
-                      inStorePage: inStore,
-                      isCampaign: isCampaign)),
+                child: ItemBottomSheet(
+                  item: item,
+                  inStorePage: inStore,
+                  isCampaign: isCampaign,
+                  storeStatus: storeStatus,
+                ),
+              ),
             );
     } else {
       log("I am in else...");
-
-      Get.toNamed(RouteHelper.getItemDetailsRoute(item.id, inStore),
-          arguments: ItemDetailsScreen(
-              item: item, inStorePage: inStore, isCampaign: isCampaign));
+      log("I am in else...");
+      log(storeStatus.toString());
+      Get.toNamed(
+        RouteHelper.getItemDetailsRoute(item.id, inStore),
+        arguments: ItemDetailsScreen(
+          storeStatus: storeStatus,
+          item: item,
+          inStorePage: inStore,
+          isCampaign: isCampaign,
+        ),
+      );
     }
   }
 

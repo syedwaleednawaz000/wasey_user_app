@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/rendering.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
@@ -413,7 +415,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                         : "closed_now".tr,
                                                 style: TextStyle(
                                                   color: ((isStoreOpen(store
-                                                      .schedules!))  &&
+                                                              .schedules!)) &&
                                                           (store.active == 1))
                                                       ? Colors.green
                                                       : Colors.red,
@@ -2058,6 +2060,16 @@ class _StoreScreenState extends State<StoreScreen> {
                                                           const SizedBox(
                                                               height: 5),
                                                           StoreItemView(
+                                                            storeStatus: ((isStoreOpen(
+                                                                        store!
+                                                                            .schedules!)) &&
+                                                                    (store.active ==
+                                                                        1))
+                                                                ? 1
+                                                                : store.active ==
+                                                                        -1
+                                                                    ? -1
+                                                                    : 0,
                                                             categoryId: '0',
                                                             isStore: false,
                                                             stores: null,
@@ -2253,13 +2265,12 @@ class StoreCategoriesGrid extends StatelessWidget {
           } else {
             // This case is theoretically covered by the check before GridView.builder
             errorMessage = "error_loading_category_details".tr;
-            print(
-                "CategoryController's categoryList became null during build (should not happen).");
+            log("CategoryController's categoryList became null during build (should not happen).");
           }
         } else {
           errorMessage = "error_loading_category_details"
               .tr; // Or some index out of bounds error
-          print("Index out of bounds for store.categoryIds.");
+          log("Index out of bounds for store.categoryIds.");
         }
 
         if (category != null) {

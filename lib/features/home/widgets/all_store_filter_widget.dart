@@ -19,7 +19,7 @@ class AllStoreFilterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool? showRestaurantText = ModuleHelper.getModule()!.id!.toString() ==
+    bool? showRestaurantText = ModuleHelper.getModule()?.id.toString() ==
         AppConstants.restaurantModuleId;
     return GetBuilder<StoreController>(builder: (storeController) {
       return Center(

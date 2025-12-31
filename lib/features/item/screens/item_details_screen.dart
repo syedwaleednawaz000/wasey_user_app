@@ -28,11 +28,15 @@ class ItemDetailsScreen extends StatefulWidget {
   final Item? item;
   final bool inStorePage;
   final bool? isCampaign;
-  const ItemDetailsScreen(
-      {super.key,
-      required this.item,
-      required this.inStorePage,
-      this.isCampaign});
+  final int storeStatus;
+
+  const ItemDetailsScreen({
+    super.key,
+    required this.item,
+    required this.inStorePage,
+    this.isCampaign,
+    this.storeStatus = 1,
+  });
 
   @override
   State<ItemDetailsScreen> createState() => _ItemDetailsScreenState();
@@ -60,6 +64,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
           CartModel? cartModel;
           OnlineCart? cart;
           double priceWithAddons = 0;
+
           int? cartId = cartController.getCartId(itemController.cartIndex);
           if (itemController.item != null &&
               itemController.variationIndex != null) {
@@ -531,11 +536,13 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                                                 .paddingSizeSmall),
                                                         decoration:
                                                             BoxDecoration(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .error
-                                                                  .withAlpha((0.1 * 255).toInt()),
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .colorScheme
+                                                              .error
+                                                              .withAlpha(
+                                                                  (0.1 * 255)
+                                                                      .toInt()),
                                                           borderRadius: BorderRadius
                                                               .circular(Dimensions
                                                                   .radiusSmall),
@@ -616,7 +623,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                                                       .textTheme
                                                                       .bodyLarge!
                                                                       .color
-                                                                      ?.withAlpha((0.5 * 255).toInt())),
+                                                                      ?.withAlpha((0.5 *
+                                                                              255)
+                                                                          .toInt())),
                                                             );
                                                           })),
                                                           const SizedBox(
@@ -659,7 +668,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                                                       .textTheme
                                                                       .bodyLarge!
                                                                       .color
-                                                                      ?.withAlpha((0.5 * 255).toInt())),
+                                                                      ?.withAlpha((0.5 *
+                                                                              255)
+                                                                          .toInt())),
                                                             );
                                                           })),
                                                           const SizedBox(
@@ -699,101 +710,113 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                               .stock! ||
                                           stock! > 0)
                                       ? () async {
-                                          if (!Get.find<SplashController>()
-                                                  .configModel!
-                                                  .moduleConfig!
-                                                  .module!
-                                                  .stock! ||
-                                              stock! > 0) {
-                                            if (itemController.item!
-                                                    .availableDateStarts !=
-                                                null) {
-                                              Get.toNamed(
-                                                  RouteHelper.getCheckoutRoute(
-                                                      'campaign'),
-                                                  arguments: CheckoutScreen(
-                                                    storeId: null,
-                                                    fromCart: false,
-                                                    cartList: [cartModel],
-                                                  ));
-                                            } else {
-                                              if (cartController.existAnotherStoreItem(
-                                                  cartModel!.item!.storeId,
-                                                  Get.find<SplashController>()
-                                                              .module ==
-                                                          null
-                                                      ? Get.find<
-                                                              SplashController>()
-                                                          .cacheModule!
-                                                          .id
-                                                      : Get.find<
-                                                              SplashController>()
-                                                          .module!
-                                                          .id)) {
-                                                Get.dialog(
-                                                    ConfirmationDialog(
-                                                      icon: Images.warning,
-                                                      title:
-                                                          'are_you_sure_to_reset'
-                                                              .tr,
-                                                      description: Get.find<
-                                                                  SplashController>()
-                                                              .configModel!
-                                                              .moduleConfig!
-                                                              .module!
-                                                              .showRestaurantText!
-                                                          ? 'if_you_continue'.tr
-                                                          : 'if_you_continue_without_another_store'
-                                                              .tr,
-                                                      onYesPressed: () {
-                                                        Get.back();
-                                                        cartController
-                                                            .clearCartOnline()
-                                                            .then(
-                                                                (success) async {
-                                                          if (success) {
-                                                            await cartController
-                                                                .addToCartOnline(
-                                                                    cart!);
-                                                            itemController
-                                                                .setExistInCart(
-                                                                    widget.item,
-                                                                    null);
-                                                            showCartSnackBar();
-                                                          }
-                                                        });
-                                                      },
-                                                    ),
-                                                    barrierDismissible: false);
+                                          if (widget.storeStatus == 1) {
+                                            if (!Get.find<SplashController>()
+                                                    .configModel!
+                                                    .moduleConfig!
+                                                    .module!
+                                                    .stock! ||
+                                                stock! > 0) {
+                                              if (itemController.item!
+                                                      .availableDateStarts !=
+                                                  null) {
+                                                Get.toNamed(
+                                                    RouteHelper
+                                                        .getCheckoutRoute(
+                                                            'campaign'),
+                                                    arguments: CheckoutScreen(
+                                                      storeId: null,
+                                                      fromCart: false,
+                                                      cartList: [cartModel],
+                                                    ));
                                               } else {
-                                                if (itemController.cartIndex ==
-                                                    -1) {
-                                                  await cartController
-                                                      .addToCartOnline(cart!)
-                                                      .then((success) {
-                                                    if (success) {
-                                                      itemController
-                                                          .setExistInCart(
-                                                              widget.item,
-                                                              null);
-                                                      showCartSnackBar();
-                                                      _key.currentState!
-                                                          .shake();
-                                                    }
-                                                  });
+                                                if (cartController.existAnotherStoreItem(
+                                                    cartModel!.item!.storeId,
+                                                    Get.find<SplashController>()
+                                                                .module ==
+                                                            null
+                                                        ? Get.find<
+                                                                SplashController>()
+                                                            .cacheModule!
+                                                            .id
+                                                        : Get.find<
+                                                                SplashController>()
+                                                            .module!
+                                                            .id)) {
+                                                  Get.dialog(
+                                                      ConfirmationDialog(
+                                                        icon: Images.warning,
+                                                        title:
+                                                            'are_you_sure_to_reset'
+                                                                .tr,
+                                                        description: Get.find<
+                                                                    SplashController>()
+                                                                .configModel!
+                                                                .moduleConfig!
+                                                                .module!
+                                                                .showRestaurantText!
+                                                            ? 'if_you_continue'
+                                                                .tr
+                                                            : 'if_you_continue_without_another_store'
+                                                                .tr,
+                                                        onYesPressed: () {
+                                                          Get.back();
+                                                          cartController
+                                                              .clearCartOnline()
+                                                              .then(
+                                                                  (success) async {
+                                                            if (success) {
+                                                              await cartController
+                                                                  .addToCartOnline(
+                                                                      cart!);
+                                                              itemController
+                                                                  .setExistInCart(
+                                                                      widget
+                                                                          .item,
+                                                                      null);
+                                                              showCartSnackBar();
+                                                            }
+                                                          });
+                                                        },
+                                                      ),
+                                                      barrierDismissible:
+                                                          false);
                                                 } else {
-                                                  await cartController
-                                                      .updateCartOnline(cart!)
-                                                      .then((success) {
-                                                    if (success) {
-                                                      showCartSnackBar();
-                                                      _key.currentState!
-                                                          .shake();
-                                                    }
-                                                  });
+                                                  if (itemController
+                                                          .cartIndex ==
+                                                      -1) {
+                                                    await cartController
+                                                        .addToCartOnline(cart!)
+                                                        .then((success) {
+                                                      if (success) {
+                                                        itemController
+                                                            .setExistInCart(
+                                                                widget.item,
+                                                                null);
+                                                        showCartSnackBar();
+                                                        _key.currentState!
+                                                            .shake();
+                                                      }
+                                                    });
+                                                  } else {
+                                                    await cartController
+                                                        .updateCartOnline(cart!)
+                                                        .then((success) {
+                                                      if (success) {
+                                                        showCartSnackBar();
+                                                        _key.currentState!
+                                                            .shake();
+                                                      }
+                                                    });
+                                                  }
                                                 }
                                               }
                                             }
+                                          } else if (widget.storeStatus == -1) {
+                                            showCustomSnackBar(
+                                                "temporarily_closed_label".tr);
+                                          } else {
+                                            showCustomSnackBar("closed_now".tr);
                                           }
                                         }
                                       : null,
@@ -864,6 +887,7 @@ class QuantityButton extends StatelessWidget {
   final int cartIndex;
   final int? quantityLimit;
   final CartController cartController;
+
   const QuantityButton({
     super.key,
     required this.isIncrement,
