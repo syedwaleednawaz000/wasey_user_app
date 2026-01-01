@@ -726,13 +726,15 @@ class CategoryShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 8,
-      padding: const EdgeInsets.only(
-          left: Dimensions.paddingSizeSmall,
-          top: Dimensions.paddingSizeDefault),
-      physics: const NeverScrollableScrollPhysics(),
-      scrollDirection: Axis.horizontal,
+    return SizedBox(
+      height: 158,
+      child: ListView.builder(
+        itemCount: 8,
+        padding: const EdgeInsets.only(
+            left: Dimensions.paddingSizeSmall,
+            top: Dimensions.paddingSizeDefault),
+        physics: const NeverScrollableScrollPhysics(),
+        scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(
@@ -770,6 +772,7 @@ class CategoryShimmer extends StatelessWidget {
           ),
         );
       },
+      ),
     );
   }
 }
@@ -781,14 +784,16 @@ class FoodCategoryShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(
-        vertical: Dimensions.paddingSizeDefault,
-      ),
-      itemCount: 8,
+    return SizedBox(
+      height: 160,
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(
+          vertical: Dimensions.paddingSizeDefault,
+        ),
+        itemCount: 8,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(
@@ -833,6 +838,7 @@ class FoodCategoryShimmer extends StatelessWidget {
           ),
         );
       },
+      ),
     );
   }
 }
@@ -909,14 +915,16 @@ class PharmacyCategoryShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(
-        vertical: Dimensions.paddingSizeDefault,
-      ),
-      itemCount: 8,
+    return SizedBox(
+      height: 160,
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(
+          vertical: Dimensions.paddingSizeDefault,
+        ),
+        itemCount: 8,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(
@@ -960,6 +968,7 @@ class PharmacyCategoryShimmer extends StatelessWidget {
           ),
         );
       },
+      ),
     );
   }
 }

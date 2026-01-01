@@ -21,9 +21,16 @@ class _BadWeatherWidgetState extends State<BadWeatherWidget> {
   void initState() {
     super.initState();
 
+    // Add null safety check for user address
+    final userAddress = AddressHelper.getUserAddressFromSharedPref();
+    if (userAddress == null || userAddress.zoneData == null) {
+      _showAlert = false;
+      return;
+    }
+
     ZoneData? zoneData;
-    for (var data in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-      if (data.id == AddressHelper.getUserAddressFromSharedPref()!.zoneId) {
+    for (var data in userAddress.zoneData!) {
+      if (data.id == userAddress.zoneId) {
         if (data.increaseDeliveryFeeStatus == 1 &&
             data.increaseDeliveryFeeMessage != null) {
           zoneData = data;

@@ -169,13 +169,19 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
+
     if (!ResponsiveHelper.isWeb()) {
-      Get.find<LocationController>().getZone(
-          AddressHelper.getUserAddressFromSharedPref()!.latitude,
-          AddressHelper.getUserAddressFromSharedPref()!.longitude,
+      final userAddress = AddressHelper.getUserAddressFromSharedPref();
+      if (userAddress != null && userAddress.latitude != null && userAddress.longitude != null) {
+        Get.find<LocationController>().getZone(
+          userAddress.latitude,
+          userAddress.longitude,
           false,
-          updateInAddress: true);
+          updateInAddress: true,
+        );
+      }
     }
+
 
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
@@ -497,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  addressType.tr,
+                                                  (addressType ?? 'your_location'.tr),
                                                   style: STCMedium.copyWith(
                                                       color: Theme.of(context)
                                                           .textTheme
@@ -587,26 +593,47 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: SizedBox(
                                   width: Dimensions.webMaxWidth,
                                   child: !showMobileModule
-                                      ? Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                              // Container(
-                                              //     height: 200,
-                                              //     width: double.infinity,
-                                              //     color: Colors.green,
-                                              //     child: ModuleWidget()),
-                                              isGrocery
-                                                  ? const GroceryHomeScreen()
-                                                  : isPharmacy
-                                                      ? const PharmacyHomeScreen()
-                                                      : isFood
-                                                          ? const FoodHomeScreen()
-                                                          // ? Text("data")
-                                                          : isShop
-                                                              ? const ShopHomeScreen()
-                                                              : const SizedBox(),
-                                            ])
+                                      ? GetBuilder<HomeController>(
+                                          builder: (homeCtrl) {
+                                            // Check if module is loaded and essential data is being fetched
+                                            bool isModuleLoaded = splashController.module != null;
+                                            bool hasStartedLoading = homeCtrl.cashBackOfferList != null || 
+                                                                      Get.find<BannerController>().bannerImageList != null ||
+                                                                      Get.find<CategoryController>().categoryList != null;
+                                            
+                                            // Show loading only if module is loaded but initial data hasn't started loading yet
+                                            if (isModuleLoaded && !hasStartedLoading) {
+                                              return const Padding(
+                                                padding: EdgeInsets.all(100.0),
+                                                child: Center(
+                                                  child: CircularProgressIndicator(),
+                                                ),
+                                              );
+                                            }
+                                            
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Container(
+                                                //     height: 200,
+                                                //     width: double.infinity,
+                                                //     color: Colors.green,
+                                                //     child: ModuleWidget()),
+                                                isGrocery
+                                                    ? const GroceryHomeScreen()
+                                                    : isPharmacy
+                                                        ? const PharmacyHomeScreen()
+                                                        : isFood
+                                                            ? const FoodHomeScreen()
+                                                            // ? Text("data")
+                                                            : isShop
+                                                                ? const ShopHomeScreen()
+                                                                : const SizedBox(),
+                                              ],
+                                            );
+                                          },
+                                        )
                                       : ModuleView(
                                           splashController: splashController,
                                         ),
@@ -928,3 +955,4 @@ class SliverDelegate extends SliverPersistentHeaderDelegate {
         child != oldDelegate.child;
   }
 }
+
