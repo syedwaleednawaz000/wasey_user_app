@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/common/enums/data_source_enum.dart';
 import 'package:sixam_mart/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
@@ -176,43 +177,251 @@ class StoreController extends GetxController implements GetxService {
   bool get isLoadingCategoriesWithStores => _isLoadingCategoriesWithStores;
 
   Future<void> getCategoriesWithStoreList({required bool reload}) async {
-    if (_categoryWithStoreList == null || reload) {
+    // If we are not forcing a reload and data is already in memory, do nothing.
+    // This is for navigating between screens without closing the app.
+    if (_categoryWithStoreList != null && !reload) {
+      return;
+    }
+
+    // If this is a forced refresh (e.g., pull-to-refresh), show the loading spinner.
+    // if (reload) {
+    //   _isLoadingCategoriesWithStores = true;
+    //   update();
+    // }
+
+    SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+    int? moduleId = ModuleHelper.getCacheModule()?.id;
+    String cacheId = 'categories_with_stores_$moduleId';
+
+    // --- Step 1: INSTANTLY LOAD FROM CACHE (if available) ---
+    // This happens only if the data isn't already in memory.
+    if (_categoryWithStoreList == null) {
       _isLoadingCategoriesWithStores = true;
       update();
+      String? cachedData = sharedPreferences.getString(cacheId);
+      if (cachedData != null && cachedData.isNotEmpty) {
+        try {
+          List<dynamic> decodedList = jsonDecode(cachedData);
+          _categoryWithStoreList = decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+          if(_categoryWithStoreList != null){
+            _isLoadingCategoriesWithStores = false;
+          }
+          log("CACHE: Loaded categories from local storage.");
+          // We call update() here so the user sees data immediately.
+          // The loading indicator won't show if we found cache.
 
-      ApiClient apiClient = Get.find<ApiClient>();
-
-      String uri =
-          '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
-
-      log("Verifying Correct API Call: ${apiClient.appBaseUrl}$uri");
-
-      try {
-        Response response = await apiClient.getData(uri);
-
-        if (response.statusCode == 200) {
-          log("Stores API Response: ${response.body}");
-          _categoryWithStoreList = [];
-          _categoryWithStoreList?.clear();
-          response.body.forEach((categoryJson) {
-            _categoryWithStoreList?.add(CategoryWithStores.fromJson(categoryJson));
-          });
-          log("SUCCESS: Fetched and parsed categories with stores.");
-        } else {
-          _categoryWithStoreList = [];
-          log("API CALL FAILED: The server responded with an error.");
-          ApiChecker.checkApi(response);
+          update();
+        } catch (e) {
+          log("CACHE_ERROR: Could not parse cached data. $e");
         }
-      } catch (e) {
-        _categoryWithStoreList = [];
-        log("EXCEPTION CAUGHT: $e");
-        // showCustomSnackBar(e.toString());
       }
+    }
 
+    // --- Step 2: ALWAYS FETCH FROM NETWORK IN THE BACKGROUND ---
+    // This part runs regardless of whether cache was found or not.
+    // It ensures data is always kept fresh.
+
+    // If, after checking cache, we still have no data, show a loading indicator.
+    // This only happens on the very first launch.
+    if (_categoryWithStoreList == null) {
+      _isLoadingCategoriesWithStores = true;
+      update();
+    }
+
+    try {
+      ApiClient apiClient = Get.find<ApiClient>();
+      String uri = '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+      Response response = await apiClient.getData(uri);
+
+      if (response.statusCode == 200) {
+        List<dynamic> decodedList = response.body;
+              List<CategoryWithStores> freshList =
+              decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+
+              // Overwrite the in-memory list and save to cache
+              _categoryWithStoreList = freshList;
+        // _categoryWithStoreList = decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+        await sharedPreferences.setString(cacheId, jsonEncode(decodedList));
+        log("NETWORK: Fetched fresh data and updated cache.");
+      } else {
+        // If the API fails, we don't throw an error. We just log it
+        // and continue using the old (stale) data if we have it.
+        log("NETWORK_ERROR: API call failed with status ${response.statusCode}");
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      log("NETWORK_EXCEPTION: $e");
+    } finally {
+      // --- Step 3: FINAL UI UPDATE ---
+      // This turns off any loading indicators and displays the latest data
+      // (either fresh from the network or the original cached data if network failed).
       _isLoadingCategoriesWithStores = false;
       update();
     }
   }
+
+  // Future<void> getCategoriesWithStoreList({required bool reload}) async {
+  //   // 1. Exit early if we have data and don't need to reload.
+  //   if (_categoryWithStoreList != null && !reload) {
+  //     return;
+  //   }
+  //
+  //   SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  //   int? moduleId = ModuleHelper.getCacheModule()?.id;
+  //   String cacheId = 'categories_with_stores_$moduleId';
+  //
+  //   // 2. If reloading, we should show a loading indicator.
+  //   if (reload) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //
+  //   // 3. Try to load from cache first to show data instantly.
+  //   if (_categoryWithStoreList == null) {
+  //     String? cachedData = sharedPreferences.getString(cacheId);
+  //     if (cachedData != null && cachedData.isNotEmpty) {
+  //       try {
+  //         List<dynamic> decodedList = jsonDecode(cachedData);
+  //         _categoryWithStoreList =
+  //             decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+  //         log("SUCCESS: Loaded categories from cache.");
+  //         update(); // Show cached data immediately.
+  //       } catch (e) {
+  //         log("Cache parsing error: $e");
+  //       }
+  //     }
+  //   }
+  //
+  //   // 4. If there's still no data, it's the very first load. Show indicator.
+  //   if (_categoryWithStoreList == null) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //
+  //   // 5. Fetch fresh data from the network.
+  //   try {
+  //     ApiClient apiClient = Get.find<ApiClient>();
+  //     String uri = '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+  //     Response response = await apiClient.getData(uri);
+  //
+  //     if (response.statusCode == 200) {
+  //       // Parse the new data
+  //       List<dynamic> decodedList = response.body;
+  //       List<CategoryWithStores> freshList =
+  //       decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+  //
+  //       // Overwrite the in-memory list and save to cache
+  //       _categoryWithStoreList = freshList;
+  //       await sharedPreferences.setString(cacheId, jsonEncode(decodedList));
+  //       log("SUCCESS: Fetched fresh categories from API and updated cache.");
+  //     } else {
+  //       // On API failure, we keep the old cached data if it exists.
+  //       log("API CALL FAILED: Server responded with status ${response.statusCode}");
+  //       if (_categoryWithStoreList == null) {
+  //         // If we have neither cache nor network, show an error state.
+  //         _categoryWithStoreList = [];
+  //       }
+  //       ApiChecker.checkApi(response);
+  //     }
+  //   } catch (e) {
+  //     log("EXCEPTION CAUGHT during network call: $e");
+  //     if (_categoryWithStoreList == null) {
+  //       // If an exception occurs and we have no data, set to empty.
+  //       _categoryWithStoreList = [];
+  //     }
+  //   } finally {
+  //     // 6. Final UI update.
+  //     // This ensures the loading indicator is always turned off and the UI shows the latest data (fresh or cached).
+  //     _isLoadingCategoriesWithStores = false;
+  //     update();
+  //   }
+  // }
+
+  // Future<void> getCategoriesWithStoreList({required bool reload}) async {
+  //   if (_categoryWithStoreList == null || reload) {
+  //     SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  //     int? moduleId = ModuleHelper.getCacheModule()?.id;
+  //     String cacheId = 'categories_with_stores_$moduleId';
+  //
+  //     if (_categoryWithStoreList == null) {
+  //       String? cache = sharedPreferences.getString(cacheId);
+  //       if (cache != null && cache.isNotEmpty) {
+  //         try {
+  //           _categoryWithStoreList = [];
+  //           jsonDecode(cache).forEach((categoryJson) {
+  //             _categoryWithStoreList!
+  //                 .add(CategoryWithStores.fromJson(categoryJson));
+  //           });
+  //           log("stores parsed from cache...");
+  //           update();
+  //         } catch (e) {
+  //           log("Cache parsing error: $e");
+  //         }
+  //       }
+  //     }
+  //
+  //     if (_categoryWithStoreList == null) {
+  //       _isLoadingCategoriesWithStores = true;
+  //       update();
+  //     }
+  //
+  //     ApiClient apiClient = Get.find<ApiClient>();
+  //
+  //     String uri =
+  //         '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+  //
+  //     log("Verifying Correct API Call: ${apiClient.appBaseUrl}$uri");
+  //
+  //     try {
+  //       Response response = await apiClient.getData(uri);
+  //
+  //       if (response.statusCode == 200) {
+  //         log("Stores API Response: ${response.body}");
+  //         // _categoryWithStoreList = [];
+  //
+  //         // Parse the new data
+  //         List<dynamic> decodedList = response.body;
+  //         List<CategoryWithStores> freshList = decodedList
+  //             .map((json) => CategoryWithStores.fromJson(json))
+  //             .toList();
+  //
+  //         // Overwrite the in-memory list and save to cache
+  //         _categoryWithStoreList?.clear();
+  //         _categoryWithStoreList = freshList;
+  //         // response.body.forEach((categoryJson) {
+  //         //   _categoryWithStoreList!
+  //         //       .add(CategoryWithStores.fromJson(categoryJson));
+  //         // });
+  //
+  //         if (_categoryWithStoreList != null) {
+  //           sharedPreferences.setString(
+  //               cacheId,
+  //               jsonEncode(
+  //                   _categoryWithStoreList!.map((e) => e.toJson()).toList()));
+  //         }
+  //         log("SUCCESS: Fetched and parsed categories with stores.");
+  //       } else {
+  //         // Only clear if we don't have cached data, OR if we want to enforce consistency.
+  //         // But clearing it on error leaves the user with nothing if they had cache.
+  //         // Let's NOT clear _categoryWithStoreList on error if we have data.
+  //         if (_categoryWithStoreList == null) {
+  //           _categoryWithStoreList = [];
+  //         }
+  //         log("API CALL FAILED: The server responded with an error.");
+  //         ApiChecker.checkApi(response);
+  //       }
+  //     } catch (e) {
+  //       if (_categoryWithStoreList == null) {
+  //         _categoryWithStoreList = [];
+  //       }
+  //       log("EXCEPTION CAUGHT: $e");
+  //       // showCustomSnackBar(e.toString());
+  //     } finally {
+  //       _isLoadingCategoriesWithStores = false;
+  //       update();
+  //     }
+  //   }
+  // }
 
   getSubCatWithItems() async {
     if (store?.categoryIds != null) {

@@ -354,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                         await Get.find<StoreController>()
                             .getFeaturedStoreList();
-                        print("getCategoriesWithStoreList called");
+                        // print("getCategoriesWithStoreList called");
                         await Get.find<StoreController>()
                             .getCategoriesWithStoreList(reload: true);
                       }
