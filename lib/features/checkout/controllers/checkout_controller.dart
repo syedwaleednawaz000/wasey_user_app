@@ -810,12 +810,12 @@ class CheckoutController extends GetxController implements GetxService {
       //   }
       // }
       if (paymentMethodIndex == 2) {
-        // if (digitalPaymentName != null && digitalPaymentName!.isNotEmpty) {
-        //   if (digitalPaymentName!.toLowerCase() == 'tranzila') {
-        //     log("Digital payment is Tranzila, navigating to WebView screen.");
-        //     Get.to(() => TranzilaWebPaymentScreen(orderID: orderID));
-        //   }
-        // } else {
+        if (digitalPaymentName != null && digitalPaymentName!.isNotEmpty) {
+          if (digitalPaymentName!.toLowerCase() == 'tranzila') {
+            log("Digital payment is Tranzila, navigating to WebView screen.");
+            Get.to(() => TranzilaWebPaymentScreen(orderID: orderID));
+          }
+        } else {
         Get.to(() => DirectPaymentScreen(
               orderId: orderID,
               customerID: Get.find<ProfileController>().userInfoModel?.id ??
@@ -827,7 +827,7 @@ class CheckoutController extends GetxController implements GetxService {
               guestID: userID.isNotEmpty ? userID : AuthHelper.getGuestId(),
               contactNumber: contactNumber,
             ));
-        // }
+        }
       } else {
         double total = ((amount / 100) *
             Get.find<SplashController>()

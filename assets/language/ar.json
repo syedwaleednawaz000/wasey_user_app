@@ -1,4 +1,7 @@
 {
+  "complete_payment": "إتمام الدفع",
+  "restaurant_is_currently_closed": "المطعم مغلق حاليًا، يرجى المحاولة مرة أخرى لاحقًا.",
+  "store_is_currently_closed": "المتجر مغلق حاليًا، يرجى المحاولة مرة أخرى لاحقًا.",
   "refresh": "تحديث",
   "you_can_pick_up_your_order": "بإمكانك استالم الطلب من المطعم",
   "delivery_currently_unavailable": "التوصيل غير متاح حاليا",

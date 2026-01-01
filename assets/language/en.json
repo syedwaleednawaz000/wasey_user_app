@@ -1,5 +1,9 @@
 {
-  "refresh": "Refresh",
+  "complete_payment": "Complete Payment",
+  "restaurant_is_currently_closed": "Restaurant is currently closed, please try again later.",
+  "store_is_currently_closed": "Store is currently closed, please try again later.",
+
+"refresh": "Refresh",
   "you_can_pick_up_your_order": "You can pick up your order from the restaurant",
   "delivery_currently_unavailable": "Delivery is currently unavailable",
   "please_login_to_track_orders": "Please login to track your orders",

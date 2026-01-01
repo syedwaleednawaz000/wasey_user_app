@@ -1583,10 +1583,10 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                   } else if (widget.storeStatus == -1) {
                                     Get.back();
                                     showCustomSnackBar(
-                                        "temporarily_closed_label".tr);
+                                        "restaurant_is_currently_closed".tr);
                                   } else {
                                     Get.back();
-                                    showCustomSnackBar("closed_now".tr);
+                                    showCustomSnackBar("restaurant_is_currently_closed".tr);
                                   }
                                   // --- END: Modified onPressed Logic ---
                                 },

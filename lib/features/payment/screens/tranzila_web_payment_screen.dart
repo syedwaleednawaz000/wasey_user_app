@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
+
 // import 'package:sixam_mart/helper/route_helper.dart'; // For navigating on success
 import 'dart:developer';
 
@@ -15,7 +17,8 @@ class TranzilaWebPaymentScreen extends StatefulWidget {
   });
 
   @override
-  State<TranzilaWebPaymentScreen> createState() => _TranzilaWebPaymentScreenState();
+  State<TranzilaWebPaymentScreen> createState() =>
+      _TranzilaWebPaymentScreenState();
 }
 
 class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
@@ -26,29 +29,35 @@ class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
   @override
   void initState() {
     super.initState();
-    _paymentUrl = Uri.parse('${AppConstants.baseUrl}/payment/tranzila/pay?order_id=${widget.orderID}');
+    _paymentUrl = Uri.parse(
+        '${AppConstants.baseUrl}/payment/tranzila/pay?order_id=${widget.orderID}');
     log('Payment URL: $_paymentUrl');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Complete Payment'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Optional: Show a confirmation dialog before canceling payment
-            Get.back();
-          },
-        ),
+      appBar: CustomAppBar(
+        title: "complete_payment".tr,
+        backButton: true,
       ),
+      // AppBar(
+      //   title: const Text('Complete Payment'),
+      //   leading: IconButton(
+      //     icon: const Icon(Icons.arrow_back_ios_new_rounded),
+      //     onPressed: () {
+      //       // Optional: Show a confirmation dialog before canceling payment
+      //       Get.back();
+      //     },
+      //   ),
+      // ),
       body: Stack(
         children: [
           InAppWebView(
             initialUrlRequest: URLRequest(url: WebUri.uri(_paymentUrl)),
             initialSettings: InAppWebViewSettings(
-              useShouldOverrideUrlLoading: true, // This is key for intercepting navigation
+              useShouldOverrideUrlLoading: true,
+              // This is key for intercepting navigation
               javaScriptEnabled: true,
             ),
             onWebViewCreated: (controller) {
@@ -62,8 +71,10 @@ class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
 
               // 2. Listen for the success or failure URL to navigate away
               // IMPORTANT: Adjust these URLs to match what Tranzila redirects to
-              final String successUrlIdentifier = '/payment/tranzila/success'; // Example
-              final String failureUrlIdentifier = '/payment/tranzila/fail';     // Example
+              final String successUrlIdentifier =
+                  '/payment/tranzila/success'; // Example
+              final String failureUrlIdentifier =
+                  '/payment/tranzila/fail'; // Example
 
               if (url.toString().contains(successUrlIdentifier)) {
                 log('Payment Successful, redirecting to Order Success Screen.');
@@ -98,7 +109,9 @@ class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
           // Show a progress indicator at the top
           if (_progress < 1.0)
             Positioned(
-              top: 0, left: 0, right: 0,
+              top: 0,
+              left: 0,
+              right: 0,
               child: LinearProgressIndicator(value: _progress),
             ),
         ],

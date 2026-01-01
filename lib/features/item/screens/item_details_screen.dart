@@ -814,9 +814,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                             }
                                           } else if (widget.storeStatus == -1) {
                                             showCustomSnackBar(
-                                                "temporarily_closed_label".tr);
+                                                "store_is_currently_closed".tr);
                                           } else {
-                                            showCustomSnackBar("closed_now".tr);
+                                            showCustomSnackBar("store_is_currently_closed".tr);
                                           }
                                         }
                                       : null,
