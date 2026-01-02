@@ -785,7 +785,7 @@ class FoodCategoryShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 160,
+      height: 130,
       child: ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
@@ -797,9 +797,7 @@ class FoodCategoryShimmer extends StatelessWidget {
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(
-            bottom: Dimensions.paddingSizeDefault,
             left: Dimensions.paddingSizeDefault,
-            top: Dimensions.paddingSizeDefault,
           ),
           child: SizedBox(
             width: 90,
@@ -810,8 +808,8 @@ class FoodCategoryShimmer extends StatelessWidget {
                     duration: const Duration(seconds: 2),
                     enabled: true,
                     child: Container(
-                      height: 90,
-                      width: 90, // Match the SizedBox width for a perfect circle
+                      height: 70,
+                      width: 70, // Match the SizedBox width for a perfect circle
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Theme.of(context).shadowColor,

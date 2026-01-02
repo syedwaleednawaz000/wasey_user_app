@@ -65,6 +65,11 @@ class _BannerViewState extends State<BannerView> {
           ? bannerController.featuredBannerDataList
           : bannerController.bannerDataList;
 
+      // If banners list is empty, show SizedBox instead of shimmer
+      if (bannerList != null && bannerList.isEmpty) {
+        return const SizedBox();
+      }
+
       return Container(
         width: screenWidth,
         padding: const EdgeInsets.only(top: Dimensions.paddingSizeDefault),
