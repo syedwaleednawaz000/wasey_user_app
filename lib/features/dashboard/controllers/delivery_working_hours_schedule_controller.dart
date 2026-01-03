@@ -78,7 +78,7 @@ class TimeSlotController extends GetxController {
       log("Weekly Pickup: ${timeSlot?.weeklyPickupTimeSlots}");
 
       if (timeSlot != null) {
-        if(!timeSlot!.deliverySlotSystemEnabled) {
+        if(timeSlot?.weeklyPickupTimeSlots != null && !timeSlot!.deliverySlotSystemEnabled) {
           showModalBottomSheet(
           context: context,
           isScrollControlled: true,

@@ -17,6 +17,7 @@ class AppConstants {
   static const String fontFamilyIBMPlexSansArabic = 'IBMPlexSansArabic';
   static const String fontFamilyAlmarai = 'Almarai';
   static const String directPaymentSavedCards = 'saved_cards';
+  static const String categoriesWithStores = 'categories_with_stores';
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
   static const String webHostedUrl = 'https://waseyapp.com';

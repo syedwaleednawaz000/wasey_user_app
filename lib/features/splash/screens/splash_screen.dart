@@ -4,6 +4,7 @@ import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
+import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -62,6 +63,7 @@ class SplashScreenState extends State<SplashScreen> {
     }
     // _route();
     Get.find<SplashController>().getConfigData(notificationBody: widget.body);
+    // Get.find<StoreController>().getCategoriesWithStoreList(reload: false);
   }
 
   @override

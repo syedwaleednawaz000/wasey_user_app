@@ -25,15 +25,19 @@ import 'advertisement_controller.dart';
 
 class HomeController extends GetxController implements GetxService {
   final HomeServiceInterface homeServiceInterface;
+
   HomeController({required this.homeServiceInterface});
 
   List<CashBackModel>? _cashBackOfferList;
+
   List<CashBackModel>? get cashBackOfferList => _cashBackOfferList;
 
   CashBackModel? _cashBackData;
+
   CashBackModel? get cashBackData => _cashBackData;
 
   bool _showFavButton = true;
+
   bool get showFavButton => _showFavButton;
   SplashController splashController = Get.find();
 
@@ -58,7 +62,16 @@ class HomeController extends GetxController implements GetxService {
             .moduleConfig!
             .module!
             .isParcel!) {
-      Get.find<BannerController>().getBannerList(reload);
+      // ======================= CORRECTED SECTION START =======================
+
+      // Call the function to fetch the FIRST page of categories.
+      // The `reload` parameter will tell the function whether to clear old data or not.
+      log("Calling getCategoriesWithStoreList from HomeController for the first page.");
+      await Get.find<StoreController>().getCategoriesWithStoreList(1, reload: reload);
+
+      // (The old call from here has been removed as it's now handled above)
+
+      // ======================== CORRECTED SECTION END ========================
       Get.find<StoreController>().getRecommendedStoreList();
       if (Get.find<SplashController>().module!.moduleType.toString() ==
           AppConstants.grocery) {
@@ -121,19 +134,31 @@ class HomeController extends GetxController implements GetxService {
       }
     }
     // --- ADD THIS CALL TO THE END OF THE METHOD ---
-    log("getCategoriesWithStoreList called inside homeController ");
-    await Get.find<StoreController>().getCategoriesWithStoreList(reload: reload);
+    // log("getCategoriesWithStoreList called inside homeController ");
+    if (Get.find<StoreController>().categoryWithStoreList == null &&
+        Get.find<StoreController>().categoryWithStoreList!.isEmpty) {
+      log("categoryWithStoreList == null calling again...");
+      // ======================= CORRECTED SECTION START =======================
+
+      // Call the function to fetch the FIRST page of categories.
+      // The `reload` parameter will tell the function whether to clear old data or not.
+      await Get.find<StoreController>().getCategoriesWithStoreList(1, reload: reload);
+
+      // (The old call from here has been removed as it's now handled above)
+
+      // ======================== CORRECTED SECTION END ========================
+    }
     // ---------------------------------------------
   }
 
-
-  Future<void> setModuleRestaurant()async{
+  Future<void> setModuleRestaurant() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString("moduleId", "2");
-     splashController.switchModule(1, true);
+    splashController.switchModule(1, true);
     log("ModuleID is Set to: ${sharedPreferences.getString("moduleId")}");
     update();
   }
+
   // Future<void> setModuleSuperMarket()async{
   //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   //   sharedPreferences.setString("moduleId", "1");
@@ -152,9 +177,6 @@ class HomeController extends GetxController implements GetxService {
   //   }
   // }
 
-
-
-
   Future<void> getCashBackOfferList() async {
     _cashBackOfferList = null;
     _cashBackOfferList = await homeServiceInterface.getCashBackOfferList();
@@ -172,14 +194,15 @@ class HomeController extends GetxController implements GetxService {
   }*/
 
   Future<void> getCashBackData(double amount) async {
-    CashBackModel? cashBackModel = await homeServiceInterface.getCashBackData(amount);
-    if(cashBackModel != null) {
+    CashBackModel? cashBackModel =
+        await homeServiceInterface.getCashBackData(amount);
+    if (cashBackModel != null) {
       _cashBackData = cashBackModel;
     }
     update();
   }
 
-  void changeFavVisibility(){
+  void changeFavVisibility() {
     _showFavButton = !_showFavButton;
     update();
   }
@@ -199,5 +222,4 @@ class HomeController extends GetxController implements GetxService {
   bool getIsStoreRegistrationSharedPref() {
     return homeServiceInterface.getIsRestaurantRegistration();
   }
-
 }

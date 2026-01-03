@@ -25,10 +25,16 @@ class _WorkingHoursBottomSheetState extends State<WorkingHoursBottomSheet> {
           return _buildLoadingSheet();
         }
 
-        if (controller.error != null || controller.timeSlot == null) {
-          return _buildErrorSheet(controller.error);
+        // if (controller.error != null || controller.timeSlot == null) {
+        //   return _buildErrorSheet(controller.error);
+        // }
+        // --- CORRECTED PART ---
+        // Now, check if we actually have data. If not, show an error or loading state.
+        // This is safer than using the null-check operator (!).
+        if (controller.timeSlot == null) {
+          // If there's an error message, show it. Otherwise, show a generic "not found" error.
+          return _buildErrorSheet(controller.error ?? "time_slot_not_available".tr);
         }
-
         final slot = controller.timeSlot!;
         // final bool deliveryHoursAvailable = slot.isDeliveryAvailableNow;
         final bool pickupHoursAvailable = slot.isPickupAvailableNow;
