@@ -17,7 +17,8 @@ class FlashSaleRepository implements FlashSaleRepositoryInterface {
   @override
   Future<FlashSaleModel?> getFlashSale({required DataSourceEnum source}) async {
     FlashSaleModel? flashSaleModel;
-    String cacheId = '${AppConstants.flashSaleUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = '${AppConstants.flashSaleUri}-$moduleId';
 
     switch(source) {
       case DataSourceEnum.client:
