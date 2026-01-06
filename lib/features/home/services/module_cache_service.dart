@@ -46,6 +46,13 @@ class RestaurantModuleCacheService {
       }
       
       try {
+        // Promotional Banner - use localOnly=true to prevent API call
+        await Get.find<BannerController>().getPromotionalBannerList(false, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('RestaurantModuleCacheService: Promotional banner load error: $e');
+      }
+      
+      try {
         // Category - use localOnly=true to prevent API call, pass explicit moduleId
         await Get.find<CategoryController>().getCategoryList(false, allCategory: false, localOnly: true, moduleId: moduleId);
       } catch (e) {
@@ -57,6 +64,13 @@ class RestaurantModuleCacheService {
         await Get.find<StoreController>().getPopularStoreList(false, 'all', false, localOnly: true);
       } catch (e) {
         if (kDebugMode) print('RestaurantModuleCacheService: Popular stores load error: $e');
+      }
+      
+      try {
+        // Top Offer stores - use localOnly=true to prevent API call
+        await Get.find<StoreController>().getTopOfferStoreList(false, false, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('RestaurantModuleCacheService: Top offer stores load error: $e');
       }
       
       try {
@@ -81,10 +95,17 @@ class RestaurantModuleCacheService {
       }
       
       try {
-        // Campaign - use localOnly=true to prevent API call
+        // Basic Campaign (MiddleSectionBannerView) - use localOnly=true to prevent API call
+        await Get.find<CampaignController>().getBasicCampaignList(false, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('RestaurantModuleCacheService: Basic campaign load error: $e');
+      }
+      
+      try {
+        // Item Campaign (JustForYouView) - use localOnly=true to prevent API call
         await Get.find<CampaignController>().getItemCampaignList(false, localOnly: true);
       } catch (e) {
-        if (kDebugMode) print('RestaurantModuleCacheService: Campaign load error: $e');
+        if (kDebugMode) print('RestaurantModuleCacheService: Item campaign load error: $e');
       }
       
       try {
@@ -92,6 +113,13 @@ class RestaurantModuleCacheService {
         await Get.find<AdvertisementController>().getAdvertisementList(dataSource: DataSourceEnum.local, localOnly: true);
       } catch (e) {
         if (kDebugMode) print('RestaurantModuleCacheService: Advertisement load error: $e');
+      }
+      
+      try {
+        // Discounted items (Special Offers) - use localOnly=true to prevent API call
+        await Get.find<ItemController>().getDiscountedItemList(false, false, 'all', localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('RestaurantModuleCacheService: Discounted items load error: $e');
       }
 
       if (kDebugMode) {

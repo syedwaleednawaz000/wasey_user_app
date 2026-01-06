@@ -557,35 +557,31 @@ class _MarketScreenState extends State<MarketScreen> {
                     child: Center(
                         child: SizedBox(
                             width: Dimensions.webMaxWidth,
-                            child:
-                            // !showMobileModule ?
-                            Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  // Container(
-                                  //     height: 200,
-                                  //     width: double.infinity,
-                                  //     color: Colors.green,
-                                  //     child: ModuleWidget()),
-                                  isGrocery
-                                      ? const GroceryHomeScreen()
-                                      // ? const SizedBox()
-                                      : isPharmacy
-                                      ? const PharmacyHomeScreen()
-                                      : isFood
-                                      ? const FoodHomeScreen()
-                                      : isShop
-                                      ? const ShopHomeScreen()
-                                      : const SizedBox(),
-                                ])
-                          // : ModuleView(
-                          //     splashController: splashController,
-                          //   ),
+                            child: splashController.module != null
+                                ? Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      isGrocery
+                                          ? const GroceryHomeScreen()
+                                          : isPharmacy
+                                          ? const PharmacyHomeScreen()
+                                          : isFood
+                                          ? const FoodHomeScreen()
+                                          : isShop
+                                          ? const ShopHomeScreen()
+                                          : const SizedBox(),
+                                    ])
+                                : const Padding(
+                                    padding: EdgeInsets.all(100.0),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
                         )),
                   ),
 
-                  !showMobileModule
+                  splashController.module != null
                       ? SliverPersistentHeader(
                     key: _headerKey,
                     pinned: true,
@@ -600,7 +596,7 @@ class _MarketScreenState extends State<MarketScreen> {
                       : const SliverToBoxAdapter(),
 
                   SliverToBoxAdapter(
-                      child: !showMobileModule
+                      child: splashController.module != null
                           ? Center(
                         child: GetBuilder<StoreController>(
                           builder: (storeController) {

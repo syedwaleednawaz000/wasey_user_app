@@ -257,7 +257,8 @@ class ItemController extends GetxController implements GetxService {
 
   Future<void> getDiscountedItemList(bool reload, bool notify, String type,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     _discountedType = type;
     if (reload) {
       _discountedItemList = null;
@@ -276,8 +277,11 @@ class ItemController extends GetxController implements GetxService {
           _isLoading = false;
         }
         update();
-        getDiscountedItemList(false, notify, type,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getDiscountedItemList(false, notify, type,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         items =
             await itemServiceInterface.getDiscountedItemList(type, dataSource);

@@ -47,27 +47,30 @@ class HomeController extends GetxController implements GetxService {
 // NOTE: When fromModule=true, this method is called from SplashController.switchModule()
 // which already set the module. When fromModule=false (initial load), we need to set it.
   Future<void> loadHomeData(bool reload, {bool fromModule = false}) async {
-    // Clear category list when switching modules to ensure correct categories are loaded
-    if (fromModule) {
-      Get.find<CategoryController>().clearCategoryList();
-    }
+    // Always clear category list to ensure correct categories are loaded for this module
+    Get.find<CategoryController>().clearCategoryList();
     
     // Verify the current module ID from SharedPreferences
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? currentModuleId = sharedPreferences.getString("moduleId");
     log("HomeController: Current stored moduleId = $currentModuleId, fromModule = $fromModule");
     
-    // If called from initial load (not from module switch), ensure module is set
-    if (!fromModule) {
-      // Ensure module ID is set to "2" for Restaurant
-      if (currentModuleId != "2") {
-        await sharedPreferences.setString("moduleId", "2");
-        log("HomeController: Updated moduleId to 2 for Restaurant");
-      }
-      // Set the module in SplashController without triggering API calls
-      // skipDataFetch=true because we'll handle data loading here with cache support
+    // Ensure module ID is set to "2" for Restaurant
+    if (currentModuleId != "2") {
+      await sharedPreferences.setString("moduleId", "2");
+      log("HomeController: Updated moduleId to 2 for Restaurant");
+    }
+    
+    // Wait for moduleList to be available if not yet loaded
+    if (splashController.moduleList == null || splashController.moduleList!.isEmpty) {
+      log("HomeController: Waiting for moduleList to be available...");
+      await splashController.getModules();
+    }
+    
+    // Set the module in SplashController if not already Restaurant
+    if (splashController.module == null || splashController.module!.id != 2) {
       if (splashController.moduleList != null && splashController.moduleList!.isNotEmpty) {
-        // Find and set Restaurant module (ID: 2, usually at index 1)
+        // Find and set Restaurant module (ID: 2)
         for (int i = 0; i < splashController.moduleList!.length; i++) {
           if (splashController.moduleList![i].id == 2) {
             await splashController.setModule(splashController.moduleList![i], skipDataFetch: true);
@@ -145,7 +148,7 @@ class HomeController extends GetxController implements GetxService {
       Get.find<StoreController>().getLatestStoreList(reload, 'all', false);
       Get.find<StoreController>().getTopOfferStoreList(reload, false);
       Get.find<ItemController>().getReviewedItemList(reload, 'all', false);
-      Get.find<ItemController>().getRecommendedItemList(reload, 'all', false);
+      // Get.find<ItemController>().getRecommendedItemList(reload, 'all', false); // Commented - Item that you love API
       Get.find<StoreController>().getStoreList(1, reload);
       Get.find<AdvertisementController>().getAdvertisementList();
     }

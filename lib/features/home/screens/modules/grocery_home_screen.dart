@@ -39,7 +39,7 @@ class GroceryHomeScreen extends StatelessWidget {
       // const BestReviewItemView(),
       const JustForYouView(),
       const TopOffersNearMe(),
-      const ItemThatYouLoveView(forShop: false),
+      // const ItemThatYouLoveView(forShop: false), // Commented - Item that you love UI
       isLoggedIn ? const PromoCodeBannerView() : const SizedBox(),
       // const NewOnMartView(isPharmacy: false, isShop: false),
       const PromotionalBannerView(),

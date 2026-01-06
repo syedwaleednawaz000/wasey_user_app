@@ -32,7 +32,7 @@ class FoodHomeScreen extends StatelessWidget {
         const BannerView(isFeatured: false),
         const SizedBox(height: 12),
         const SpecialOfferView(isFood: true, isShop: false),
-        const ItemThatYouLoveView(forShop: false),
+        // const ItemThatYouLoveView(forShop: false), // Commented - Item that you love UI
         // const MostPopularItemView(isFood: true, isShop: false),
       ],
     );

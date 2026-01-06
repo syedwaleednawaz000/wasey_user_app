@@ -9,6 +9,8 @@ import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
+import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
+import 'package:sixam_mart/features/home/controllers/advertisement_controller.dart';
 import '../../item/controllers/campaign_controller.dart';
 import '../services/module_cache_service.dart';
 
@@ -21,7 +23,7 @@ class MarketController extends GetxController implements GetxService {
   // This method will now be responsible for loading all data for the MarketScreen
   // NOTE: This method handles module setting and cache-aware data loading
   Future<void> loadMarketData(bool reload) async {
-    // Clear category list to ensure correct categories are loaded for this module
+    // Always clear category list to ensure correct categories are loaded for this module
     Get.find<CategoryController>().clearCategoryList();
     
     _isLoading = true;
@@ -41,8 +43,13 @@ class MarketController extends GetxController implements GetxService {
       log("MarketController: Updated moduleId to 1 for Market");
     }
     
-    // Ensure SplashController has the correct module set (Market = ID 1, usually index 0)
-    // skipDataFetch=true because we'll handle data loading here with cache support
+    // Wait for moduleList to be available if not yet loaded
+    if (splashController.moduleList == null || splashController.moduleList!.isEmpty) {
+      log("MarketController: Waiting for moduleList to be available...");
+      await splashController.getModules();
+    }
+    
+    // Set the module in SplashController if not already Market
     if (splashController.module == null || splashController.module!.id != 1) {
       if (splashController.moduleList != null && splashController.moduleList!.isNotEmpty) {
         for (int i = 0; i < splashController.moduleList!.length; i++) {
@@ -81,16 +88,22 @@ class MarketController extends GetxController implements GetxService {
 
     // --- Now, load only the data needed for the MARKET module ---
     await Get.find<BannerController>().getBannerList(reload);
+    await Get.find<BannerController>().getPromotionalBannerList(reload); // PromotionalBannerView
     await Get.find<CategoryController>().getCategoryList(reload);
     await Get.find<StoreController>().getPopularStoreList(reload, 'all', false);
-    await Get.find<CampaignController>().getItemCampaignList(reload);
-    await Get.find<ItemController>().getPopularItemList(reload, 'all', false);
+    await Get.find<StoreController>().getTopOfferStoreList(reload, false); // TopOffersNearMe
     await Get.find<StoreController>().getLatestStoreList(reload, 'all', false);
     await Get.find<StoreController>().getStoreList(1, reload);
+    await Get.find<CampaignController>().getBasicCampaignList(reload); // MiddleSectionBannerView
+    await Get.find<CampaignController>().getItemCampaignList(reload); // JustForYouView
+    await Get.find<ItemController>().getPopularItemList(reload, 'all', false);
+    await Get.find<ItemController>().getDiscountedItemList(reload, false, 'all'); // Special Offers
+    await Get.find<AdvertisementController>().getAdvertisementList(); // HighlightWidget
 
     if (AuthHelper.isLoggedIn()) {
       await Get.find<ProfileController>().getUserInfo();
       await Get.find<NotificationController>().getNotificationList(reload);
+      await Get.find<CouponController>().getCouponList(); // PromoCodeBannerView
       // Get.find<StoreController>().getVisitAgainStoreList(fromModule: true); // Commented - not needed for Market
     }
 

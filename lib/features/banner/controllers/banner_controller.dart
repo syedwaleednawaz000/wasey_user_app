@@ -455,13 +455,26 @@ class BannerController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getPromotionalBannerList(bool reload) async {
-    if(_promotionalBanner == null || reload) {
-      PromotionalBanner? promotionalBanner = await bannerServiceInterface.getPromotionalBannerList();
-      if (promotionalBanner != null) {
-        _promotionalBanner = promotionalBanner;
+  Future<void> getPromotionalBannerList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool localOnly = false}) async {
+    if(_promotionalBanner == null || reload || fromRecall) {
+      PromotionalBanner? promotionalBanner;
+      if (dataSource == DataSourceEnum.local) {
+        promotionalBanner = await bannerServiceInterface.getPromotionalBannerList(DataSourceEnum.local);
+        if (promotionalBanner != null) {
+          _promotionalBanner = promotionalBanner;
+        }
+        update();
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getPromotionalBannerList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        }
+      } else {
+        promotionalBanner = await bannerServiceInterface.getPromotionalBannerList(DataSourceEnum.client);
+        if (promotionalBanner != null) {
+          _promotionalBanner = promotionalBanner;
+        }
+        update();
       }
-      update();
     }
   }
 }

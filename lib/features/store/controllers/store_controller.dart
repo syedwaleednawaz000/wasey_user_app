@@ -1058,7 +1058,8 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getTopOfferStoreList(bool reload, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     if (reload) {
       _topOfferStoreList = null;
     }
@@ -1075,8 +1076,11 @@ class StoreController extends GetxController implements GetxService {
           _topOfferStoreList!.addAll(latestStoreList);
         }
         update();
-        getTopOfferStoreList(false, notify,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getTopOfferStoreList(false, notify,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         latestStoreList = await storeServiceInterface.getTopOfferStoreList(
             source: DataSourceEnum.client);

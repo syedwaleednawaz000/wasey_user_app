@@ -9,6 +9,7 @@ import 'package:sixam_mart/features/category/controllers/category_controller.dar
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/item/controllers/campaign_controller.dart';
+import 'package:sixam_mart/features/home/controllers/advertisement_controller.dart';
 
 class MarketModuleCacheService {
   static const String moduleId = AppConstants.superMarketModuleId; // Module ID: 1
@@ -45,6 +46,13 @@ class MarketModuleCacheService {
       }
       
       try {
+        // Promotional Banner - use localOnly=true to prevent API call
+        await Get.find<BannerController>().getPromotionalBannerList(false, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('MarketModuleCacheService: Promotional banner load error: $e');
+      }
+      
+      try {
         // Category - use localOnly=true to prevent API call, pass explicit moduleId
         await Get.find<CategoryController>().getCategoryList(false, allCategory: false, localOnly: true, moduleId: moduleId);
       } catch (e) {
@@ -56,6 +64,13 @@ class MarketModuleCacheService {
         await Get.find<StoreController>().getPopularStoreList(false, 'all', false, localOnly: true);
       } catch (e) {
         if (kDebugMode) print('MarketModuleCacheService: Popular stores load error: $e');
+      }
+      
+      try {
+        // Top Offer stores - use localOnly=true to prevent API call
+        await Get.find<StoreController>().getTopOfferStoreList(false, false, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('MarketModuleCacheService: Top offer stores load error: $e');
       }
       
       try {
@@ -80,10 +95,31 @@ class MarketModuleCacheService {
       }
       
       try {
-        // Campaign - use localOnly=true to prevent API call
+        // Basic Campaign (MiddleSectionBannerView) - use localOnly=true to prevent API call
+        await Get.find<CampaignController>().getBasicCampaignList(false, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('MarketModuleCacheService: Basic campaign load error: $e');
+      }
+      
+      try {
+        // Item Campaign (JustForYouView) - use localOnly=true to prevent API call
         await Get.find<CampaignController>().getItemCampaignList(false, localOnly: true);
       } catch (e) {
-        if (kDebugMode) print('MarketModuleCacheService: Campaign load error: $e');
+        if (kDebugMode) print('MarketModuleCacheService: Item campaign load error: $e');
+      }
+      
+      try {
+        // Discounted items (Special Offers) - use localOnly=true to prevent API call
+        await Get.find<ItemController>().getDiscountedItemList(false, false, 'all', localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('MarketModuleCacheService: Discounted items load error: $e');
+      }
+      
+      try {
+        // Advertisement (HighlightWidget) - use localOnly=true to prevent API call
+        await Get.find<AdvertisementController>().getAdvertisementList(dataSource: DataSourceEnum.local, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('MarketModuleCacheService: Advertisement load error: $e');
       }
 
       if (kDebugMode) {

@@ -97,7 +97,7 @@ class HomeScreen extends StatefulWidget {
       Get.find<StoreController>().getLatestStoreList(reload, 'all', false);
       Get.find<StoreController>().getTopOfferStoreList(reload, false);
       Get.find<ItemController>().getReviewedItemList(reload, 'all', false);
-      Get.find<ItemController>().getRecommendedItemList(reload, 'all', false);
+      // Get.find<ItemController>().getRecommendedItemList(reload, 'all', false); // Commented - Item that you love API
       Get.find<StoreController>().getStoreList(1, reload);
       Get.find<AdvertisementController>().getAdvertisementList();
     }
@@ -610,33 +610,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Center(
                                     child: SizedBox(
                                   width: Dimensions.webMaxWidth,
-                                  child: GetBuilder<HomeController>(
-                                      builder: (homeCtrl) {
-                                        // Check if module is loaded and essential data is being fetched
-                                        bool isModuleLoaded =
-                                            splashController.module != null;
-                                        bool hasStartedLoading = homeCtrl
-                                                    .cashBackOfferList !=
-                                                null ||
-                                            Get.find<BannerController>()
-                                                    .bannerImageList !=
-                                                null ||
-                                            Get.find<CategoryController>()
-                                                    .categoryList !=
-                                                null;
-
-                                        // Show loading indicator if module is not yet loaded or data hasn't started loading
-                                        if (!isModuleLoaded || !hasStartedLoading) {
-                                          return const Padding(
-                                            padding: EdgeInsets.all(100.0),
-                                            child: Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ),
-                                          );
-                                        }
-
-                                        return Column(
+                                  child: splashController.module != null
+                                      ? Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
@@ -650,9 +625,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ? const ShopHomeScreen()
                                                             : const SizedBox(),
                                           ],
-                                        );
-                                      },
-                                    ),
+                                        )
+                                      : const Padding(
+                                          padding: EdgeInsets.all(100.0),
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
                                 )),
                               ),
 
