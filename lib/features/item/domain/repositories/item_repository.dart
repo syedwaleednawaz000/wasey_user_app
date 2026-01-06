@@ -18,7 +18,9 @@ class ItemRepository implements ItemRepositoryInterface {
   @override
   Future<BasicMedicineModel?> getBasicMedicine(DataSourceEnum source) async {
     BasicMedicineModel? basicMedicineModel;
-    String cacheId = '${AppConstants.basicMedicineUri}?offset=1&limit=50-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.basicMedicineUri}?offset=1&limit=50';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
 
@@ -95,7 +97,9 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<List<Item>?> _getPopularItemList(String type, {required DataSourceEnum source}) async {
     List<Item>? popularItemList;
-    String cacheId = '${AppConstants.popularItemUri}?type=$type-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.popularItemUri}?type=$type';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
 
@@ -120,7 +124,9 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<ItemModel?> _getReviewedItemList(String type, {required DataSourceEnum source}) async {
     ItemModel? itemModel;
-    String cacheId = '${AppConstants.reviewedItemUri}?type=$type${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.reviewedItemUri}?type=$type';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
 
@@ -143,7 +149,9 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<ItemModel?> _getFeaturedCategoriesItemList({required DataSourceEnum source}) async {
     ItemModel? featuredCategoriesItem;
-    String cacheId = '${AppConstants.featuredCategoriesItemsUri}?limit=30&offset=1${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.featuredCategoriesItemsUri}?limit=30&offset=1';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
 
@@ -166,7 +174,9 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<List<Item>?> _getRecommendedItemList(String type, {required DataSourceEnum source}) async {
     List<Item>? recommendedItemList;
-    String cacheId = '${AppConstants.recommendedItemsUri}$type&limit=30${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.recommendedItemsUri}$type&limit=30';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
 
@@ -201,7 +211,9 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<List<Item>?> _getDiscountedItemList(String type, {required DataSourceEnum source}) async {
     List<Item>? discountedItemList;
-    String cacheId = '${AppConstants.discountedItemsUri}?type=$type&offset=1&limit=50${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.discountedItemsUri}?type=$type&offset=1&limit=50';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
 

@@ -163,13 +163,9 @@ class _MarketScreenState extends State<MarketScreen> {
     //   }
     // });
 
-    if (!ResponsiveHelper.isWeb()) {
-      Get.find<LocationController>().getZone(
-          AddressHelper.getUserAddressFromSharedPref()!.latitude,
-          AddressHelper.getUserAddressFromSharedPref()!.longitude,
-          false,
-          updateInAddress: true);
-    }
+    // Note: Zone data sync is handled by the controller and doesn't need to be called
+    // on every screen view. This prevents unnecessary API calls on module switch.
+    // Zone data is synced: on app start, on address change, and on force refresh.
 
     // _scrollController.addListener(() {
     //   if (_scrollController.position.userScrollDirection ==
@@ -246,10 +242,8 @@ class _MarketScreenState extends State<MarketScreen> {
   Widget build(BuildContext context) {
     return GetBuilder<MarketController>(builder: (marketController) {
       return GetBuilder<SplashController>(builder: (splashController) {
-        if (splashController.moduleList != null &&
-            splashController.moduleList!.length == 1) {
-          splashController.switchModule(0, true);
-        }
+        // Note: Removed automatic switchModule call here as it was causing unnecessary API calls
+        // on every rebuild. Module switching is handled by the controllers.
         bool showMobileModule = !ResponsiveHelper.isDesktop(context) &&
             splashController.module == null &&
             splashController.configModel!.module == null;

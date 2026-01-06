@@ -34,7 +34,8 @@ class BannerRepository implements BannerRepositoryInterface {
 
   Future<BannerModel?> _getBannerList({required DataSourceEnum source}) async {
     BannerModel? bannerModel;
-    String cacheId = '${AppConstants.bannerUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    String cacheId = LocalClient.generateModuleCacheKey(AppConstants.bannerUri, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:

@@ -25,7 +25,7 @@ class PharmacyHomeScreen extends StatelessWidget {
       const BannerView(isFeatured: false),
       const SizedBox(height: 12),
       const CategoryView(),
-      isLoggedIn ? const VisitAgainView() : const SizedBox(),
+      // isLoggedIn ? const VisitAgainView() : const SizedBox(), // Commented - visit again UI
       const ProductWithCategoriesView(),
       const HighlightWidget(),
       const MiddleSectionBannerView(),

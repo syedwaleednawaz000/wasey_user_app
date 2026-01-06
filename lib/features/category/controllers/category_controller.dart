@@ -165,10 +165,15 @@ class CategoryController extends GetxController implements GetxService {
     _categoryList = null;
   }
 
+  /// Get category list
+  /// [localOnly] - If true, only loads from local cache without making API call
+  /// [moduleId] - Optional explicit module ID for cache key (used when loading from cache service)
   Future<void> getCategoryList(bool reload,
       {bool allCategory = false,
       DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false,
+      String? moduleId}) async {
     if (_categoryList == null || reload || fromRecall) {
       if (reload) {
         _categoryList = null;
@@ -176,12 +181,15 @@ class CategoryController extends GetxController implements GetxService {
       List<CategoryModel>? categoryList;
       if (dataSource == DataSourceEnum.local) {
         categoryList = await categoryServiceInterface
-            .getCategoryList(allCategory, source: DataSourceEnum.local);
+            .getCategoryList(allCategory, source: DataSourceEnum.local, moduleId: moduleId);
         _prepareCategoryList(categoryList);
-        getCategoryList(false,
-            fromRecall: true,
-            allCategory: allCategory,
-            dataSource: DataSourceEnum.client);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getCategoryList(false,
+              fromRecall: true,
+              allCategory: allCategory,
+              dataSource: DataSourceEnum.client);
+        }
       } else {
         categoryList = await categoryServiceInterface
             .getCategoryList(allCategory, source: DataSourceEnum.client);

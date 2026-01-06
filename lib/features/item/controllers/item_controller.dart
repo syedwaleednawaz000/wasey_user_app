@@ -179,9 +179,12 @@ class ItemController extends GetxController implements GetxService {
     _recommendedItemList = null;
   }
 
+  /// Get popular item list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getPopularItemList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     _popularType = type;
     if (reload) {
       _popularItemList = null;
@@ -194,8 +197,11 @@ class ItemController extends GetxController implements GetxService {
       if (dataSource == DataSourceEnum.local) {
         items = await itemServiceInterface.getPopularItemList(type, dataSource);
         _preparePopularItems(items);
-        getPopularItemList(false, type, notify,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getPopularItemList(false, type, notify,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         items = await itemServiceInterface.getPopularItemList(type, dataSource);
         _preparePopularItems(items);

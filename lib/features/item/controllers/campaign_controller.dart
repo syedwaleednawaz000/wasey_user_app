@@ -65,13 +65,18 @@ class CampaignController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getItemCampaignList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
+  /// Get item campaign list
+  /// [localOnly] - If true, only loads from local cache without making API call
+  Future<void> getItemCampaignList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool localOnly = false}) async {
     if(_itemCampaignList == null || reload || fromRecall) {
       List<Item>? itemCampaignList;
       if(dataSource == DataSourceEnum.local) {
         itemCampaignList = await campaignServiceInterface.getItemCampaignList(DataSourceEnum.local);
         _prepareItemCampaign(itemCampaignList);
-        getItemCampaignList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getItemCampaignList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         itemCampaignList = await campaignServiceInterface.getItemCampaignList(DataSourceEnum.client);
         _prepareItemCampaign(itemCampaignList);

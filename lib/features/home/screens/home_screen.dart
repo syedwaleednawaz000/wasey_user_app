@@ -62,8 +62,8 @@ class HomeScreen extends StatefulWidget {
     // print('------------call from home');
     // await Get.find<CartController>().getCartDataOnline();
     if (AuthHelper.isLoggedIn()) {
-      Get.find<StoreController>()
-          .getVisitAgainStoreList(fromModule: fromModule);
+      // Get.find<StoreController>()
+      //     .getVisitAgainStoreList(fromModule: fromModule); // Commented - visit again API
     }
     if (Get.find<SplashController>().module != null &&
         !Get.find<SplashController>()
@@ -79,12 +79,12 @@ class HomeScreen extends StatefulWidget {
       Get.find<StoreController>().getRecommendedStoreList();
       if (Get.find<SplashController>().module!.moduleType.toString() ==
           AppConstants.grocery) {
-        Get.find<FlashSaleController>().getFlashSale(reload, false);
+        // Get.find<FlashSaleController>().getFlashSale(reload, false); // Commented - flash sale API
       }
       if (Get.find<SplashController>().module!.moduleType.toString() ==
           AppConstants.ecommerce) {
         Get.find<ItemController>().getFeaturedCategoriesItemList(false, false);
-        Get.find<FlashSaleController>().getFlashSale(reload, false);
+        // Get.find<FlashSaleController>().getFlashSale(reload, false); // Commented - flash sale API
         Get.find<BrandsController>().getBrandList();
       }
       Get.find<BannerController>().getPromotionalBannerList(reload);
@@ -107,17 +107,18 @@ class HomeScreen extends StatefulWidget {
       Get.find<NotificationController>().getNotificationList(reload);
       Get.find<CouponController>().getCouponList();
     }
-    await Get.find<SplashController>().getModules();
+    // await Get.find<SplashController>().getModules(); // Not needed - module list loaded on app start
     // await Get.find<SplashController>().getStoredModule();
 
-    if (Get.find<SplashController>().module == null &&
-        Get.find<SplashController>().configModel!.module == null) {
-      Get.find<BannerController>().getFeaturedBanner();
-      Get.find<StoreController>().getFeaturedStoreList();
-      if (AuthHelper.isLoggedIn()) {
-        Get.find<AddressController>().getAddressList();
-      }
-    }
+    // Commented out - Restaurant tab should always have module set, no need for default featured data
+    // if (Get.find<SplashController>().module == null &&
+    //     Get.find<SplashController>().configModel!.module == null) {
+    //   Get.find<BannerController>().getFeaturedBanner();
+    //   Get.find<StoreController>().getFeaturedStoreList();
+    //   if (AuthHelper.isLoggedIn()) {
+    //     Get.find<AddressController>().getAddressList();
+    //   }
+    // }
     if (Get.find<SplashController>().module != null &&
         Get.find<SplashController>()
             .configModel!
@@ -173,19 +174,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    if (!ResponsiveHelper.isWeb()) {
-      final userAddress = AddressHelper.getUserAddressFromSharedPref();
-      if (userAddress != null &&
-          userAddress.latitude != null &&
-          userAddress.longitude != null) {
-        Get.find<LocationController>().getZone(
-          userAddress.latitude,
-          userAddress.longitude,
-          false,
-          updateInAddress: true,
-        );
-      }
-    }
+    // Note: Zone data sync is handled by the controller and doesn't need to be called
+    // on every screen view. This prevents unnecessary API calls on module switch.
+    // Zone data is synced: on app start, on address change, and on force refresh.
 
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
@@ -283,11 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<SplashController>(builder: (splashController) {
-      if (splashController.moduleList != null &&
-          splashController.moduleList!.length == 1) {
-        // splashController.switchModule(1, true);
-        Get.find<HomeController>().setModuleRestaurant();
-      }
+      // Note: Removed automatic setModuleRestaurant call here as it was causing unnecessary
+      // operations on every rebuild. Module setting is handled in loadHomeData.
       bool showMobileModule = !ResponsiveHelper.isDesktop(context) &&
           splashController.module == null &&
           splashController.configModel!.module == null;
@@ -331,8 +319,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         // await Get.find<StoreController>()
                         //     .getCategoriesWithStoreList(reload: true);
                         if (isGrocery) {
-                          await Get.find<FlashSaleController>()
-                              .getFlashSale(true, true);
+                          // await Get.find<FlashSaleController>()
+                          //     .getFlashSale(true, true); // Commented - flash sale API
                         }
                         await Get.find<BannerController>()
                             .getPromotionalBannerList(true);
@@ -369,28 +357,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           Get.find<ItemController>().getCommonConditions(true);
                         }
                         if (isShop) {
-                          await Get.find<FlashSaleController>()
-                              .getFlashSale(true, true);
+                          // await Get.find<FlashSaleController>()
+                          //     .getFlashSale(true, true); // Commented - flash sale API
                           Get.find<ItemController>()
                               .getFeaturedCategoriesItemList(true, true);
                           Get.find<BrandsController>().getBrandList();
                         }
-                      } else {
-                        await Get.find<BannerController>().getFeaturedBanner();
-                        await Get.find<SplashController>().getModules();
-                        if (AuthHelper.isLoggedIn()) {
-                          await Get.find<AddressController>().getAddressList();
-                        }
-                        await Get.find<StoreController>()
-                            .getFeaturedStoreList();
-                        // print("getCategoriesWithStoreList called");
-                        // ======================= CORRECTED PART START =======================
-                        // Refresh the first page of categories with stores
-                        print("Calling getCategoriesWithStoreList from onRefresh");
-                        await Get.find<StoreController>().getCategoriesWithStoreList(1, reload: true);
-                        // ======================== CORRECTED PART END ========================
-
                       }
+                      // Commented out - Restaurant tab should always have module set
+                      // else {
+                      //   await Get.find<BannerController>().getFeaturedBanner();
+                      //   await Get.find<SplashController>().getModules();
+                      //   if (AuthHelper.isLoggedIn()) {
+                      //     await Get.find<AddressController>().getAddressList();
+                      //   }
+                      //   await Get.find<StoreController>()
+                      //       .getFeaturedStoreList();
+                      //   await Get.find<StoreController>().getCategoriesWithStoreList(1, reload: true);
+                      // }
                       splashController.setRefreshing(false);
                     },
                     child: ResponsiveHelper.isDesktop(context)
@@ -626,64 +610,53 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Center(
                                     child: SizedBox(
                                   width: Dimensions.webMaxWidth,
-                                  child: !showMobileModule
-                                      ? GetBuilder<HomeController>(
-                                          builder: (homeCtrl) {
-                                            // Check if module is loaded and essential data is being fetched
-                                            bool isModuleLoaded =
-                                                splashController.module != null;
-                                            bool hasStartedLoading = homeCtrl
-                                                        .cashBackOfferList !=
-                                                    null ||
-                                                Get.find<BannerController>()
-                                                        .bannerImageList !=
-                                                    null ||
-                                                Get.find<CategoryController>()
-                                                        .categoryList !=
-                                                    null;
+                                  child: GetBuilder<HomeController>(
+                                      builder: (homeCtrl) {
+                                        // Check if module is loaded and essential data is being fetched
+                                        bool isModuleLoaded =
+                                            splashController.module != null;
+                                        bool hasStartedLoading = homeCtrl
+                                                    .cashBackOfferList !=
+                                                null ||
+                                            Get.find<BannerController>()
+                                                    .bannerImageList !=
+                                                null ||
+                                            Get.find<CategoryController>()
+                                                    .categoryList !=
+                                                null;
 
-                                            // Show loading only if module is loaded but initial data hasn't started loading yet
-                                            if (isModuleLoaded &&
-                                                !hasStartedLoading) {
-                                              return const Padding(
-                                                padding: EdgeInsets.all(100.0),
-                                                child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                ),
-                                              );
-                                            }
+                                        // Show loading indicator if module is not yet loaded or data hasn't started loading
+                                        if (!isModuleLoaded || !hasStartedLoading) {
+                                          return const Padding(
+                                            padding: EdgeInsets.all(100.0),
+                                            child: Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                          );
+                                        }
 
-                                            return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                // Container(
-                                                //     height: 200,
-                                                //     width: double.infinity,
-                                                //     color: Colors.green,
-                                                //     child: ModuleWidget()),
-                                                isGrocery
-                                                    ? const GroceryHomeScreen()
-                                                    : isPharmacy
-                                                        ? const PharmacyHomeScreen()
-                                                        : isFood
-                                                            ? const FoodHomeScreen()
-                                                            // ? Text("data")
-                                                            : isShop
-                                                                ? const ShopHomeScreen()
-                                                                : const SizedBox(),
-                                              ],
-                                            );
-                                          },
-                                        )
-                                      : ModuleView(
-                                          splashController: splashController,
-                                        ),
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            isGrocery
+                                                ? const GroceryHomeScreen()
+                                                : isPharmacy
+                                                    ? const PharmacyHomeScreen()
+                                                    : isFood
+                                                        ? const FoodHomeScreen()
+                                                        : isShop
+                                                            ? const ShopHomeScreen()
+                                                            : const SizedBox(),
+                                          ],
+                                        );
+                                      },
+                                    ),
                                 )),
                               ),
 
-                              !showMobileModule
+                              splashController.module != null
                                   ? SliverPersistentHeader(
                                       key: _headerKey,
                                       pinned: true,
@@ -698,7 +671,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : const SliverToBoxAdapter(),
 
                               SliverToBoxAdapter(
-                                  child: !showMobileModule
+                                  child: splashController.module != null
                                       ? Column(
                                           children: [
                                             GetBuilder<StoreController>(builder: (storeController) {

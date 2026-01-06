@@ -54,7 +54,9 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<StoreModel?> _getStoreList(int offset, String filterBy, String storeType, {required DataSourceEnum source}) async {
     StoreModel? storeModel;
-    String cacheId = '${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=10000-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=10000';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:
@@ -76,7 +78,9 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getPopularStoreList(String type, {required DataSourceEnum source}) async {
     List<Store>? popularStoreList;
-    String cacheId = '${AppConstants.popularStoreUri}?type=$type}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.popularStoreUri}?type=$type';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:
@@ -100,7 +104,9 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getLatestStoreList(String type, {required DataSourceEnum source}) async {
     List<Store>? latestStoreList;
-    String cacheId = '${AppConstants.popularStoreUri}?type=$type-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.latestStoreUri}?type=$type';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:
@@ -124,7 +130,8 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getTopOfferStoreList({required DataSourceEnum source}) async {
     List<Store>? topOfferStoreList;
-    String cacheId = '${AppConstants.topOfferStoreUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    String cacheId = LocalClient.generateModuleCacheKey(AppConstants.topOfferStoreUri, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:
@@ -147,7 +154,9 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getFeaturedStoreList({required DataSourceEnum source}) async {
     List<Store>? featuredStoreList;
-    String cacheId = '${AppConstants.storeUri}/all?featured=1&offset=1&limit=50-${Get.find<SplashController>().module?.id??''}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    final endpoint = '${AppConstants.storeUri}/all?featured=1&offset=1&limit=50';
+    String cacheId = LocalClient.generateModuleCacheKey(endpoint, moduleId);
     Map<String, String> header = (Get.find<SplashController>().module == null && Get.find<SplashController>().configModel!.module == null) ? HeaderHelper.featuredHeader() : apiClient.getHeader();
 
     switch(source) {
@@ -291,7 +300,8 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getRecommendedStoreList({required DataSourceEnum source}) async {
     List<Store>? recommendedStoreList;
-    String cacheId = '${AppConstants.storeUri}/all?featured=1&offset=1&limit=50-${Get.find<SplashController>().module?.id??''}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    String cacheId = LocalClient.generateModuleCacheKey(AppConstants.recommendedStoreUri, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:

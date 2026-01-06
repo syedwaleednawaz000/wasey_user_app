@@ -22,6 +22,7 @@ import '../../parcel/controllers/parcel_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../store/controllers/store_controller.dart';
 import 'advertisement_controller.dart';
+import '../services/module_cache_service.dart';
 
 class HomeController extends GetxController implements GetxService {
   final HomeServiceInterface homeServiceInterface;
@@ -43,18 +44,69 @@ class HomeController extends GetxController implements GetxService {
 
   // (In HomeController)
 // Add a new method to handle all home screen data loading
+// NOTE: When fromModule=true, this method is called from SplashController.switchModule()
+// which already set the module. When fromModule=false (initial load), we need to set it.
   Future<void> loadHomeData(bool reload, {bool fromModule = false}) async {
-    await setModuleRestaurant(); // Set module to Supermarket first
-    // Now copy all the Get.find calls from HomeScreen.loadData here
-    // For example:
+    // Clear category list when switching modules to ensure correct categories are loaded
+    if (fromModule) {
+      Get.find<CategoryController>().clearCategoryList();
+    }
+    
+    // Verify the current module ID from SharedPreferences
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? currentModuleId = sharedPreferences.getString("moduleId");
+    log("HomeController: Current stored moduleId = $currentModuleId, fromModule = $fromModule");
+    
+    // If called from initial load (not from module switch), ensure module is set
+    if (!fromModule) {
+      // Ensure module ID is set to "2" for Restaurant
+      if (currentModuleId != "2") {
+        await sharedPreferences.setString("moduleId", "2");
+        log("HomeController: Updated moduleId to 2 for Restaurant");
+      }
+      // Set the module in SplashController without triggering API calls
+      // skipDataFetch=true because we'll handle data loading here with cache support
+      if (splashController.moduleList != null && splashController.moduleList!.isNotEmpty) {
+        // Find and set Restaurant module (ID: 2, usually at index 1)
+        for (int i = 0; i < splashController.moduleList!.length; i++) {
+          if (splashController.moduleList![i].id == 2) {
+            await splashController.setModule(splashController.moduleList![i], skipDataFetch: true);
+            log("HomeController: Set SplashController module to Restaurant (index $i)");
+            break;
+          }
+        }
+      }
+    }
+    
+    // Check if we should load from cache first (only if not forcing reload)
+    if (!reload) {
+      final isCacheValid = await RestaurantModuleCacheService.isRestaurantCacheValid();
+      if (isCacheValid) {
+        log("HomeController: Loading Restaurant data from cache");
+        final cacheLoaded = await RestaurantModuleCacheService.loadRestaurantCache();
+        if (cacheLoaded) {
+          log("HomeController: Successfully loaded Restaurant data from cache - NO API CALLS");
+          // When cache is valid, skip all API calls including user-specific ones
+          // These will be refreshed when user explicitly pulls to refresh
+          return; // Exit early if cache loaded successfully
+        } else {
+          log("HomeController: Cache load failed, fetching from API");
+        }
+      } else {
+        log("HomeController: Cache invalid or expired, fetching from API");
+      }
+    } else {
+      log("HomeController: Force reload requested, clearing cache and fetching from API");
+      await RestaurantModuleCacheService.clearRestaurantCache();
+    }
+
+    // Fetch fresh data from API
     Get.find<SplashController>().getStoredModule();
-    Get.find<LocationController>().syncZoneData();
+    // Get.find<LocationController>().syncZoneData(); // Zone data is synced on app start, not on every module load
     Get.find<FlashSaleController>().setEmptyFlashSale(fromModule: fromModule);
-    // print('------------call from home');
-    // await Get.find<CartController>().getCartDataOnline();
+    
     if (AuthHelper.isLoggedIn()) {
-      Get.find<StoreController>()
-          .getVisitAgainStoreList(fromModule: fromModule);
+      // Get.find<StoreController>().getVisitAgainStoreList(fromModule: fromModule); // Commented - not needed on module switch
     }
     if (Get.find<SplashController>().module != null &&
         !Get.find<SplashController>()
@@ -75,12 +127,12 @@ class HomeController extends GetxController implements GetxService {
       Get.find<StoreController>().getRecommendedStoreList();
       if (Get.find<SplashController>().module!.moduleType.toString() ==
           AppConstants.grocery) {
-        Get.find<FlashSaleController>().getFlashSale(reload, false);
+        // Get.find<FlashSaleController>().getFlashSale(reload, false); // Commented - flash sale API
       }
       if (Get.find<SplashController>().module!.moduleType.toString() ==
           AppConstants.ecommerce) {
         Get.find<ItemController>().getFeaturedCategoriesItemList(false, false);
-        Get.find<FlashSaleController>().getFlashSale(reload, false);
+        // Get.find<FlashSaleController>().getFlashSale(reload, false); // Commented - flash sale API
         Get.find<BrandsController>().getBrandList();
       }
       Get.find<BannerController>().getPromotionalBannerList(reload);
@@ -103,17 +155,18 @@ class HomeController extends GetxController implements GetxService {
       Get.find<NotificationController>().getNotificationList(reload);
       Get.find<CouponController>().getCouponList();
     }
-    await Get.find<SplashController>().getModules();
+    // await Get.find<SplashController>().getModules(); // Module list is loaded on app start, not on every module load
     // await Get.find<SplashController>().getStoredModule();
 
-    if (Get.find<SplashController>().module == null &&
-        Get.find<SplashController>().configModel!.module == null) {
-      Get.find<BannerController>().getFeaturedBanner();
-      Get.find<StoreController>().getFeaturedStoreList();
-      if (AuthHelper.isLoggedIn()) {
-        Get.find<AddressController>().getAddressList();
-      }
-    }
+    // Commented out - Restaurant tab should always have module set, no need for default featured data
+    // if (Get.find<SplashController>().module == null &&
+    //     Get.find<SplashController>().configModel!.module == null) {
+    //   Get.find<BannerController>().getFeaturedBanner();
+    //   Get.find<StoreController>().getFeaturedStoreList();
+    //   if (AuthHelper.isLoggedIn()) {
+    //     Get.find<AddressController>().getAddressList();
+    //   }
+    // }
     if (Get.find<SplashController>().module != null &&
         Get.find<SplashController>()
             .configModel!
@@ -135,9 +188,10 @@ class HomeController extends GetxController implements GetxService {
     }
     // --- ADD THIS CALL TO THE END OF THE METHOD ---
     // log("getCategoriesWithStoreList called inside homeController ");
-    if (Get.find<StoreController>().categoryWithStoreList == null &&
-        Get.find<StoreController>().categoryWithStoreList!.isEmpty) {
-      log("categoryWithStoreList == null calling again...");
+    if (Get.find<StoreController>().categoryWithStoreList == null ||
+        (Get.find<StoreController>().categoryWithStoreList != null &&
+            Get.find<StoreController>().categoryWithStoreList!.isEmpty)) {
+      log("categoryWithStoreList == null or empty, calling again...");
       // ======================= CORRECTED SECTION START =======================
 
       // Call the function to fetch the FIRST page of categories.
@@ -148,13 +202,30 @@ class HomeController extends GetxController implements GetxService {
 
       // ======================== CORRECTED SECTION END ========================
     }
+    
+    // Mark Restaurant cache as complete after all API calls
+    await RestaurantModuleCacheService.cacheRestaurantData();
+    log("HomeController: Marked Restaurant cache as complete");
     // ---------------------------------------------
   }
 
+  /// Sets the module to Restaurant (ID: 2) directly without triggering switchModule
+  /// This is used internally - for external module switching use SplashController.switchModule()
   Future<void> setModuleRestaurant() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString("moduleId", "2");
-    splashController.switchModule(1, true);
+    await sharedPreferences.setString("moduleId", "2");
+    
+    // Set the module in SplashController directly with skipDataFetch to avoid API calls
+    if (splashController.moduleList != null && splashController.moduleList!.isNotEmpty) {
+      for (int i = 0; i < splashController.moduleList!.length; i++) {
+        if (splashController.moduleList![i].id == 2) {
+          await splashController.setModule(splashController.moduleList![i], skipDataFetch: true);
+          log("setModuleRestaurant: Set module to Restaurant (ID: 2, index: $i)");
+          break;
+        }
+      }
+    }
+    
     log("ModuleID is Set to: ${sharedPreferences.getString("moduleId")}");
     update();
   }
