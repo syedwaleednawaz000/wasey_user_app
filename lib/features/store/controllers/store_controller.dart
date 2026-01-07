@@ -46,7 +46,7 @@ import 'package:flutter/foundation.dart';
 //   if (decodedList.isEmpty) {
 //     return [];
 //   }
-  // This is the heavy lifting: creating thousands of objects from the JSON map.
+// This is the heavy lifting: creating thousands of objects from the JSON map.
 //   return decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
 // }
 
@@ -189,32 +189,42 @@ class StoreController extends GetxController implements GetxService {
 
   StoreCategories? get selectedSubCategory => _selectedSubCategory;
 
+  //
   bool _isLoadingCategoriesWithStores = true;
 
   bool get isLoadingCategoriesWithStores => _isLoadingCategoriesWithStores;
+// ... inside your StoreController class, after _selectedSubCategory getter ...
 
+  // === REFINED & CORRECTED VARIABLES FOR PAGINATION START ===
+
+  /// Holds the list of categories displayed on the screen.
   List<CategoryWithStores>? _categoryWithStoreList;
   List<CategoryWithStores>? get categoryWithStoreList => _categoryWithStoreList;
 
+  /// Tracks the current page offset for fetching the next page.
   int _categoryOffset = 1;
   int get categoryOffset => _categoryOffset;
 
+  /// Total number of categories available on the server (from the API).
   int? _totalCategories;
   int? get totalCategories => _totalCategories;
 
+  /// Loading state for the initial page load (shows a full-screen spinner).
+  /// This replaces the old `_isLoadingCategoriesWithStores`.
+  // bool _isLoading = true;
+  // @override
+  // bool get isLoading => _isLoading; // The getter now uses the correct variable.
+
+  /// Loading state for fetching subsequent pages (shows a small spinner at the bottom).
   bool _isPaginating = false;
   bool get isPaginating => _isPaginating;
 
-<<<<<<< HEAD
-  Future<void> getCategoriesWithStoreList(int offset, {required bool reload}) async {
-=======
   // === REFINED & CORRECTED VARIABLES FOR PAGINATION END ===
 
 
   /// Get categories with store list
   /// [localOnly] - If true, only loads from local cache (SharedPreferences) without making API call
   Future<bool> getCategoriesWithStoreList(int offset, {required bool reload, bool localOnly = false}) async {
->>>>>>> e9005fee3c774330df3161d3fb8f630fb0c482d0
     // If reloading, reset all state to their initial values.
     if (reload) {
       _categoryOffset = 1;
@@ -820,7 +830,7 @@ class StoreController extends GetxController implements GetxService {
       var filteredCategories = storeItemModel!.categories!.where((category) {
         bool matchesSelectedId = (category.parentId == _selectedCategoryId);
         bool isRootOrNullParent =
-            (category.parentId == 0 || category.parentId == null);
+        (category.parentId == 0 || category.parentId == null);
         return matchesSelectedId || isRootOrNullParent;
       }).toList();
       _selectedStoreSubCategories?.addAll(filteredCategories);
@@ -846,12 +856,12 @@ class StoreController extends GetxController implements GetxService {
   double getRestaurantDistance(LatLng storeLatLng) {
     double distance = 0;
     distance = Geolocator.distanceBetween(
-            storeLatLng.latitude,
-            storeLatLng.longitude,
-            double.parse(
-                AddressHelper.getUserAddressFromSharedPref()!.latitude!),
-            double.parse(
-                AddressHelper.getUserAddressFromSharedPref()!.longitude!)) /
+        storeLatLng.latitude,
+        storeLatLng.longitude,
+        double.parse(
+            AddressHelper.getUserAddressFromSharedPref()!.latitude!),
+        double.parse(
+            AddressHelper.getUserAddressFromSharedPref()!.longitude!)) /
         1000;
     return distance;
   }
@@ -903,7 +913,7 @@ class StoreController extends GetxController implements GetxService {
       update();
     }
     RecommendedItemModel? recommendedItemModel =
-        await storeServiceInterface.getStoreRecommendedItemList(storeId);
+    await storeServiceInterface.getStoreRecommendedItemList(storeId);
     if (recommendedItemModel != null) {
       _recommendedItemModel = recommendedItemModel;
     }
@@ -912,12 +922,12 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getCartStoreSuggestedItemList(int? storeId) async {
     CartSuggestItemModel? cartSuggestItemModel =
-        await storeServiceInterface.getCartStoreSuggestedItemList(
-            storeId,
-            Get.find<LocalizationController>().locale.languageCode,
-            ModuleHelper.getModule(),
-            ModuleHelper.getCacheModule()?.id,
-            ModuleHelper.getModule()?.id);
+    await storeServiceInterface.getCartStoreSuggestedItemList(
+        storeId,
+        Get.find<LocalizationController>().locale.languageCode,
+        ModuleHelper.getModule(),
+        ModuleHelper.getCacheModule()?.id,
+        ModuleHelper.getModule()?.id);
     if (cartSuggestItemModel != null) {
       _cartSuggestItemModel = cartSuggestItemModel;
     }
@@ -926,7 +936,7 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getStoreBannerList(int? storeId) async {
     List<StoreBannerModel>? storeBanners =
-        await storeServiceInterface.getStoreBannerList(storeId);
+    await storeServiceInterface.getStoreBannerList(storeId);
     if (storeBanners != null) {
       _storeBanners = [];
       _storeBanners!.addAll(storeBanners);
@@ -992,8 +1002,8 @@ class StoreController extends GetxController implements GetxService {
   /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getPopularStoreList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false,
-      bool localOnly = false}) async {
+        bool fromRecall = false,
+        bool localOnly = false}) async {
     _type = type;
     if (reload) {
       _popularStoreList = null;
@@ -1032,8 +1042,8 @@ class StoreController extends GetxController implements GetxService {
   /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getLatestStoreList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false,
-      bool localOnly = false}) async {
+        bool fromRecall = false,
+        bool localOnly = false}) async {
     _type = type;
     if (reload) {
       _latestStoreList = null;
@@ -1070,8 +1080,8 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getTopOfferStoreList(bool reload, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false,
-      bool localOnly = false}) async {
+        bool fromRecall = false,
+        bool localOnly = false}) async {
     if (reload) {
       _topOfferStoreList = null;
     }
@@ -1110,12 +1120,12 @@ class StoreController extends GetxController implements GetxService {
     List<Store>? stores;
     if (dataSource == DataSourceEnum.local) {
       stores =
-          await storeServiceInterface.getFeaturedStoreList(source: dataSource);
+      await storeServiceInterface.getFeaturedStoreList(source: dataSource);
       _prepareFeaturedStore(stores);
       getFeaturedStoreList(dataSource: DataSourceEnum.client);
     } else {
       stores =
-          await storeServiceInterface.getFeaturedStoreList(source: dataSource);
+      await storeServiceInterface.getFeaturedStoreList(source: dataSource);
       _prepareFeaturedStore(stores);
     }
   }
@@ -1140,8 +1150,8 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getVisitAgainStoreList(
       {bool fromModule = false,
-      DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+        DataSourceEnum dataSource = DataSourceEnum.local,
+        bool fromRecall = false}) async {
     if (fromModule && !fromRecall) {
       _visitAgainStoreList = null;
     }
@@ -1242,8 +1252,8 @@ class StoreController extends GetxController implements GetxService {
       Get.find<CheckoutController>().setOrderType(
         _store != null
             ? _store!.delivery!
-                ? 'delivery'
-                : 'take_away'
+            ? 'delivery'
+            : 'take_away'
             : 'delivery',
         notify: false,
       );
@@ -1255,7 +1265,7 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getRecommendedStoreList(
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+        bool fromRecall = false}) async {
     if (!fromRecall) {
       _recommendedStoreList = null;
     }
@@ -1293,7 +1303,7 @@ class StoreController extends GetxController implements GetxService {
     }
 
     ItemNewApiModel? storeItemModelResult =
-        await storeServiceInterface.getStoreItemListNewAPI(storeID, offset);
+    await storeServiceInterface.getStoreItemListNewAPI(storeID, offset);
 
     if (storeItemModelResult != null) {
       if (offset == 1) {
@@ -1355,16 +1365,16 @@ class StoreController extends GetxController implements GetxService {
         update();
       }
       ItemModel? storeSearchItemModel =
-          await storeServiceInterface.getStoreSearchItemList(
-              searchText,
-              storeID,
-              offset,
-              type,
-              (_store != null &&
-                      _store!.categoryIds!.isNotEmpty &&
-                      _categoryIndex != 0)
-                  ? _categoryList![_categoryIndex].id
-                  : 0);
+      await storeServiceInterface.getStoreSearchItemList(
+          searchText,
+          storeID,
+          offset,
+          type,
+          (_store != null &&
+              _store!.categoryIds!.isNotEmpty &&
+              _categoryIndex != 0)
+              ? _categoryList![_categoryIndex].id
+              : 0);
       if (storeSearchItemModel != null) {
         if (offset == 1) {
           _storeSearchItemModel = storeSearchItemModel;
@@ -1529,7 +1539,7 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> _loadNextSubCategory() async {
     final nextSubCategory =
-        _selectedStoreSubCategories![_currentSubCategoryIndex];
+    _selectedStoreSubCategories![_currentSubCategoryIndex];
     await getSubCatItems(nextSubCategory.id);
 
     // Add the new items to our combined list
@@ -1650,7 +1660,7 @@ class StoreController extends GetxController implements GetxService {
   String getCategoryNameById(int categoryId) {
     if (_categoryList == null) return '';
     final category =
-        _categoryList!.firstWhereOrNull((cat) => cat.id == categoryId);
+    _categoryList!.firstWhereOrNull((cat) => cat.id == categoryId);
     return category?.name ?? '';
   }
 }

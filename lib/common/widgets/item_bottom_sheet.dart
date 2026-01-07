@@ -687,6 +687,8 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                                   Text(
                                                     textAlign: TextAlign.right,
                                                     widget.item!.description!,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 2,
                                                     style: STCRegular.copyWith(
                                                       color: Theme.of(context)
                                                           .cardColor,
@@ -2514,20 +2516,22 @@ class NewVariationView extends StatelessWidget {
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: [
-                                            Text(
-                                              item!.foodVariations![index]
-                                                  .variationValues![i].level!
-                                                  .trim(),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: itemController
-                                                          .selectedVariations[
-                                                      index][i]!
-                                                  ? STCMedium
-                                                  : STCRegular.copyWith(
-                                                      color: Theme.of(context)
-                                                          .hintColor,
-                                                    ),
+                                            Flexible(
+                                              child: Text(
+                                                item!.foodVariations![index]
+                                                    .variationValues![i].level!
+                                                    .trim(),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: itemController
+                                                            .selectedVariations[
+                                                        index][i]!
+                                                    ? STCMedium
+                                                    : STCRegular.copyWith(
+                                                        color: Theme.of(context)
+                                                            .hintColor,
+                                                      ),
+                                              ),
                                             ),
                                             SizedBox(
                                               width: item!

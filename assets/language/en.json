@@ -1,9 +1,9 @@
 {
+  "are_you_sure_you_want_to_go_back": "Are you sure you want to go back?",
   "complete_payment": "Complete Payment",
   "restaurant_is_currently_closed": "Restaurant is currently closed, please try again later.",
   "store_is_currently_closed": "Store is currently closed, please try again later.",
-
-"refresh": "Refresh",
+  "refresh": "Refresh",
   "you_can_pick_up_your_order": "You can pick up your order from the restaurant",
   "delivery_currently_unavailable": "Delivery is currently unavailable",
   "please_login_to_track_orders": "Please login to track your orders",
@@ -78,7 +78,6 @@
   "email_open_app_message": "This will open your email app to compose a message to ",
   "make_a_call": "Make a Call",
   "call_support_message": "This will make a phone call to support at ",
-  "cancel": "Cancel",
   "proceed": "Proceed",
   "call": "Call",
   "could_not_launch": "Could Not Launch",
