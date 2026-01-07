@@ -42,7 +42,8 @@ class ParcelRepository implements ParcelRepositoryInterface {
 
   Future<VideoContentModel?> _getVideoContentDetails({required DataSourceEnum source}) async {
     VideoContentModel? videoContentDetails;
-    String cacheId = '${AppConstants.videoContentUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = '${AppConstants.videoContentUri}-$moduleId';
 
     switch(source) {
       case DataSourceEnum.client:
@@ -63,7 +64,8 @@ class ParcelRepository implements ParcelRepositoryInterface {
 
   Future<WhyChooseModel?> _getWhyChooseDetails({required DataSourceEnum source}) async {
     WhyChooseModel? whyChooseDetails;
-    String cacheId = '${AppConstants.whyChooseUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = '${AppConstants.whyChooseUri}-$moduleId';
 
     switch(source) {
       case DataSourceEnum.client:

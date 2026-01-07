@@ -96,7 +96,9 @@ class BannerController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getBannerList(bool reload, {BuildContext? contextForPrecache, DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
+  /// Get banner list
+  /// [localOnly] - If true, only loads from local cache without making API call
+  Future<void> getBannerList(bool reload, {BuildContext? contextForPrecache, DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool localOnly = false}) async {
 
     // --- START: NEW LOGIC INSIDE getBannerList ---
     String? currentModuleId = Get.find<SplashController>().module?.id.toString();
@@ -123,8 +125,24 @@ class BannerController extends GetxController implements GetxService {
       BannerModel? bannerModel;
       if (dataSource == DataSourceEnum.local) {
         bannerModel = await bannerServiceInterface.getBannerList(source: DataSourceEnum.local);
+        // If we're loading cache-only and there is no local cache for banners,
+        // mark banners as "loaded but empty" to prevent endless shimmer.
+        if (bannerModel == null && localOnly) {
+          if (useModuleCache) {
+            _moduleBannerImageLists[currentModuleId ?? 'no_module'] = <String?>[];
+            _moduleBannerDataLists[currentModuleId ?? 'no_module'] = <dynamic>[];
+          } else {
+            _bannerImageList = <String?>[];
+            _bannerDataList = <dynamic>[];
+          }
+          update();
+          return;
+        }
         await _prepareBanner(bannerModel, contextForPrecache: contextForPrecache);
-        getBannerList(false, contextForPrecache: contextForPrecache, dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getBannerList(false, contextForPrecache: contextForPrecache, dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         bannerModel = await bannerServiceInterface.getBannerList(source: DataSourceEnum.client);
         await _prepareBanner(bannerModel, contextForPrecache: contextForPrecache, isClientCall: true);
@@ -450,13 +468,26 @@ class BannerController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getPromotionalBannerList(bool reload) async {
-    if(_promotionalBanner == null || reload) {
-      PromotionalBanner? promotionalBanner = await bannerServiceInterface.getPromotionalBannerList();
-      if (promotionalBanner != null) {
-        _promotionalBanner = promotionalBanner;
+  Future<void> getPromotionalBannerList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool localOnly = false}) async {
+    if(_promotionalBanner == null || reload || fromRecall) {
+      PromotionalBanner? promotionalBanner;
+      if (dataSource == DataSourceEnum.local) {
+        promotionalBanner = await bannerServiceInterface.getPromotionalBannerList(DataSourceEnum.local);
+        if (promotionalBanner != null) {
+          _promotionalBanner = promotionalBanner;
+        }
+        update();
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getPromotionalBannerList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        }
+      } else {
+        promotionalBanner = await bannerServiceInterface.getPromotionalBannerList(DataSourceEnum.client);
+        if (promotionalBanner != null) {
+          _promotionalBanner = promotionalBanner;
+        }
+        update();
       }
-      update();
     }
   }
 }

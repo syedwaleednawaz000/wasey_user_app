@@ -18,9 +18,9 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
   @override
   Future getList({int? offset, bool categoryList = false, bool subCategoryList = false, bool categoryItemList = false, bool categoryStoreList = false,
-    bool? allCategory, String? id, String? type, DataSourceEnum? source}) async {
+    bool? allCategory, String? id, String? type, DataSourceEnum? source, String? moduleId}) async {
     if (categoryList) {
-      return await _getCategoryList(allCategory!, source ?? DataSourceEnum.client);
+      return await _getCategoryList(allCategory!, source ?? DataSourceEnum.client, explicitModuleId: moduleId);
     } else if (subCategoryList) {
       return await _getSubCategoryList(id);
     } else if (categoryItemList) {
@@ -30,7 +30,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
     }
   }
 
-  Future<List<CategoryModel>?> _getCategoryList(bool allCategory, DataSourceEnum source) async {
+  Future<List<CategoryModel>?> _getCategoryList(bool allCategory, DataSourceEnum source, {String? explicitModuleId}) async {
     List<CategoryModel>? categoryList;
     Map<String, String>? header = allCategory ? {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -39,7 +39,9 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
     Map<String, String>? cacheHeader = header ?? apiClient.getHeader();
 
-    String cacheId = AppConstants.categoryUri + Get.find<SplashController>().module!.id!.toString();
+    // Use explicit module ID if provided, otherwise get from SplashController
+    final moduleId = explicitModuleId ?? Get.find<SplashController>().module?.id?.toString();
+    String cacheId = LocalClient.generateModuleCacheKey(AppConstants.categoryUri, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:

@@ -34,6 +34,7 @@ import 'package:sixam_mart/util/app_constants.dart';
 import '../../../api/api_checker.dart';
 import '../../../api/api_client.dart';
 import '../../../helper/store_schedule_checker.dart';
+import '../../splash/controllers/splash_controller.dart';
 import '../domain/models/category_with_stores.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -204,7 +205,16 @@ class StoreController extends GetxController implements GetxService {
   bool _isPaginating = false;
   bool get isPaginating => _isPaginating;
 
+<<<<<<< HEAD
   Future<void> getCategoriesWithStoreList(int offset, {required bool reload}) async {
+=======
+  // === REFINED & CORRECTED VARIABLES FOR PAGINATION END ===
+
+
+  /// Get categories with store list
+  /// [localOnly] - If true, only loads from local cache (SharedPreferences) without making API call
+  Future<bool> getCategoriesWithStoreList(int offset, {required bool reload, bool localOnly = false}) async {
+>>>>>>> e9005fee3c774330df3161d3fb8f630fb0c482d0
     // If reloading, reset all state to their initial values.
     if (reload) {
       _categoryOffset = 1;
@@ -216,10 +226,18 @@ class StoreController extends GetxController implements GetxService {
       log("ACTION: Manual refresh initiated. Resetting all category data.");
     }
 
+    // If we're only allowed to load local cache, never paginate.
+    if (localOnly && offset != 1) {
+      _isLoadingCategoriesWithStores = false;
+      _isPaginating = false;
+      update();
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
+    }
+
     // Don't proceed if there are no more items to load.
     bool hasMoreData = _totalCategories == null || (_categoryWithStoreList == null || _categoryWithStoreList!.length < _totalCategories!);
     if(!hasMoreData) {
-      return;
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
     }
 
     // Set the appropriate loading indicator.
@@ -231,7 +249,8 @@ class StoreController extends GetxController implements GetxService {
     update();
 
     final SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
-    const String cacheId = AppConstants.categoriesWithStores ?? "categories_with_stores";
+    final String? moduleId = Get.find<SplashController>().module?.id?.toString();
+    final String cacheId = 'categories_with_stores_${moduleId ?? 'no_module'}';
 
     // --- Step 1: Attempt to load the FIRST PAGE from cache for an instant UI ---
     if (offset == 1 && _categoryWithStoreList == null) {
@@ -256,6 +275,14 @@ class StoreController extends GetxController implements GetxService {
       } else {
         log("CACHE: No data found in local storage.");
       }
+    }
+
+    // If localOnly is enabled, do not call API.
+    if (localOnly) {
+      _isLoadingCategoriesWithStores = false;
+      _isPaginating = false;
+      update();
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
     }
 
     // --- Step 2: Fetch data from the network ---
@@ -296,6 +323,8 @@ class StoreController extends GetxController implements GetxService {
       _isPaginating = false;
       update();
     }
+
+    return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
   }
 
 
@@ -905,8 +934,10 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
+  /// Get store list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getStoreList(int offset, bool reload,
-      {DataSourceEnum source = DataSourceEnum.local}) async {
+      {DataSourceEnum source = DataSourceEnum.local, bool localOnly = false}) async {
     if (reload) {
       _storeModel = null;
       update();
@@ -917,7 +948,10 @@ class StoreController extends GetxController implements GetxService {
           offset, _filterType, _storeType,
           source: DataSourceEnum.local);
       _prepareStoreModel(storeModel, offset);
-      getStoreList(offset, false, source: DataSourceEnum.client);
+      // Only fetch from API if not localOnly
+      if (!localOnly) {
+        getStoreList(offset, false, source: DataSourceEnum.client);
+      }
     } else {
       storeModel = await storeServiceInterface.getStoreList(
           offset, _filterType, _storeType,
@@ -954,9 +988,12 @@ class StoreController extends GetxController implements GetxService {
     _storeType = 'all';
   }
 
+  /// Get popular store list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getPopularStoreList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     _type = type;
     if (reload) {
       _popularStoreList = null;
@@ -974,8 +1011,11 @@ class StoreController extends GetxController implements GetxService {
           _popularStoreList!.addAll(popularStoreList);
         }
         update();
-        getPopularStoreList(false, type, notify,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getPopularStoreList(false, type, notify,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         popularStoreList = await storeServiceInterface.getPopularStoreList(type,
             source: DataSourceEnum.client);
@@ -988,9 +1028,12 @@ class StoreController extends GetxController implements GetxService {
     }
   }
 
+  /// Get latest store list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getLatestStoreList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     _type = type;
     if (reload) {
       _latestStoreList = null;
@@ -1008,8 +1051,11 @@ class StoreController extends GetxController implements GetxService {
           _latestStoreList!.addAll(latestStoreList);
         }
         update();
-        getLatestStoreList(false, type, notify,
-            fromRecall: true, dataSource: DataSourceEnum.client);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getLatestStoreList(false, type, notify,
+              fromRecall: true, dataSource: DataSourceEnum.client);
+        }
       } else {
         latestStoreList = await storeServiceInterface.getLatestStoreList(type,
             source: DataSourceEnum.client);
@@ -1024,7 +1070,8 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getTopOfferStoreList(bool reload, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     if (reload) {
       _topOfferStoreList = null;
     }
@@ -1041,8 +1088,11 @@ class StoreController extends GetxController implements GetxService {
           _topOfferStoreList!.addAll(latestStoreList);
         }
         update();
-        getTopOfferStoreList(false, notify,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getTopOfferStoreList(false, notify,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         latestStoreList = await storeServiceInterface.getTopOfferStoreList(
             source: DataSourceEnum.client);

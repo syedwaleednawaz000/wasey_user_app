@@ -17,7 +17,9 @@ class AdvertisementController extends GetxController implements GetxService {
 
   bool autoPlay = true;
 
-  Future<void> getAdvertisementList({DataSourceEnum dataSource = DataSourceEnum.local}) async {
+  /// Get advertisement list
+  /// [localOnly] - If true, only loads from local cache without making API call
+  Future<void> getAdvertisementList({DataSourceEnum dataSource = DataSourceEnum.local, bool localOnly = false}) async {
     List<AdvertisementModel>? responseAdvertisement;
     if(dataSource == DataSourceEnum.local) {
       responseAdvertisement = await advertisementServiceInterface.getAdvertisementList(dataSource);
@@ -25,7 +27,10 @@ class AdvertisementController extends GetxController implements GetxService {
         _advertisementList = responseAdvertisement;
       }
       update();
-      getAdvertisementList(dataSource: DataSourceEnum.client);
+      // Only fetch from API if not localOnly
+      if (!localOnly) {
+        getAdvertisementList(dataSource: DataSourceEnum.client);
+      }
     } else {
       responseAdvertisement = await advertisementServiceInterface.getAdvertisementList(dataSource);
       if (responseAdvertisement != null) {

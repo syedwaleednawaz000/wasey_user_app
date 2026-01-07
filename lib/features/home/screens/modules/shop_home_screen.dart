@@ -32,9 +32,9 @@ class ShopHomeScreen extends StatelessWidget {
       const BannerView(isFeatured: false),
       const SizedBox(height: 12),
 
-      isLoggedIn ? const VisitAgainView() : const SizedBox(),
+      // isLoggedIn ? const VisitAgainView() : const SizedBox(), // Commented - visit again UI
       const MostPopularItemView(isFood: false, isShop: true),
-      const FlashSaleViewWidget(),
+      // const FlashSaleViewWidget(), // Commented - flash sale UI
       const MiddleSectionBannerView(),
       const HighlightWidget(),
       const PopularStoreView(),
@@ -45,9 +45,9 @@ class ShopHomeScreen extends StatelessWidget {
       const TopOffersNearMe(),
       const FeaturedCategoriesView(),
       // const StoreWiseBannerView(),
-      const ItemThatYouLoveView(
-        forShop: true,
-      ),
+      // const ItemThatYouLoveView( // Commented - Item that you love UI
+      //   forShop: true,
+      // ),
       const NewOnMartView(isShop: true, isPharmacy: false),
       const PromotionalBannerView(),
     ]);

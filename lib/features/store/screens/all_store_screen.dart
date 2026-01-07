@@ -41,6 +41,7 @@ class AllStoreScreen extends StatefulWidget {
 class _AllStoreScreenState extends State<AllStoreScreen> {
   final ScrollController _scrollController = ScrollController();
   late StoreFilterType _activeFilter;
+  bool _isPaginatingAll = false;
 
   @override
   void initState() {
@@ -52,23 +53,38 @@ class _AllStoreScreenState extends State<AllStoreScreen> {
     _scrollController.addListener(() {
       // We only paginate for the 'all' filter
       if (_activeFilter == StoreFilterType.all) {
-        if (_scrollController.position.pixels ==
-                _scrollController.position.maxScrollExtent &&
+        // Trigger a bit before the absolute end for smoother UX
+        if (_scrollController.position.pixels >=
+                _scrollController.position.maxScrollExtent - 200 &&
             Get.find<StoreController>().storeModel != null &&
-            !Get.find<StoreController>().isLoading) {
+            !_isPaginatingAll) {
           int pageSize =
               (Get.find<StoreController>().storeModel!.totalSize! / 10).ceil();
           // The StoreController's getStoreList method internally manages its offset.
           // We just need to check if we can load more data.
           if (Get.find<StoreController>().storeModel!.offset! < pageSize) {
-            // The controller will automatically handle the next offset.
-            Get.find<StoreController>().getStoreList(
-                Get.find<StoreController>().storeModel!.offset! + 1, false);
+            _loadNextAllPage();
           }
         }
       }
     });
     // --- END CORRECTION ---
+  }
+
+  Future<void> _loadNextAllPage() async {
+    if (_isPaginatingAll) return;
+    final storeController = Get.find<StoreController>();
+    final currentOffset = storeController.storeModel?.offset;
+    if (currentOffset == null) return;
+
+    setState(() => _isPaginatingAll = true);
+    try {
+      await storeController.getStoreList(currentOffset + 1, false);
+    } finally {
+      if (mounted) {
+        setState(() => _isPaginatingAll = false);
+      }
+    }
   }
 
   @override
@@ -296,6 +312,16 @@ class _AllStoreScreenState extends State<AllStoreScreen> {
                                             ? storeController.topOfferStoreList
                                             : [],
                       ),
+                      if (_activeFilter == StoreFilterType.all &&
+                          _isPaginatingAll)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: Dimensions.paddingSizeDefault,
+                          ),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
                     ],
                   ),
                 ),
