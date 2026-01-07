@@ -22,6 +22,7 @@ import 'package:sixam_mart/common/widgets/veg_filter_widget.dart';
 import 'package:sixam_mart/common/widgets/web_menu_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 import '../../../common/models/module_model.dart';
 import '../../../util/app_constants.dart';
@@ -119,25 +120,13 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
         }
       }
     });
-    // In CategoryItemScreenState (category_item_screen.dart)
-    final CategoryController catController = Get.find<CategoryController>();
-
-    // Use addPostFrameCallback to run code after the first frame is built
+    
+    // Set initial selected category ID for UI highlighting after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Now it's safe to call methods that might trigger UI updates
       if (mounted) {
-        // Good practice to check if the widget is still in the tree
-        catController.setSelectedCategoryStores(
-            selectedCatId: widget.categoryID
-                .toString()); // Assuming widget.categoryID is available
+        Get.find<CategoryController>().setSelectedCatId(widget.categoryID.toString());
       }
     });
-
-    // Other initState logic that doesn't call update() can remain here
-
-    // if(widget.categoryID != null && widget.categoryID!.isNotEmpty) {
-    //   Get.find<CategoryController>().setSelectedCategoryStores(selectedCatId: widget.categoryID!);
-    // }
   }
 
   @override
@@ -809,40 +798,16 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                                   top: Dimensions
                                                       .paddingSizeDefault),
                                               child: InkWell(
-                                                onTap: () async {
-                                                  catController
-                                                      .setSelectedCategoryStores(
-                                                    selectedCatId:
-                                                        catId.toString(),
+                                                onTap: () {
+                                                  // Set selected category for UI highlighting
+                                                  catController.setSelectedCatId(catId);
+                                                  // Fetch stores for the selected category via API
+                                                  catController.getCategoryStoreList(
+                                                    catId,
+                                                    1,
+                                                    catController.type,
+                                                    true,
                                                   );
-                                                  SharedPreferences
-                                                      sharedPreferences =
-                                                      await SharedPreferences
-                                                          .getInstance();
-                                                  final moduleID =
-                                                      sharedPreferences
-                                                              .getString(
-                                                                  "moduleId") ??
-                                                          '2';
-                                                  // log("current module id is: $moduleID");
-                                                  log(showRestaurantText!
-                                                      ? "true"
-                                                      : "false");
-                                                  log(ModuleHelper.getModule()!
-                                                          .id!
-                                                          .toString() +
-                                                      AppConstants
-                                                          .restaurantModuleId);
-
-                                                  // changeSelectedCategory(
-                                                  //   categoryId:
-                                                  //       catId.toString(),
-                                                  // );
-                                                  // setState(() {
-                                                  //   selectedCat = index;
-                                                  // });
-                                                  // log("Selected Cat...");
-                                                  // log(selectedCat.toString());
                                                 },
                                                 // () {
 
@@ -1041,10 +1006,10 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
 // var isLoadingSelectedStores = true.obs; // Or just a bool and manage with update()
 // var selectedStoresErrorMessage = Rx<String?>(null);
 
-// Main conditional rendering block
-                        (catController.categoryStoreList !=
-                                    null && // Check if the base category has any stores concept
-                                catController.categoryStoreList!.isNotEmpty)
+// Main conditional rendering block - Show if loading OR if data exists
+                        (catController.isLoading ||
+                                (catController.categoryStoreList != null &&
+                                    catController.categoryStoreList!.isNotEmpty))
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 // Align "Stores" title to the left
@@ -1064,80 +1029,30 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                       ),
                                     ),
                                   ),
-                                  // Conditional UI based on the state of selectCatStoreList
-                                  Obx(() {
-                                    // Assuming you make isLoadingSelectedStores and selectedStoresErrorMessage observable
-                                    // Or use GetBuilder and check boolean flags if not using Rx observables
-                                    if (catController
-                                        .isLoadingSelectedStores.value) {
-                                      // Check loading state from controller
-                                      return Container(
-                                        height: 400,
-                                        alignment: Alignment.center,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            const CircularProgressIndicator(),
-                                            const SizedBox(height: 10),
-                                            Text("loading_stores".tr),
-                                          ],
-                                        ),
-                                      );
-                                    } else if (catController
-                                            .selectedStoresErrorMessage.value !=
-                                        null) {
-                                      // Check error state
-                                      return Container(
-                                        height: 400,
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Text(
-                                          catController
-                                              .selectedStoresErrorMessage
-                                              .value!,
-                                          // Display error from controller
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: Colors.red.shade700),
-                                        ),
-                                      );
-                                    } else if (catController
-                                                .selectCatStoreList !=
-                                            null &&
-                                        catController
-                                            .selectCatStoreList!.isNotEmpty) {
-                                      // Data is available and not empty, show the GridView
-                                      return SizedBox(
-                                        width: double.infinity,
-                                        child: GridView.builder(
-                                          itemCount: catController
-                                              .selectCatStoreList!.length,
-                                          physics:
-                                              const BouncingScrollPhysics(),
-                                          padding: const EdgeInsets.all(12.0),
-                                          shrinkWrap: true,
-                                          gridDelegate:
-                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 2,
-                                            crossAxisSpacing: 8,
-                                            mainAxisSpacing: 6,
-                                            childAspectRatio:
-                                                0.70, // Adjust this: width / height
-                                          ),
-                                          itemBuilder: (context, i) {
-                                            // This check is good for safety, though itemCount should handle it
-                                            if (catController
-                                                        .selectCatStoreList ==
-                                                    null ||
-                                                i >=
-                                                    catController
-                                                        .selectCatStoreList!
-                                                        .length) {
-                                              return const SizedBox.shrink();
-                                            }
-                                            Store store = catController
-                                                .selectCatStoreList![i];
+                                  // Use categoryStoreList (API data) directly - stable for both Market and Restaurant
+                                  catController.isLoading
+                                      ? CategoryStoreShimmer()
+                                      : stores != null && stores.isNotEmpty
+                                          ? SizedBox(
+                                              width: double.infinity,
+                                              child: GridView.builder(
+                                                itemCount: stores.length,
+                                                physics:
+                                                    const BouncingScrollPhysics(),
+                                                padding: const EdgeInsets.all(12.0),
+                                                shrinkWrap: true,
+                                                gridDelegate:
+                                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 2,
+                                                  crossAxisSpacing: 8,
+                                                  mainAxisSpacing: 6,
+                                                  childAspectRatio: 0.70,
+                                                ),
+                                                itemBuilder: (context, i) {
+                                                  if (i >= stores!.length) {
+                                                    return const SizedBox.shrink();
+                                                  }
+                                                  Store store = stores[i];
 
                                             return Card(
                                               elevation: 2,
@@ -1348,32 +1263,88 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
                                             );
                                           },
                                         ),
-                                      );
-                                    } else {
-                                      // selectCatStoreList is null or empty, but no error and not loading
-                                      return Container(
-                                        height:
-                                            200, // Give some height to the message
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          "no_stores_match_filter".tr,
-                                        ), // Message for empty filtered list
-                                      );
-                                    }
-                                  }),
+                                      )
+                                          : Container(
+                                              height: 250,
+                                              alignment: Alignment.center,
+                                              padding: const EdgeInsets.all(20),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.store_outlined,
+                                                    size: 80,
+                                                    color: Theme.of(context)
+                                                        .disabledColor,
+                                                  ),
+                                                  const SizedBox(height: 16),
+                                                  Text(
+                                                    "no_stores_found_category".tr,
+                                                    textAlign: TextAlign.center,
+                                                    style: STCMedium.copyWith(
+                                                      fontSize: 16,
+                                                      color: Theme.of(context)
+                                                          .disabledColor,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Text(
+                                                    showRestaurantText!
+                                                        ? "no_restaurants_in_category"
+                                                            .tr
+                                                        : "no_stores_in_category"
+                                                            .tr,
+                                                    textAlign: TextAlign.center,
+                                                    style: STCRegular.copyWith(
+                                                      fontSize: 14,
+                                                      color: Theme.of(context)
+                                                          .hintColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                 ],
                               )
-                            : Container(
-                                // Fallback for when catController.categoryStoreList is null or empty
-                                height: 200, // Give some height for the message
-                                alignment: Alignment.center,
-                                child: Text(
-                                    catController
-                                            .isLoading // Assuming a general loading flag for the category itself
-                                        ? "loading_stores".tr
-                                        : "no_stores_found_category".tr,
-                                    textAlign: TextAlign.center),
-                              ),
+                            : !catController.isLoading
+                                ? Container(
+                                    height: 250,
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.all(20),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.store_outlined,
+                                          size: 80,
+                                          color: Theme.of(context).disabledColor,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          "no_stores_found_category".tr,
+                                          textAlign: TextAlign.center,
+                                          style: STCMedium.copyWith(
+                                            fontSize: 16,
+                                            color:
+                                                Theme.of(context).disabledColor,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          showRestaurantText!
+                                              ? "no_restaurants_in_category".tr
+                                              : "no_stores_in_category".tr,
+                                          textAlign: TextAlign.center,
+                                          style: STCRegular.copyWith(
+                                            fontSize: 14,
+                                            color: Theme.of(context).hintColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : const SizedBox(),
 
                         // (catController.categoryStoreList != null &&
                         //         catController.categoryStoreList!
@@ -2233,3 +2204,77 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
 //     });
 //   }
 // }
+
+// Shimmer widget for loading state in category stores grid
+class CategoryStoreShimmer extends StatelessWidget {
+  const CategoryStoreShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      itemCount: 6, // Show 6 shimmer cards
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(12.0),
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 6,
+        childAspectRatio: 0.70,
+      ),
+      itemBuilder: (context, index) {
+        return Shimmer(
+          duration: const Duration(seconds: 2),
+          enabled: true,
+          child: Card(
+            elevation: 2,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image shimmer
+                Container(
+                  height: 120,
+                  width: double.infinity,
+                  color: Colors.grey[300],
+                ),
+                // Content shimmer
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Store name shimmer
+                      Container(
+                        height: 12,
+                        width: double.infinity,
+                        color: Colors.grey[300],
+                      ),
+                      const SizedBox(height: 8),
+                      // Rating shimmer
+                      Container(
+                        height: 10,
+                        width: 80,
+                        color: Colors.grey[300],
+                      ),
+                      const SizedBox(height: 8),
+                      // Distance shimmer
+                      Container(
+                        height: 10,
+                        width: 100,
+                        color: Colors.grey[300],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

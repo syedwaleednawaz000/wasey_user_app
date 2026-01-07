@@ -10,7 +10,7 @@ import 'package:drift/drift.dart' as drift;
 class ModuleCacheManager {
   static const String _cacheTimestampPrefix = 'module_cache_timestamp_';
   static const String _cacheKeysPrefix = 'module_cache_keys_';
-  static const int _cacheValidityMinutes = 10; // Cache expires after 10 minutes
+  static const int _cacheValidityMinutes = 5; // Cache expires after 10 minutes
 
   /// Generate a module-aware cache key
   static String generateModuleCacheKey(String endpoint, String? moduleId) {

@@ -85,6 +85,11 @@ class CategoryController extends GetxController implements GetxService {
 
   String get selectedCatId => _selectedCatId;
 
+  void setSelectedCatId(String catId) {
+    _selectedCatId = catId;
+    update();
+  }
+
   List<Store>? _selectCatStoreList = [];
 
   List<Store>? get selectCatStoreList => _selectCatStoreList;
@@ -295,10 +300,10 @@ class CategoryController extends GetxController implements GetxService {
         _isSearching = false;
       }
       _type = type;
-      if (notify) {
-        update();
-      }
       _categoryStoreList = null;
+      if (notify) {
+        update(); // Trigger UI update to show shimmer
+      }
     }
     StoreModel? categoryStore = await categoryServiceInterface
         .getCategoryStoreList(categoryID, offset, type);
