@@ -71,10 +71,8 @@ class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
 
               // 2. Listen for the success or failure URL to navigate away
               // IMPORTANT: Adjust these URLs to match what Tranzila redirects to
-              final String successUrlIdentifier =
-                  '/payment/tranzila/success'; // Example
-              final String failureUrlIdentifier =
-                  '/payment/tranzila/fail'; // Example
+              const String successUrlIdentifier = '/payment/tranzila/success'; // Example
+              const String failureUrlIdentifier = '/payment/tranzila/fail'; // Example
 
               if (url.toString().contains(successUrlIdentifier)) {
                 log('Payment Successful, redirecting to Order Success Screen.');

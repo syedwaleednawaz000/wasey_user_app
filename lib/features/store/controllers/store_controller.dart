@@ -188,38 +188,21 @@ class StoreController extends GetxController implements GetxService {
 
   StoreCategories? get selectedSubCategory => _selectedSubCategory;
 
-  //
   bool _isLoadingCategoriesWithStores = true;
 
   bool get isLoadingCategoriesWithStores => _isLoadingCategoriesWithStores;
-// ... inside your StoreController class, after _selectedSubCategory getter ...
 
-  // === REFINED & CORRECTED VARIABLES FOR PAGINATION START ===
-
-  /// Holds the list of categories displayed on the screen.
   List<CategoryWithStores>? _categoryWithStoreList;
   List<CategoryWithStores>? get categoryWithStoreList => _categoryWithStoreList;
 
-  /// Tracks the current page offset for fetching the next page.
   int _categoryOffset = 1;
   int get categoryOffset => _categoryOffset;
 
-  /// Total number of categories available on the server (from the API).
   int? _totalCategories;
   int? get totalCategories => _totalCategories;
 
-  /// Loading state for the initial page load (shows a full-screen spinner).
-  /// This replaces the old `_isLoadingCategoriesWithStores`.
-  // bool _isLoading = true;
-  // @override
-  // bool get isLoading => _isLoading; // The getter now uses the correct variable.
-
-  /// Loading state for fetching subsequent pages (shows a small spinner at the bottom).
   bool _isPaginating = false;
   bool get isPaginating => _isPaginating;
-
-  // === REFINED & CORRECTED VARIABLES FOR PAGINATION END ===
-
 
   Future<void> getCategoriesWithStoreList(int offset, {required bool reload}) async {
     // If reloading, reset all state to their initial values.
