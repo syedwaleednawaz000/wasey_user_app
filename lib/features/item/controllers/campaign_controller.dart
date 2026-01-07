@@ -38,6 +38,13 @@ class CampaignController extends GetxController implements GetxService {
       List<BasicCampaignModel>? basicCampaignList;
       if(dataSource == DataSourceEnum.local) {
         basicCampaignList = await campaignServiceInterface.getBasicCampaignList(DataSourceEnum.local);
+        // If cache-only and there is no local cache, mark as "loaded but empty"
+        // so UI doesn't show endless shimmer.
+        if (basicCampaignList == null && localOnly) {
+          _basicCampaignList = <BasicCampaignModel>[];
+          update();
+          return;
+        }
         _prepareBasicCampaign(basicCampaignList);
         // Only call API if not localOnly
         if (!localOnly) {
@@ -75,6 +82,13 @@ class CampaignController extends GetxController implements GetxService {
       List<Item>? itemCampaignList;
       if(dataSource == DataSourceEnum.local) {
         itemCampaignList = await campaignServiceInterface.getItemCampaignList(DataSourceEnum.local);
+        // If cache-only and there is no local cache, mark as "loaded but empty"
+        // so UI doesn't show endless shimmer.
+        if (itemCampaignList == null && localOnly) {
+          _itemCampaignList = <Item>[];
+          update();
+          return;
+        }
         _prepareItemCampaign(itemCampaignList);
         // Only fetch from API if not localOnly
         if (!localOnly) {

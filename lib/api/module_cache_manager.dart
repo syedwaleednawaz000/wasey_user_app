@@ -134,6 +134,12 @@ class ModuleCacheManager {
     try {
       SharedPreferences sharedPreferences = Get.find();
       
+      // Must have cache keys saved for this module, otherwise treat as invalid
+      final cacheKeys = sharedPreferences.getStringList('$_cacheKeysPrefix$moduleId');
+      if (cacheKeys == null || cacheKeys.isEmpty) {
+        return false;
+      }
+
       final timestamp = sharedPreferences.getInt('$_cacheTimestampPrefix$moduleId');
       if (timestamp == null) {
         return false;
@@ -142,7 +148,19 @@ class ModuleCacheManager {
       final cacheAge = DateTime.now().millisecondsSinceEpoch - timestamp;
       final cacheAgeMinutes = cacheAge / (1000 * 60);
 
-      return cacheAgeMinutes < _cacheValidityMinutes;
+      // Optional: sanity-check that at least one cached payload exists.
+      // This prevents cases where keys exist but data was wiped/corrupted.
+      if (cacheAgeMinutes < _cacheValidityMinutes) {
+        final firstKey = cacheKeys.first;
+        if (GetPlatform.isWeb) {
+          return sharedPreferences.getString(firstKey) != null;
+        } else {
+          final cacheData = await database.getCacheResponseById(firstKey);
+          return cacheData != null && cacheData.response != null;
+        }
+      }
+
+      return false;
     } catch (e) {
       if (kDebugMode) {
         print('ModuleCacheManager: Error checking cache validity: $e');

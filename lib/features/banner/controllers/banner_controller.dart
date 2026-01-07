@@ -125,6 +125,19 @@ class BannerController extends GetxController implements GetxService {
       BannerModel? bannerModel;
       if (dataSource == DataSourceEnum.local) {
         bannerModel = await bannerServiceInterface.getBannerList(source: DataSourceEnum.local);
+        // If we're loading cache-only and there is no local cache for banners,
+        // mark banners as "loaded but empty" to prevent endless shimmer.
+        if (bannerModel == null && localOnly) {
+          if (useModuleCache) {
+            _moduleBannerImageLists[currentModuleId ?? 'no_module'] = <String?>[];
+            _moduleBannerDataLists[currentModuleId ?? 'no_module'] = <dynamic>[];
+          } else {
+            _bannerImageList = <String?>[];
+            _bannerDataList = <dynamic>[];
+          }
+          update();
+          return;
+        }
         await _prepareBanner(bannerModel, contextForPrecache: contextForPrecache);
         // Only fetch from API if not localOnly
         if (!localOnly) {

@@ -38,6 +38,16 @@ class RestaurantModuleCacheService {
 
       // Load data from local cache into controllers
       // Using DataSourceEnum.local with localOnly=true ensures no API calls are made
+      bool categoriesWithStoresLoaded = false;
+
+      try {
+        // Categories with stores (Restaurant main list) - must be loaded to avoid infinite loader
+        categoriesWithStoresLoaded = await Get.find<StoreController>()
+            .getCategoriesWithStoreList(1, reload: false, localOnly: true);
+      } catch (e) {
+        if (kDebugMode) print('RestaurantModuleCacheService: Categories-with-stores load error: $e');
+      }
+
       try {
         // Banner - has dataSource parameter, use local only with localOnly=true to prevent API call
         await Get.find<BannerController>().getBannerList(false, dataSource: DataSourceEnum.local, localOnly: true);
@@ -126,7 +136,9 @@ class RestaurantModuleCacheService {
         print('RestaurantModuleCacheService: Successfully loaded Restaurant data from cache');
       }
 
-      return true;
+      // If the critical categories-with-stores list couldn't be loaded from local,
+      // report cache load as failed so HomeController can fall back to API (offset=1).
+      return categoriesWithStoresLoaded;
     } catch (e) {
       if (kDebugMode) {
         print('RestaurantModuleCacheService: Error loading Restaurant cache: $e');

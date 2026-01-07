@@ -95,8 +95,26 @@ class SplashController extends GetxController implements GetxService {
   }
 
   void loadData() async {
-    await getModules();
+    await ensureModulesLoaded();
     await getStoredModule();
+  }
+
+  /// Ensures module list is available.
+  /// Important: `getModules()` in local mode triggers remote fetch without awaiting it,
+  /// which can leave `_moduleList` null on first launch. This method awaits remote
+  /// only when local is empty.
+  Future<void> ensureModulesLoaded({Map<String, String>? headers}) async {
+    if (_moduleList != null && _moduleList!.isNotEmpty) {
+      return;
+    }
+
+    // Try local only first
+    await getModules(headers: headers, dataSource: DataSourceEnum.local, alsoFetchRemote: false);
+
+    // If local is empty, fetch remote and await
+    if (_moduleList == null || _moduleList!.isEmpty) {
+      await getModules(headers: headers, dataSource: DataSourceEnum.client, alsoFetchRemote: false);
+    }
   }
 
   Future<void> getConfigData(
@@ -139,13 +157,21 @@ class SplashController extends GetxController implements GetxService {
       debugPrint('getStoredModule: No module stored, setting default to 2 (restaurant)');
     }
 
-    // Switch to the appropriate module based on stored module ID
-    if (_storedModuleId == '1') {
-      splashController.switchModule(0, true);  // Market at index 0
-      debugPrint('getStoredModule: Switched to Market (moduleId=1, index=0)');
+    // Ensure modules are loaded before switching
+    await ensureModulesLoaded();
+
+    final int desiredId = int.tryParse(_storedModuleId) ?? 2;
+    final int idx = _moduleList?.indexWhere((m) => m.id == desiredId) ?? -1;
+
+    if (idx >= 0) {
+      splashController.switchModule(idx, true);
+      debugPrint('getStoredModule: Switched to moduleId=$desiredId (index=$idx)');
+    } else if (_moduleList != null && _moduleList!.isNotEmpty) {
+      // Fallback: if desired module not found, use first available module
+      splashController.switchModule(0, true);
+      debugPrint('getStoredModule: Desired moduleId=$desiredId not found, switched to index=0');
     } else {
-      splashController.switchModule(1, true);  // Restaurant at index 1
-      debugPrint('getStoredModule: Switched to Restaurant (moduleId=2, index=1)');
+      debugPrint('getStoredModule: Module list is still empty; cannot switch module yet');
     }
   }
 
@@ -315,14 +341,17 @@ class SplashController extends GetxController implements GetxService {
 
   Future<void> getModules(
       {Map<String, String>? headers,
-      DataSourceEnum dataSource = DataSourceEnum.local}) async {
+      DataSourceEnum dataSource = DataSourceEnum.local,
+      bool alsoFetchRemote = true}) async {
     _moduleIndex = 0;
     List<ModuleModel>? moduleList;
     if (dataSource == DataSourceEnum.local) {
       moduleList = await splashServiceInterface.getModules(
           headers: headers, source: DataSourceEnum.local);
       _prepareModuleList(moduleList);
-      getModules(headers: headers, dataSource: DataSourceEnum.client);
+      if (alsoFetchRemote) {
+        getModules(headers: headers, dataSource: DataSourceEnum.client, alsoFetchRemote: alsoFetchRemote);
+      }
     } else {
       moduleList = await splashServiceInterface.getModules(
           headers: headers, source: DataSourceEnum.client);

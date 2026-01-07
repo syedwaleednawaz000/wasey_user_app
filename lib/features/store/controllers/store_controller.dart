@@ -34,6 +34,7 @@ import 'package:sixam_mart/util/app_constants.dart';
 import '../../../api/api_checker.dart';
 import '../../../api/api_client.dart';
 import '../../../helper/store_schedule_checker.dart';
+import '../../splash/controllers/splash_controller.dart';
 import '../domain/models/category_with_stores.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -221,7 +222,9 @@ class StoreController extends GetxController implements GetxService {
   // === REFINED & CORRECTED VARIABLES FOR PAGINATION END ===
 
 
-  Future<void> getCategoriesWithStoreList(int offset, {required bool reload}) async {
+  /// Get categories with store list
+  /// [localOnly] - If true, only loads from local cache (SharedPreferences) without making API call
+  Future<bool> getCategoriesWithStoreList(int offset, {required bool reload, bool localOnly = false}) async {
     // If reloading, reset all state to their initial values.
     if (reload) {
       _categoryOffset = 1;
@@ -233,10 +236,18 @@ class StoreController extends GetxController implements GetxService {
       log("ACTION: Manual refresh initiated. Resetting all category data.");
     }
 
+    // If we're only allowed to load local cache, never paginate.
+    if (localOnly && offset != 1) {
+      _isLoadingCategoriesWithStores = false;
+      _isPaginating = false;
+      update();
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
+    }
+
     // Don't proceed if there are no more items to load.
     bool hasMoreData = _totalCategories == null || (_categoryWithStoreList == null || _categoryWithStoreList!.length < _totalCategories!);
     if(!hasMoreData) {
-      return;
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
     }
 
     // Set the appropriate loading indicator.
@@ -248,7 +259,8 @@ class StoreController extends GetxController implements GetxService {
     update();
 
     final SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
-    const String cacheId = AppConstants.categoriesWithStores ?? "categories_with_stores";
+    final String? moduleId = Get.find<SplashController>().module?.id?.toString();
+    final String cacheId = 'categories_with_stores_${moduleId ?? 'no_module'}';
 
     // --- Step 1: Attempt to load the FIRST PAGE from cache for an instant UI ---
     if (offset == 1 && _categoryWithStoreList == null) {
@@ -273,6 +285,14 @@ class StoreController extends GetxController implements GetxService {
       } else {
         log("CACHE: No data found in local storage.");
       }
+    }
+
+    // If localOnly is enabled, do not call API.
+    if (localOnly) {
+      _isLoadingCategoriesWithStores = false;
+      _isPaginating = false;
+      update();
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
     }
 
     // --- Step 2: Fetch data from the network ---
@@ -313,6 +333,8 @@ class StoreController extends GetxController implements GetxService {
       _isPaginating = false;
       update();
     }
+
+    return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
   }
 
 

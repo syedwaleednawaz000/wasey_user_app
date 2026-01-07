@@ -11,6 +11,9 @@ class CouponController extends GetxController implements GetxService {
   List<CouponModel>? _couponList;
   List<CouponModel>? get couponList => _couponList;
 
+  bool _isCouponListLoading = false;
+  bool get isCouponListLoading => _isCouponListLoading;
+
   List<CouponModel>? _taxiCouponList;
   List<CouponModel>? get taxiCouponList => _taxiCouponList;
 
@@ -37,12 +40,16 @@ class CouponController extends GetxController implements GetxService {
   }
 
   Future<void> getCouponList() async {
-    List<CouponModel>? couponList = await couponServiceInterface.getCouponList();
-    if (couponList != null) {
-      _couponList = [];
-      _couponList!.addAll(couponList);
-    }
+    _isCouponListLoading = true;
     update();
+    try {
+      final List<CouponModel>? couponList =
+          await couponServiceInterface.getCouponList();
+      _couponList = couponList ?? <CouponModel>[];
+    } finally {
+      _isCouponListLoading = false;
+      update();
+    }
   }
 
   Future<void> getTaxiCouponList() async {

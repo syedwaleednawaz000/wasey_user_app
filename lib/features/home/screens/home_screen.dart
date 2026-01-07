@@ -195,24 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    // ======================= NEW PAGINATION LOGIC =======================
-    _scrollController.addListener(() {
-      // This is the trigger for fetching the next page
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 // Trigger 200 pixels before the end
-          && Get.find<StoreController>().categoryWithStoreList != null) {
-
-        final storeController = Get.find<StoreController>();
-        int? total = storeController.totalCategories;
-        int currentLength = storeController.categoryWithStoreList?.length ?? 0;
-
-        // Check if there is more data to load and we are not already fetching
-        if (total != null && currentLength < total && !storeController.isPaginating) {
-          print("Reached end of list, fetching next page with offset: ${storeController.categoryOffset}");
-          storeController.getCategoriesWithStoreList(storeController.categoryOffset, reload: false);
-        }
-      }
-    });
-    // ======================== END OF NEW LOGIC ==========================
+    // Pagination for categories-with-stores is intentionally disabled on Restaurant tab
+    // to prevent repeated API calls like: /categories/withstorelist?offset=2/3...
 
     // Get.find<HomeController>().setModuleRestaurant();
   }

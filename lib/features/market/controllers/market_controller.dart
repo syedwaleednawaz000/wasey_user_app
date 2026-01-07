@@ -46,7 +46,7 @@ class MarketController extends GetxController implements GetxService {
     // Wait for moduleList to be available if not yet loaded
     if (splashController.moduleList == null || splashController.moduleList!.isEmpty) {
       log("MarketController: Waiting for moduleList to be available...");
-      await splashController.getModules();
+      await splashController.ensureModulesLoaded();
     }
     
     // Set the module in SplashController if not already Market
