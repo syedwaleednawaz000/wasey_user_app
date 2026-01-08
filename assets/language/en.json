@@ -42,6 +42,8 @@
   "pay_now": "Pay Now",
   "payment_method": "Payment Method",
   "waiting_for_payment": "Waiting for Payment",
+  "switch_module": "Switch Module",
+  "switched_to": "Switched to :module",
   "no_categories_with_stores_found_yet": "Currently no categories with stores found, please visit again later.",
   "pickup": "Pickup",
   "delivery": "Delivery",

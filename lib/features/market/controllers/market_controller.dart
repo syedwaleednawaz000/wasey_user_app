@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/banner/controllers/banner_controller.dart';
+import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
@@ -60,6 +61,13 @@ class MarketController extends GetxController implements GetxService {
           }
         }
       }
+    }
+    
+    // Always refresh cart data when switching to Market tab
+    // This ensures cart displays correct module-specific data
+    if (AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
+      log("MarketController: Refreshing cart data for Market module");
+      Get.find<CartController>().getCartDataOnline();
     }
 
     // Check if we should load from cache first (only if not forcing reload)

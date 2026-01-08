@@ -136,7 +136,8 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       appBar: CustomAppBar(
           title: 'my_cart'.tr,
-          backButton: (ResponsiveHelper.isDesktop(context) || !widget.fromNav)),
+          backButton: (ResponsiveHelper.isDesktop(context) || !widget.fromNav),
+          showModuleSwitcher: true),
       endDrawer: const MenuDrawer(),
       endDrawerEnableOpenDragGesture: false,
       body: GetBuilder<StoreController>(builder: (storeController) {

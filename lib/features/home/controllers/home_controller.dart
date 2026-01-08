@@ -11,6 +11,7 @@ import '../../../util/app_constants.dart';
 import '../../address/controllers/address_controller.dart';
 import '../../banner/controllers/banner_controller.dart';
 import '../../brands/controllers/brands_controller.dart';
+import '../../cart/controllers/cart_controller.dart';
 import '../../category/controllers/category_controller.dart';
 import '../../coupon/controllers/coupon_controller.dart';
 import '../../flash_sale/controllers/flash_sale_controller.dart';
@@ -79,6 +80,13 @@ class HomeController extends GetxController implements GetxService {
           }
         }
       }
+    }
+    
+    // Always refresh cart data when switching to Restaurant tab
+    // This ensures cart displays correct module-specific data
+    if (AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
+      log("HomeController: Refreshing cart data for Restaurant module");
+      Get.find<CartController>().getCartDataOnline();
     }
     
     // Check if we should load from cache first (only if not forcing reload)

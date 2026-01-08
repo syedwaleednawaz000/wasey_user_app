@@ -41,6 +41,8 @@
   "pay_now": "ادفع الآن",
   "payment_method": "طريقة الدفع",
   "waiting_for_payment": "في انتظار الدفع",
+  "switch_module": "تبديل الوحدة",
+  "switched_to": "تم التبديل إلى :module",
   "no_categories_with_stores_found_yet": "لا توجد أقسام مع متاجر متاحة حالياً، يرجى المحاولة مرة أخرى لاحقاً.",
   "pickup": "استلام",
   "delivery": "توصيل",

@@ -244,6 +244,7 @@ class AppConstants {
   static const String zoneId = 'zoneId';
   static const String operationAreaId = 'operationAreaId';
   static const String moduleId = 'moduleId';
+  static const String cartModuleId = 'cart_module_Id';
   static const String superMarketModuleId = '1';
   static const String restaurantModuleId = '2';
   static const String cacheModuleId = 'cacheModuleId';
