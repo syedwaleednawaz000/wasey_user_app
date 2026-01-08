@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import '../../../common/widgets/cart_widget.dart';
 import '../../../common/widgets/custom_app_bar.dart';
 import '../../../common/widgets/item_view.dart';
 import '../../../common/widgets/menu_drawer.dart';
@@ -551,17 +550,7 @@ class _MarketScreenState extends State<MarketScreen> {
                             // ),
                           ]),
                         )),
-                    actions: [
-                      // Cart Icon
-                      IconButton(
-                        onPressed: () => Get.toNamed(RouteHelper.getCartRoute()),
-                        icon: CartWidget(
-                          color: Theme.of(context).textTheme.bodyLarge!.color,
-                          size: 25,
-                        ),
-                      ),
-                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                    ],
+                    actions: const [SizedBox()],
                   ),
 
                   SliverToBoxAdapter(

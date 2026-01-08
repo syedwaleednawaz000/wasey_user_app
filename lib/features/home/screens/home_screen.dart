@@ -39,7 +39,6 @@ import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/cart_widget.dart';
 import 'package:sixam_mart/common/widgets/item_view.dart';
 import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
@@ -588,17 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     // ),
                                   ]),
                                 )),
-                                actions: [
-                                  // Cart Icon
-                                  IconButton(
-                                    onPressed: () => Get.toNamed(RouteHelper.getCartRoute()),
-                                    icon: CartWidget(
-                                      color: Theme.of(context).textTheme.bodyLarge!.color,
-                                      size: 25,
-                                    ),
-                                  ),
-                                  const SizedBox(width: Dimensions.paddingSizeSmall),
-                                ],
+                                actions: const [SizedBox()],
                               ),
 
                               SliverToBoxAdapter(
