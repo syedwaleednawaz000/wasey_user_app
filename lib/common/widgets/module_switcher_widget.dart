@@ -14,33 +14,65 @@ class ModuleSwitcherWidget extends StatelessWidget {
     int moduleId,
     String moduleName,
   ) async {
-    // Show loading indicator
-    Get.dialog(
-      const Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
+    try {
+      // Show loading indicator
+      Get.dialog(
+        WillPopScope(
+          onWillPop: () async => false,
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+        barrierDismissible: false,
+      );
 
-    // Switch module - this is a void method that triggers async operations internally
-    splashController.switchModule(moduleIndex, false, forceReload: false);
+      // Switch module - this is a void method that triggers async operations internally
+      splashController.switchModule(moduleIndex, false, forceReload: false);
 
-    // Wait a bit for the switch to complete
-    await Future.delayed(const Duration(milliseconds: 500));
+      // Wait for the module switch to complete with a reasonable timeout
+      // Poll until the module has switched or timeout
+      int attempts = 0;
+      while (attempts < 30) { // 30 attempts * 200ms = 6 seconds max
+        await Future.delayed(const Duration(milliseconds: 200));
+        
+        // Check if module has switched
+        if (splashController.module?.id == moduleId) {
+          break;
+        }
+        attempts++;
+      }
 
-    // Close loading indicator
-    if (Get.isDialogOpen ?? false) {
-      Get.back();
+      // Extra small delay to ensure UI updates
+      await Future.delayed(const Duration(milliseconds: 300));
+
+    } catch (e) {
+      print('Error during module switch: $e');
+    } finally {
+      // Always close loading indicator
+      try {
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+      } catch (e) {
+        print('Error closing dialog: $e');
+      }
+
+      // Small delay before showing snackbar
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Show success message
+      try {
+        Get.showSnackbar(
+          GetSnackBar(
+            message: 'switched_to'.trParams({'module': moduleName}),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Theme.of(Get.context!).primaryColor,
+            borderRadius: Dimensions.radiusDefault,
+            margin: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+          ),
+        );
+      } catch (e) {
+        print('Error showing snackbar: $e');
+      }
     }
-
-    // Show success message
-    Get.showSnackbar(
-      GetSnackBar(
-        message: 'switched_to'.trParams({'module': moduleName}),
-        duration: const Duration(seconds: 2),
-        backgroundColor: Theme.of(Get.context!).primaryColor,
-        borderRadius: Dimensions.radiusDefault,
-        margin: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      ),
-    );
   }
 
   @override
