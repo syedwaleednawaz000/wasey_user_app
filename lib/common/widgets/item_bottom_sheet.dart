@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
 import 'package:sixam_mart/common/widgets/custom_tool_tip_widget.dart';
@@ -687,7 +689,8 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                                   Text(
                                                     textAlign: TextAlign.right,
                                                     widget.item!.description!,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     maxLines: 2,
                                                     style: STCRegular.copyWith(
                                                       color: Theme.of(context)
@@ -1066,582 +1069,415 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                         ),
                       )
                     else
-                      const SizedBox(width: 0),
+                      const SizedBox.shrink(),
                     GetBuilder<CartController>(builder: (cartController) {
+                      // Use a local variable to make the onPressed logic cleaner.
+                      // This avoids nesting GetBuilder within the ternary operator.
+                      bool isButtonDisabled = (Get.find<SplashController>()
+                                  .configModel!
+                                  .moduleConfig!
+                                  .module!
+                                  .stock! &&
+                              stock! <= 0) ||
+                          cartController.isCartAddLoading;
+
                       return Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: cartController.isCartAddLoading
+                              ? Theme.of(context).primaryColor
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(100),
+
                         ),
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            side:
-                                BorderSide(color: Theme.of(context).cardColor),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: Dimensions.paddingSizeSmall,
+                            backgroundColor: cartController.isCartAddLoading
+                                ? Colors.transparent
+                                : Theme.of(context).primaryColor,
+                            side: BorderSide(
+                              color: cartController.isCartAddLoading
+                                  ? Colors.transparent
+                                  : Theme.of(context).cardColor,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: cartController.isCartAddLoading
+                                  ? 0
+                                  : Dimensions.paddingSizeSmall,
                               horizontal: Dimensions.paddingSizeSmall,
                             ),
                           ),
-                          /*onPressed: (Get.find<SplashController>()
-                              .configModel!
-                              .moduleConfig!
-                              .module!
-                              .stock! &&
-                              stock! <= 0)
+                          onPressed: isButtonDisabled
                               ? null
-                              : () {
-                            if (!hasFoodVariations ||
-                                (hasFoodVariations &&
-                                    _currentListIndex ==
-                                        widget.item!.foodVariations!.length - 1)) {
-                              String? invalid;
-                              if (hasFoodVariations && _newVariation) {
-                                // Only run variation validation if there ARE variations
-                                for (int index = 0;
-                                index < widget.item!.foodVariations!.length;
-                                index++) {
-                                  if (!widget.item!.foodVariations![index].multiSelect! &&
-                                      widget.item!.foodVariations![index].required! &&
-                                      !itemController.selectedVariations[index].contains(true)) {
-                                    invalid =
-                                    '${'choose_a_variation_from'.tr} ${widget.item!.foodVariations![index].name}';
-                                    break;
-                                  } else if (widget.item!.foodVariations![index].multiSelect! &&
-                                      (widget.item!.foodVariations![index].required! ||
-                                          itemController.selectedVariations[index].contains(true)) &&
-                                      widget.item!.foodVariations![index].min! >
-                                          itemController.selectedVariationLength(
-                                              itemController.selectedVariations, index)) {
-                                    invalid =
-                                    '${'select_minimum'.tr} ${widget.item!.foodVariations![index].min} '
-                                        '${'and_up_to'.tr} ${widget.item!.foodVariations![index].max} ${'options_from'.tr}'
-                                        ' ${widget.item!.foodVariations![index].name} ${'variation'.tr}';
-                                    break;
-                                  }
-                                }
-                              }
-
-                              if (Get.find<SplashController>().moduleList != null) {
-                                for (ModuleModel module in Get.find<SplashController>().moduleList!) {
-                                  if (module.id == widget.item!.moduleId) {
-                                    Get.find<SplashController>().setModule(module);
-                                    break;
-                                  }
-                                }
-                              }
-
-                              if (invalid != null) {
-                                showCustomSnackBar(invalid, getXSnackBar: true);
-                              } else {
-                                // // PROPER VARIATION HANDLING - FIXED
-                                // List<OrderVariation> variationsForCart = [];
-                                // List<Variation> selectedOldVariations = [];
-                                //
-                                // if (hasFoodVariations) {
-                                //   if (_newVariation) {
-                                //     // NEW VARIATION SYSTEM (with slices)
-                                //     variationsForCart = _getSelectedVariations(
-                                //       isFoodVariation: true,
-                                //       foodVariations: widget.item!.foodVariations!,
-                                //       selectedVariations: itemController.selectedVariations,
-                                //     );
-                                //   } else {
-                                //     // OLD VARIATION SYSTEM
-                                //     List<String> variationList = [];
-                                //     for (int index = 0; index < widget.item!.choiceOptions!.length; index++) {
-                                //       variationList.add(widget.item!.choiceOptions![index]
-                                //           .options![itemController.variationIndex![index]]
-                                //           .replaceAll(' ', ''));
-                                //     }
-                                //     String variationType = variationList.join('-');
-                                //
-                                //     for (Variation variation in widget.item!.variations!) {
-                                //       if (variation.type == variationType) {
-                                //         selectedOldVariations.add(variation);
-                                //         break;
-                                //       }
-                                //     }
-                                //   }
-                                // }
-                                //
-                                // // Create cart model
-                                // CartModel cartModel = CartModel(
-                                //   null,
-                                //   price,
-                                //   priceWithDiscountAndAddons,
-                                //   // For old variation system - pass the found variation or empty array
-                                //   selectedOldVariations,
-                                //   // For new variation system - pass selected variations
-                                //   itemController.selectedVariations,
-                                //   (price! - PriceConverter.convertWithDiscount(price, discount, discountType)!),
-                                //   itemController.quantity,
-                                //   addOnIdList,
-                                //   addOnsList,
-                                //   widget.isCampaign,
-                                //   stock,
-                                //   widget.item,
-                                //   widget.item?.quantityLimit,
-                                // );
-
-                                // PROPER VARIATION HANDLING - THIS IS CORRECT
-                                List<OrderVariation> variationsForCart = [];
-                                List<Variation> selectedOldVariations = [];
-
-                                if (hasFoodVariations) {
-                                  if (_newVariation) {
-                                    // NEW VARIATION SYSTEM (with slices) - THIS HANDLES SLICE INFO
-                                    variationsForCart = _getSelectedVariations(
-                                      isFoodVariation: true,
-                                      foodVariations: widget.item!.foodVariations!,
-                                      selectedVariations: itemController.selectedVariations,
-                                    );
-                                  } else {
-                                    // OLD VARIATION SYSTEM
-                                    List<String> variationList = [];
-                                    for (int index = 0; index < widget.item!.choiceOptions!.length; index++) {
-                                      variationList.add(widget.item!.choiceOptions![index]
-                                          .options![itemController.variationIndex![index]]
-                                          .replaceAll(' ', ''));
-                                    }
-                                    String variationType = variationList.join('-');
-
-                                    for (Variation variation in widget.item!.variations!) {
-                                      if (variation.type == variationType) {
-                                        selectedOldVariations.add(variation);
-                                        break;
-                                      }
-                                    }
-                                  }
-                                }
-
-                                // Create cart model - THIS IS CORRECT
-                                CartModel cartModel = CartModel(
-                                  null,
-                                  price,
-                                  priceWithDiscountAndAddons,
-                                  // For old variation system - pass the found variation or empty array
-                                  selectedOldVariations, // ✅ CORRECT: Uses selectedOldVariations
-                                  // For new variation system - pass selected variations
-                                  itemController.selectedVariations, // ✅ CORRECT: Passes actual selected variations
-                                  (price! - PriceConverter.convertWithDiscount(price, discount, discountType)!),
-                                  itemController.quantity,
-                                  addOnIdList,
-                                  addOnsList,
-                                  widget.isCampaign,
-                                  stock,
-                                  widget.item,
-                                  widget.item?.quantityLimit,
-                                );
-                                List<int?> listOfAddOnId = _getSelectedAddonIds(addOnIdList: addOnIdList);
-                                List<int?> listOfAddOnQty = _getSelectedAddonQtnList(addOnIdList: addOnIdList);
-
-                                OnlineCart onlineCart = OnlineCart(
-                                  (widget.cart != null || itemController.cartIndex != -1)
-                                      ? widget.cart?.id ?? cartController.cartList[itemController.cartIndex].id
-                                      : null,
-                                  widget.isCampaign ? null : widget.item!.id,
-                                  widget.isCampaign ? widget.item!.id : null,
-                                  priceWithDiscountAndAddons.toString(),
-                                  '',
-                                  // For old variation system - pass variations or null
-                                  selectedOldVariations.isNotEmpty ? selectedOldVariations : null,
-                                  // For new variation system (with slice info) - pass variations or null
-                                  variationsForCart.isNotEmpty ? variationsForCart : null,
-                                  itemController.quantity,
-                                  listOfAddOnId,
-                                  addOnsList,
-                                  listOfAddOnQty,
-                                  'Item',
-                                );
-
-                                // --- Your existing campaign/non-campaign and cart update/add logic ---
-                                if (widget.isCampaign) {
-                                  Get.toNamed(RouteHelper.getCheckoutRoute('campaign'),
-                                      arguments: CheckoutScreen(
-                                          storeId: null, fromCart: false, cartList: [cartModel]));
-                                } else {
-                                  if (Get.find<CartController>().existAnotherStoreItem(
-                                      cartModel.item!.storeId,
-                                      Get.find<SplashController>().module != null
-                                          ? Get.find<SplashController>().module!.id
-                                          : Get.find<SplashController>().cacheModule!.id)) {
-                                    Get.dialog(
-                                        ConfirmationDialog(
-                                          icon: Images.warning,
-                                          title: 'are_you_sure_to_reset'.tr,
-                                          description: Get.find<SplashController>()
-                                              .configModel!
-                                              .moduleConfig!
-                                              .module!
-                                              .showRestaurantText!
-                                              ? 'if_you_continue'.tr
-                                              : 'if_you_continue_without_another_store'.tr,
-                                          onYesPressed: () {
-                                            Get.back();
-                                            Get.find<CartController>().clearCartOnline().then((success) async {
-                                              if (success) {
-                                                await Get.find<CartController>().addToCartOnline(onlineCart);
-                                                Get.back();
-                                              }
-                                            });
-                                          },
-                                        ),
-                                        barrierDismissible: false);
-                                  } else {
-                                    if (widget.cart != null || itemController.cartIndex != -1) {
-                                      Get.find<CartController>().updateCartOnline(onlineCart).then((success) {
-                                        if (success) {
-                                          Get.back();
-                                        }
-                                      });
-                                    } else {
-                                      Get.find<CartController>().addToCartOnline(onlineCart).then((success) {
-                                        if (success) {
-                                          Get.back();
-                                        }
-                                      });
-                                    }
-                                  }
-                                }
-                                // --- End of existing cart logic ---
-                              }
-                            } else if (hasFoodVariations) {
-                              // Only call _nextList if there ARE variations and it's not the last step
-                              _nextList();
-                            }
-                          },*/
-
-                          onPressed: (Get.find<SplashController>()
-                                      .configModel!
-                                      .moduleConfig!
-                                      .module!
-                                      .stock! &&
-                                  stock! <= 0)
-                              ? null
-                              : () {
-                                  if (widget.storeStatus == 1) {
-                                    if (!hasFoodVariations ||
-                                        (hasFoodVariations &&
-                                            _currentListIndex ==
-                                                widget.item!.foodVariations!
-                                                        .length -
-                                                    1)) {
-                                      String? invalid;
-                                      if (hasFoodVariations && _newVariation) {
-                                        // Only run variation validation if there ARE variations
-                                        for (int index = 0;
-                                            index <
-                                                widget.item!.foodVariations!
-                                                    .length; // Safe due to hasFoodVariations check
-                                            index++) {
-                                          if (!widget
-                                                  .item!
-                                                  .foodVariations![index]
-                                                  .multiSelect! &&
-                                              widget
-                                                  .item!
-                                                  .foodVariations![index]
-                                                  .required! &&
-                                              !itemController
-                                                  .selectedVariations[index]
-                                                  .contains(true)) {
-                                            invalid =
-                                                '${'choose_a_variation_from'.tr} ${widget.item!.foodVariations![index].name}';
-                                            break;
-                                          } else if (widget
-                                                  .item!
-                                                  .foodVariations![index]
-                                                  .multiSelect! &&
-                                              (widget
-                                                      .item!
-                                                      .foodVariations![index]
-                                                      .required! ||
-                                                  itemController
-                                                      .selectedVariations[index]
-                                                      .contains(true)) &&
-                                              widget
-                                                      .item!
-                                                      .foodVariations![index]
-                                                      .min! >
-                                                  itemController
-                                                      .selectedVariationLength(
-                                                          itemController
-                                                              .selectedVariations,
-                                                          index)) {
-                                            invalid =
-                                                '${'select_minimum'.tr} ${widget.item!.foodVariations![index].min} '
-                                                '${'and_up_to'.tr} ${widget.item!.foodVariations![index].max} ${'options_from'.tr}'
-                                                ' ${widget.item!.foodVariations![index].name} ${'variation'.tr}';
-                                            break;
-                                          }
-                                        }
-                                      }
-
-                                      if (Get.find<SplashController>()
-                                              .moduleList !=
-                                          null) {
-                                        for (ModuleModel module
-                                            in Get.find<SplashController>()
-                                                .moduleList!) {
-                                          if (module.id ==
-                                              widget.item!.moduleId) {
-                                            Get.find<SplashController>()
-                                                .setModule(module);
-                                            break;
-                                          }
-                                        }
-                                      }
-
-                                      if (invalid != null) {
-                                        showCustomSnackBar(invalid,
-                                            getXSnackBar: true);
-                                      } else {
-                                        if (variation != null) {
-                                          debugPrint(
-                                              'variation=======> ${variation!.toJson()}');
-                                        }
-                                        // ADD TO CART LOGIC (your existing code here is mostly fine)
-                                        CartModel cartModel = CartModel(
-                                            null,
-                                            price,
-                                            priceWithDiscountAndAddons,
-                                            // Ensure 'variation' is null or empty if no variations
-                                            (hasFoodVariations &&
-                                                    variation != null)
-                                                ? [variation!]
-                                                : [],
-                                            itemController.selectedVariations,
-                                            // This might need adjustment if no variations
-                                            (price! -
-                                                PriceConverter
-                                                    .convertWithDiscount(
-                                                        price,
-                                                        discount,
-                                                        discountType)!),
-                                            itemController.quantity,
-                                            addOnIdList,
-                                            // Assuming addons are handled separately and this is fine
-                                            addOnsList,
-                                            // Assuming addons are handled separately and this is fine
-                                            widget.isCampaign,
-                                            stock,
-                                            widget.item,
-                                            widget.item?.quantityLimit);
-
-                                        List<OrderVariation> variationsForCart =
-                                            [];
-                                        if (hasFoodVariations) {
-                                          // Only get selected variations if they exist
-                                          variationsForCart =
-                                              _getSelectedVariations(
-                                            isFoodVariation:
-                                                Get.find<SplashController>()
-                                                    .getModuleConfig(
-                                                        widget.item!.moduleType)
-                                                    .newVariation!,
-                                            foodVariations:
-                                                widget.item!.foodVariations!,
-                                            // Safe due to hasFoodVariations
-                                            selectedVariations: itemController
-                                                .selectedVariations,
-                                          );
-                                        }
-
-                                        List<int?> listOfAddOnId =
-                                            _getSelectedAddonIds(
-                                                addOnIdList: addOnIdList);
-                                        List<int?> listOfAddOnQty =
-                                            _getSelectedAddonQtnList(
-                                                addOnIdList: addOnIdList);
-
-                                        OnlineCart onlineCart = OnlineCart(
-                                          (widget.cart != null ||
-                                                  itemController.cartIndex !=
-                                                      -1)
-                                              ? widget.cart?.id ??
-                                                  cartController
-                                                      .cartList[itemController
-                                                          .cartIndex]
-                                                      .id
-                                              : null,
-                                          widget.isCampaign
-                                              ? null
-                                              : widget.item!.id,
-                                          widget.isCampaign
-                                              ? widget.item!.id
-                                              : null,
-                                          priceWithDiscountAndAddons.toString(),
-                                          '',
-                                          // Ensure 'variation' for OnlineCart is null or empty if no variations
-                                          (hasFoodVariations &&
-                                                  variation != null)
-                                              ? [variation]
-                                              : null,
-                                          Get.find<SplashController>()
-                                                  .getModuleConfig(
-                                                      widget.item!.moduleType)
-                                                  .newVariation!
-                                              ? variationsForCart // Use the potentially empty list
-                                              : null,
-                                          null,
-                                          itemController.quantity,
-                                          listOfAddOnId,
-                                          addOnsList,
-                                          listOfAddOnQty,
-                                          'Item',
-                                        );
-
-                                        debugPrint(
-                                            'variationsForCart =======> ${variationsForCart}');
-
-                                        // --- Your existing campaign/non-campaign and cart update/add logic ---
-                                        // This part of your code seems generally fine and can remain as is.
-                                        // It correctly handles different scenarios based on widget.isCampaign
-                                        // and whether the item already exists in the cart.
-                                        if (widget.isCampaign) {
-                                          Get.toNamed(
-                                              RouteHelper.getCheckoutRoute(
-                                                  'campaign'),
-                                              arguments: CheckoutScreen(
-                                                  storeId: null,
-                                                  fromCart: false,
-                                                  cartList: [cartModel]));
-                                        } else {
-                                          if (Get.find<CartController>()
-                                              .existAnotherStoreItem(
-                                                  cartModel.item!.storeId,
-                                                  Get.find<SplashController>()
-                                                              .module !=
-                                                          null
-                                                      ? Get.find<
-                                                              SplashController>()
-                                                          .module!
-                                                          .id
-                                                      : Get.find<
-                                                              SplashController>()
-                                                          .cacheModule!
-                                                          .id)) {
-                                            Get.dialog(
-                                                ConfirmationDialog(
-                                                  icon: Images.warning,
-                                                  title: 'are_you_sure_to_reset'
-                                                      .tr,
-                                                  description: Get.find<
-                                                              SplashController>()
-                                                          .configModel!
-                                                          .moduleConfig!
-                                                          .module!
-                                                          .showRestaurantText!
-                                                      ? 'if_you_continue'.tr
-                                                      : 'if_you_continue_without_another_store'
-                                                          .tr,
-                                                  onYesPressed: () {
-                                                    Get.back();
-                                                    Get.find<CartController>()
-                                                        .clearCartOnline()
-                                                        .then((success) async {
-                                                      if (success) {
-                                                        await Get.find<
-                                                                CartController>()
-                                                            .addToCartOnline(
-                                                                onlineCart);
-                                                        Get.back();
-                                                      }
-                                                    });
-                                                  },
-                                                ),
-                                                barrierDismissible: false);
-                                          } else {
-                                            debugPrint(
-                                                'onlineCart: ======> ${onlineCart.toJson()}');
-                                            if (widget.cart != null ||
-                                                itemController.cartIndex !=
-                                                    -1) {
-                                              Get.find<CartController>()
-                                                  .updateCartOnline(onlineCart)
-                                                  .then((success) {
-                                                if (success) {
-                                                  Get.back();
-                                                }
-                                              });
-                                            } else {
-                                              Get.find<CartController>()
-                                                  .addToCartOnline(onlineCart)
-                                                  .then((success) {
-                                                if (success) {
-                                                  Get.back();
-                                                }
-                                              });
-                                            }
-                                          }
-                                        }
-                                        // --- End of existing cart logic ---
-                                      }
-                                    } else if (hasFoodVariations) {
-                                      // Only call _nextList if there ARE variations and it's not the last step
-                                      _nextList();
-                                    }
-                                  } else if (widget.storeStatus == -1) {
-                                    Get.back();
-                                    showCustomSnackBar(
-                                        "restaurant_is_currently_closed".tr);
-                                  } else {
-                                    Get.back();
-                                    showCustomSnackBar("restaurant_is_currently_closed".tr);
-                                  }
-                                  // --- END: Modified onPressed Logic ---
-                                },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                  (!hasFoodVariations ||
+                              : () async {
+                                  cartController.toggleCartAddLoading();
+                                  try {
+                                    if (widget.storeStatus == 1) {
+                                      if (!hasFoodVariations ||
                                           (hasFoodVariations &&
                                               _currentListIndex ==
                                                   widget.item!.foodVariations!
                                                           .length -
-                                                      1))
-                                      ? (Get.find<
-                                                      SplashController>() // Out of stock check for final step
-                                                  .configModel!
-                                                  .moduleConfig!
-                                                  .module!
-                                                  .stock! &&
-                                              stock! <= 0)
-                                          ? 'out_of_stock'.tr
-                                          : widget.isCampaign
-                                              ? 'order_now'.tr
-                                              : (widget.cart != null ||
-                                                      itemController
-                                                              .cartIndex !=
-                                                          -1)
-                                                  ? 'update_in_cart'.tr
-                                                  : 'add_to_cart'.tr
-                                      : 'next'.tr,
-                                  // Text for intermediate variation steps
-                                  // --- END: Modified Button Text Logic ---
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Colors.white)),
-                              const SizedBox(width: 8),
-                              (Get.find<SplashController>() // Out of stock check for final step
-                                          .configModel!
-                                          .moduleConfig!
-                                          .module!
-                                          .stock! &&
-                                      stock! <= 0)
-                                  ? const Icon(
-                                      Icons.strikethrough_s_outlined,
-                                      size: 25,
-                                      color: Colors.white,
-                                    )
-                                  : const Icon(
-                                      Icons.turn_right_rounded,
-                                      size: 25,
-                                      color: Colors.white,
-                                    ),
-                            ],
-                          ),
+                                                      1)) {
+                                        String? invalid;
+                                        if (hasFoodVariations &&
+                                            _newVariation) {
+                                          // Only run variation validation if there ARE variations
+                                          for (int index = 0;
+                                              index <
+                                                  widget.item!.foodVariations!
+                                                      .length; // Safe due to hasFoodVariations check
+                                              index++) {
+                                            if (!widget
+                                                    .item!
+                                                    .foodVariations![index]
+                                                    .multiSelect! &&
+                                                widget
+                                                    .item!
+                                                    .foodVariations![index]
+                                                    .required! &&
+                                                !itemController
+                                                    .selectedVariations[index]
+                                                    .contains(true)) {
+                                              invalid =
+                                                  '${'choose_a_variation_from'.tr} ${widget.item!.foodVariations![index].name}';
+                                              break;
+                                            } else if (widget
+                                                    .item!
+                                                    .foodVariations![index]
+                                                    .multiSelect! &&
+                                                (widget
+                                                        .item!
+                                                        .foodVariations![index]
+                                                        .required! ||
+                                                    itemController
+                                                        .selectedVariations[
+                                                            index]
+                                                        .contains(true)) &&
+                                                widget
+                                                        .item!
+                                                        .foodVariations![index]
+                                                        .min! >
+                                                    itemController
+                                                        .selectedVariationLength(
+                                                            itemController
+                                                                .selectedVariations,
+                                                            index)) {
+                                              invalid =
+                                                  '${'select_minimum'.tr} ${widget.item!.foodVariations![index].min} '
+                                                  '${'and_up_to'.tr} ${widget.item!.foodVariations![index].max} ${'options_from'.tr}'
+                                                  ' ${widget.item!.foodVariations![index].name} ${'variation'.tr}';
+                                              break;
+                                            }
+                                          }
+                                        }
+
+                                        if (Get.find<SplashController>()
+                                                .moduleList !=
+                                            null) {
+                                          for (ModuleModel module
+                                              in Get.find<SplashController>()
+                                                  .moduleList!) {
+                                            if (module.id ==
+                                                widget.item!.moduleId) {
+                                              Get.find<SplashController>()
+                                                  .setModule(module);
+                                              break;
+                                            }
+                                          }
+                                        }
+
+                                        if (invalid != null) {
+                                          showCustomSnackBar(invalid,
+                                              getXSnackBar: true);
+                                        } else {
+                                          if (variation != null) {
+                                            debugPrint(
+                                                'variation=======> ${variation!.toJson()}');
+                                          }
+                                          // ADD TO CART LOGIC (your existing code here is mostly fine)
+                                          CartModel cartModel = CartModel(
+                                              null,
+                                              price,
+                                              priceWithDiscountAndAddons,
+                                              // Ensure 'variation' is null or empty if no variations
+                                              (hasFoodVariations &&
+                                                      variation != null)
+                                                  ? [variation!]
+                                                  : [],
+                                              itemController.selectedVariations,
+                                              // This might need adjustment if no variations
+                                              (price! -
+                                                  PriceConverter
+                                                      .convertWithDiscount(
+                                                          price,
+                                                          discount,
+                                                          discountType)!),
+                                              itemController.quantity,
+                                              addOnIdList,
+                                              // Assuming addons are handled separately and this is fine
+                                              addOnsList,
+                                              // Assuming addons are handled separately and this is fine
+                                              widget.isCampaign,
+                                              stock,
+                                              widget.item,
+                                              widget.item?.quantityLimit);
+
+                                          List<OrderVariation>
+                                              variationsForCart = [];
+                                          if (hasFoodVariations) {
+                                            // Only get selected variations if they exist
+                                            variationsForCart =
+                                                _getSelectedVariations(
+                                              isFoodVariation:
+                                                  Get.find<SplashController>()
+                                                      .getModuleConfig(widget
+                                                          .item!.moduleType)
+                                                      .newVariation!,
+                                              foodVariations:
+                                                  widget.item!.foodVariations!,
+                                              // Safe due to hasFoodVariations
+                                              selectedVariations: itemController
+                                                  .selectedVariations,
+                                            );
+                                          }
+
+                                          List<int?> listOfAddOnId =
+                                              _getSelectedAddonIds(
+                                                  addOnIdList: addOnIdList);
+                                          List<int?> listOfAddOnQty =
+                                              _getSelectedAddonQtnList(
+                                                  addOnIdList: addOnIdList);
+
+                                          OnlineCart onlineCart = OnlineCart(
+                                            (widget.cart != null ||
+                                                    itemController.cartIndex !=
+                                                        -1)
+                                                ? widget.cart?.id ??
+                                                    cartController
+                                                        .cartList[itemController
+                                                            .cartIndex]
+                                                        .id
+                                                : null,
+                                            widget.isCampaign
+                                                ? null
+                                                : widget.item!.id,
+                                            widget.isCampaign
+                                                ? widget.item!.id
+                                                : null,
+                                            priceWithDiscountAndAddons
+                                                .toString(),
+                                            '',
+                                            // Ensure 'variation' for OnlineCart is null or empty if no variations
+                                            (hasFoodVariations &&
+                                                    variation != null)
+                                                ? [variation]
+                                                : null,
+                                            Get.find<SplashController>()
+                                                    .getModuleConfig(
+                                                        widget.item!.moduleType)
+                                                    .newVariation!
+                                                ? variationsForCart // Use the potentially empty list
+                                                : null,
+                                            null,
+                                            itemController.quantity,
+                                            listOfAddOnId,
+                                            addOnsList,
+                                            listOfAddOnQty,
+                                            'Item',
+                                          );
+
+                                          debugPrint(
+                                              'variationsForCart =======> ${variationsForCart}');
+
+                                          // --- Your existing campaign/non-campaign and cart update/add logic ---
+                                          // This part of your code seems generally fine and can remain as is.
+                                          // It correctly handles different scenarios based on widget.isCampaign
+                                          // and whether the item already exists in the cart.
+                                          if (widget.isCampaign) {
+                                            Get.toNamed(
+                                                RouteHelper.getCheckoutRoute(
+                                                    'campaign'),
+                                                arguments: CheckoutScreen(
+                                                    storeId: null,
+                                                    fromCart: false,
+                                                    cartList: [cartModel]));
+                                          } else {
+                                            if (Get.find<CartController>()
+                                                .existAnotherStoreItem(
+                                                    cartModel.item!.storeId,
+                                                    Get.find<SplashController>()
+                                                                .module !=
+                                                            null
+                                                        ? Get.find<
+                                                                SplashController>()
+                                                            .module!
+                                                            .id
+                                                        : Get.find<
+                                                                SplashController>()
+                                                            .cacheModule!
+                                                            .id)) {
+                                              Get.dialog(
+                                                  ConfirmationDialog(
+                                                    icon: Images.warning,
+                                                    title:
+                                                        'are_you_sure_to_reset'
+                                                            .tr,
+                                                    description: Get.find<
+                                                                SplashController>()
+                                                            .configModel!
+                                                            .moduleConfig!
+                                                            .module!
+                                                            .showRestaurantText!
+                                                        ? 'if_you_continue'.tr
+                                                        : 'if_you_continue_without_another_store'
+                                                            .tr,
+                                                    onYesPressed: () {
+                                                      Get.back();
+                                                      Get.find<CartController>()
+                                                          .clearCartOnline()
+                                                          .then(
+                                                              (success) async {
+                                                        if (success) {
+                                                          await Get.find<
+                                                                  CartController>()
+                                                              .addToCartOnline(
+                                                                  onlineCart);
+                                                          Get.back();
+                                                        }
+                                                      });
+                                                    },
+                                                  ),
+                                                  barrierDismissible: false);
+                                            } else {
+                                              debugPrint(
+                                                  'onlineCart: ======> ${onlineCart.toJson()}');
+                                              // 3. CRUCIAL CHANGE: Use 'await' here.
+                                              // The code will now PAUSE until the API call is complete.
+                                              if (widget.cart != null ||
+                                                  itemController.cartIndex !=
+                                                      -1) {
+                                                bool success =
+                                                    await cartController
+                                                        .updateCartOnline(
+                                                            onlineCart);
+                                                if (success) {
+                                                  Get.back();
+                                                }
+                                              } else {
+                                                bool success =
+                                                    await cartController
+                                                        .addToCartOnline(
+                                                            onlineCart);
+                                                if (success) {
+                                                  Get.back();
+                                                }
+                                              }
+                                              // if (widget.cart != null ||
+                                              //     itemController.cartIndex !=
+                                              //         -1) {
+                                              //   Get.find<CartController>()
+                                              //       .updateCartOnline(
+                                              //       onlineCart)
+                                              //       .then((success) {
+                                              //     if (success) {
+                                              //       Get.back();
+                                              //     }
+                                              //   });
+                                              // } else {
+                                              //   Get.find<CartController>()
+                                              //       .addToCartOnline(
+                                              //       onlineCart)
+                                              //       .then((success) {
+                                              //     if (success) {
+                                              //       Get.back();
+                                              //     }
+                                              //   });
+                                              // }
+                                            }
+                                          }
+                                          // --- End of existing cart logic ---
+                                        }
+                                      } else if (hasFoodVariations) {
+                                        // Only call _nextList if there ARE variations and it's not the last step
+                                        _nextList();
+                                      }
+                                    } else if (widget.storeStatus == -1) {
+                                      Get.back();
+                                      showCustomSnackBar(
+                                          "restaurant_is_currently_closed".tr);
+                                    } else {
+                                      Get.back();
+                                      showCustomSnackBar(
+                                          "restaurant_is_currently_closed".tr);
+                                    }
+                                  } catch (e) {
+                                    log("errorDuringInsideItemBottomSheet: $e");
+                                  } finally {
+                                    cartController.toggleCartAddLoading();
+                                  }
+                                },
+                          child: cartController.isCartAddLoading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Theme.of(context).cardColor,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                        (!hasFoodVariations ||
+                                                (hasFoodVariations &&
+                                                    _currentListIndex ==
+                                                        widget
+                                                                .item!
+                                                                .foodVariations!
+                                                                .length -
+                                                            1))
+                                            ? (Get.find<
+                                                            SplashController>() // Out of stock check for final step
+                                                        .configModel!
+                                                        .moduleConfig!
+                                                        .module!
+                                                        .stock! &&
+                                                    stock! <= 0)
+                                                ? 'out_of_stock'.tr
+                                                : widget.isCampaign
+                                                    ? 'order_now'.tr
+                                                    : (widget.cart != null ||
+                                                            itemController
+                                                                    .cartIndex !=
+                                                                -1)
+                                                        ? 'update_in_cart'.tr
+                                                        : 'add_to_cart'.tr
+                                            : 'next'.tr,
+                                        // Text for intermediate variation steps
+                                        // --- END: Modified Button Text Logic ---
+                                        style: const TextStyle(
+                                            fontSize: 16, color: Colors.white)),
+                                    const SizedBox(width: 8),
+                                    (Get.find<SplashController>() // Out of stock check for final step
+                                                .configModel!
+                                                .moduleConfig!
+                                                .module!
+                                                .stock! &&
+                                            stock! <= 0)
+                                        ? const Icon(
+                                            Icons.strikethrough_s_outlined,
+                                            size: 25,
+                                            color: Colors.white,
+                                          )
+                                        : const Icon(
+                                            Icons.turn_right_rounded,
+                                            size: 25,
+                                            color: Colors.white,
+                                          ),
+                                  ],
+                                ),
                         ),
                       );
                     })

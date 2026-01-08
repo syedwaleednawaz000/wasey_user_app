@@ -62,7 +62,6 @@ class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // The "Cancel" button
                     TextButton(
                       onPressed: () {
                         Get.back(); // Just closes the dialog
@@ -113,16 +112,6 @@ class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
           backButton: true,
           onBackPressed: handleBackNavigation,
         ),
-        // AppBar(
-        //   title: const Text('Complete Payment'),
-        //   leading: IconButton(
-        //     icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        //     onPressed: () {
-        //       // Optional: Show a confirmation dialog before canceling payment
-        //       Get.back();
-        //     },
-        //   ),
-        // ),
         body: Stack(
           children: [
             InAppWebView(

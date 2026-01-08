@@ -377,6 +377,7 @@ class CartItemWidget extends StatelessWidget {
                                   }
                                 },
                           isIncrement: false,
+                          fromCart: true,
                           showRemoveIcon: cart.quantity! == 1,
                         ),
                         Text(
@@ -401,6 +402,7 @@ class CartItemWidget extends StatelessWidget {
                                       cart.quantityLimit);
                                 },
                           isIncrement: true,
+                          fromCart: true,
                           color: cartController.isLoading
                               ? Theme.of(context).disabledColor
                               : null,
