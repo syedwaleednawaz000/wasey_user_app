@@ -405,11 +405,6 @@ class StoreController extends GetxController implements GetxService {
               .map((v) => Store.fromJson(v))
               .toList();
 
-          // Skip first 4 stores since we already have them from initial load
-          List<Store> newStores = allStoresFromApi.length > 4 
-              ? allStoresFromApi.sublist(4) 
-              : [];
-
           // Find and update the category
           int categoryIndex = _categoryWithStoreList?.indexWhere(
             (cat) => cat.cId == categoryId,
@@ -420,6 +415,17 @@ class StoreController extends GetxController implements GetxService {
             if (_categoryWithStoreList![categoryIndex].stores == null) {
               _categoryWithStoreList![categoryIndex].stores = [];
             }
+            
+            // Get current store IDs to avoid duplicates
+            Set<int> existingStoreIds = _categoryWithStoreList![categoryIndex].stores
+                ?.map((store) => store.id ?? 0)
+                .where((id) => id != 0)
+                .toSet() ?? {};
+            
+            // Filter out stores that already exist (by ID)
+            List<Store> newStores = allStoresFromApi
+                .where((store) => store.id != null && !existingStoreIds.contains(store.id))
+                .toList();
             
             if (newStores.isNotEmpty) {
               _categoryWithStoreList![categoryIndex].stores?.addAll(newStores);
@@ -436,7 +442,7 @@ class StoreController extends GetxController implements GetxService {
               update();
               return true;
             } else {
-              // If no new stores after skipping first 4, mark as no more stores
+              // If no new stores (all were duplicates), mark as no more stores
               _categoriesWithNoMoreStores.add(categoryId);
               update();
               return false; // No stores loaded
