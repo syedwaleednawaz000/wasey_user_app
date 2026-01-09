@@ -89,9 +89,33 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
   Future<StoreModel?> _getCategoryStoreList(String? categoryID, int offset, String type) async {
     StoreModel? categoryStore;
-    Response response = await apiClient.getData('${AppConstants.categoryStoreUri}$categoryID?limit=10&offset=$offset&type=$type');
+    String endpoint;
+    
+    if (offset > 1) {
+      // New endpoint for pagination - only limit and offset needed
+      endpoint = '/api/v1/categories/$categoryID/details-with-stores?limit=15&offset=$offset';
+    } else {
+      // Existing endpoint for initial load
+      endpoint = '${AppConstants.categoryStoreUri}$categoryID?limit=10&offset=$offset&type=$type';
+    }
+    
+    Response response = await apiClient.getData(endpoint);
     if (response.statusCode == 200) {
-      categoryStore = StoreModel.fromJson(response.body);
+      Map<String, dynamic> jsonData = response.body;
+      
+      // Handle new endpoint response structure
+      if (jsonData.containsKey('category')) {
+        // New endpoint: extract stores from root level
+        categoryStore = StoreModel(
+          totalSize: jsonData['total_size'],
+          limit: jsonData['limit']?.toString() ?? '15',
+          offset: jsonData['offset'],
+          stores: (jsonData['stores'] as List?)?.map((v) => Store.fromJson(v)).toList(),
+        );
+      } else {
+        // Old endpoint: use existing parsing
+        categoryStore = StoreModel.fromJson(jsonData);
+      }
     }
     return categoryStore;
   }

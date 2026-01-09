@@ -775,6 +775,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         stores:
                                                         categoryWithStore
                                                             .stores,
+                                                        categoryIdInt: categoryWithStore.cId,
                                                         // storeController
                                                         //     .storeModel?.stores,
                                                         padding: EdgeInsets

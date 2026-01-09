@@ -98,11 +98,18 @@ class CategoryItemScreenState extends State<CategoryItemScreen>
               storeScrollController.position.maxScrollExtent &&
           Get.find<CategoryController>().categoryStoreList != null &&
           !Get.find<CategoryController>().isLoading) {
-        int pageSize =
-            (Get.find<CategoryController>().restPageSize! / 10).ceil();
-        if (Get.find<CategoryController>().offset < pageSize) {
+        // Calculate page size: first page uses limit=10, pagination uses limit=15
+        int currentOffset = Get.find<CategoryController>().offset;
+        int totalSize = Get.find<CategoryController>().restPageSize!;
+        int currentListSize = Get.find<CategoryController>().categoryStoreList?.length ?? 0;
+        
+        // Check if there are more items to load
+        // First page loads 10, subsequent pages load 15
+        bool hasMoreItems = currentListSize < totalSize;
+        
+        if (hasMoreItems) {
           if (kDebugMode) {
-            print('end of the page');
+            print('end of the page - loading more stores');
           }
           Get.find<CategoryController>().showBottomLoader();
           Get.find<CategoryController>().getCategoryStoreList(

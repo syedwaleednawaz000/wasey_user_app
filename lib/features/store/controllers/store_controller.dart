@@ -204,6 +204,19 @@ class StoreController extends GetxController implements GetxService {
   /// Tracks the current page offset for fetching the next page.
   int _categoryOffset = 1;
   int get categoryOffset => _categoryOffset;
+  
+  // Track pagination state per category: Map<categoryId, Map{'offset': int, 'totalSize': int}>
+  Map<int, Map<String, int>> _categoryPaginationState = {};
+  
+  // Track loading state per category
+  Map<int, bool> _categoryLoadingState = {};
+  
+  // Track categories that returned 0 stores (no more stores available)
+  Set<int> _categoriesWithNoMoreStores = {};
+  
+  bool isCategoryLoading(int categoryId) => _categoryLoadingState[categoryId] ?? false;
+  
+  bool hasNoMoreStores(int categoryId) => _categoriesWithNoMoreStores.contains(categoryId);
 
   /// Total number of categories available on the server (from the API).
   int? _totalCategories;
@@ -276,6 +289,8 @@ class StoreController extends GetxController implements GetxService {
             _totalCategories = paginatedData.totalCategories;
             _categoryOffset = 2; // Set the next offset to 2
             log("CACHE: Background parsing complete. Updating UI instantly.");
+            
+            // No need to initialize pagination state - we always use offset=1
           } else {
             log("CACHE: Parsed cache, but the list is empty.");
           }
@@ -312,10 +327,14 @@ class StoreController extends GetxController implements GetxService {
           _categoryWithStoreList = paginatedData.categories;
           await sharedPreferences.setString(cacheId, response.bodyString!);
           log("NETWORK: Parsed first page. Cache updated.");
+          
+          // No need to initialize pagination state - we always use offset=1
         } else {
           // Subsequent pages: Append to the existing list.
           _categoryWithStoreList?.addAll(paginatedData.categories);
           log("NETWORK: Appended data for page with offset $offset.");
+          
+          // No need to initialize pagination state - we always use offset=1
         }
 
         _totalCategories = paginatedData.totalCategories;
@@ -335,6 +354,106 @@ class StoreController extends GetxController implements GetxService {
     }
 
     return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
+  }
+
+  /// Load more stores for a specific category using the new endpoint
+  /// Returns true if more stores were loaded, false otherwise
+  Future<bool> loadMoreStoresForCategory(int categoryId) async {
+    // Check if already loading
+    if (_categoryLoadingState[categoryId] == true) {
+      return false;
+    }
+
+    // Check if this category already returned 0 stores (no more stores available)
+    if (_categoriesWithNoMoreStores.contains(categoryId)) {
+      return false;
+    }
+
+    // Check if category exists
+    CategoryWithStores? category = _categoryWithStoreList?.firstWhereOrNull(
+      (cat) => cat.cId == categoryId,
+    );
+    if (category == null) {
+      return false;
+    }
+
+    int currentStoreCount = category.stores?.length ?? 0;
+    
+    // If category has less than 4 stores, don't call API
+    if (currentStoreCount < 4) {
+      return false;
+    }
+
+    // Always use offset=1 for pagination
+    const int offset = 1;
+    
+    // Set loading state
+    _categoryLoadingState[categoryId] = true;
+    update();
+
+    try {
+      final ApiClient apiClient = Get.find<ApiClient>();
+      final String uri = '/api/v1/categories/$categoryId/details-with-stores?limit=34&offset=$offset';
+      final Response response = await apiClient.getData(uri);
+
+      if (response.statusCode == 200 && response.body != null) {
+        Map<String, dynamic> jsonData = response.body;
+        
+        // Extract stores from response
+        if (jsonData.containsKey('stores') && jsonData['stores'] != null) {
+          List<Store> allStoresFromApi = (jsonData['stores'] as List)
+              .map((v) => Store.fromJson(v))
+              .toList();
+
+          // Skip first 4 stores since we already have them from initial load
+          List<Store> newStores = allStoresFromApi.length > 4 
+              ? allStoresFromApi.sublist(4) 
+              : [];
+
+          // Find and update the category
+          int categoryIndex = _categoryWithStoreList?.indexWhere(
+            (cat) => cat.cId == categoryId,
+          ) ?? -1;
+
+          if (categoryIndex >= 0 && _categoryWithStoreList != null) {
+            // Append new stores to existing list
+            if (_categoryWithStoreList![categoryIndex].stores == null) {
+              _categoryWithStoreList![categoryIndex].stores = [];
+            }
+            
+            if (newStores.isNotEmpty) {
+              _categoryWithStoreList![categoryIndex].stores?.addAll(newStores);
+              
+              // Create a new list reference to trigger GetBuilder update
+              _categoryWithStoreList = List<CategoryWithStores>.from(_categoryWithStoreList!);
+              
+              // If API returned less than 34 stores, mark as no more stores (but still add the stores we got)
+              if (allStoresFromApi.length < 34) {
+                _categoriesWithNoMoreStores.add(categoryId);
+              }
+              
+              // Update UI after adding stores
+              update();
+              return true;
+            } else {
+              // If no new stores after skipping first 4, mark as no more stores
+              _categoriesWithNoMoreStores.add(categoryId);
+              update();
+              return false; // No stores loaded
+            }
+          }
+        }
+      } else {
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      // Silent error handling
+    } finally {
+      _categoryLoadingState[categoryId] = false;
+      update();
+    }
+
+    return false;
   }
 
 
