@@ -27,6 +27,7 @@ class StoreCardWithDistance extends StatelessWidget {
   final bool fromAllStore;
   final bool? isNewStore;
   final bool? fromTopOffers;
+
   const StoreCardWithDistance(
       {super.key,
       required this.store,
@@ -48,8 +49,7 @@ class StoreCardWithDistance extends StatelessWidget {
     String currencySymbol =
         Get.find<SplashController>().configModel!.currencySymbol!;
 
-    return
-      Stack(
+    return Stack(
       children: [
         Container(
           width: fromAllStore ? double.infinity : 260,
@@ -104,10 +104,10 @@ class StoreCardWithDistance extends StatelessWidget {
                           : const SizedBox(),
                       Get.find<StoreController>().isOpenNow(store)
                           ? const SizedBox()
-    : NotAvailableWidget(
-        isStore: true,
-        store: store,
-      ),
+                          : NotAvailableWidget(
+                              isStore: true,
+                              store: store,
+                            ),
                       /* AddFavouriteView(
                           item: Item(id: store.id),
                         ),*/

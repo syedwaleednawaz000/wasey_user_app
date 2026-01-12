@@ -3,6 +3,7 @@ import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/cart_widget.dart';
+import 'package:sixam_mart/common/widgets/module_switcher_widget.dart';
 import 'package:sixam_mart/common/widgets/veg_filter_widget.dart';
 import 'package:sixam_mart/common/widgets/web_menu_bar.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool backButton;
   final Function? onBackPressed;
   final bool showCart;
+  final bool showModuleSwitcher;
   final Function(String value)? onVegFilterTap;
   final String? type;
   final String? leadingIcon;
@@ -23,6 +25,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.backButton = true,
       this.onBackPressed,
       this.showCart = false,
+      this.showModuleSwitcher = false,
       this.leadingIcon,
       this.onVegFilterTap,
       this.type,
@@ -55,8 +58,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             surfaceTintColor: Theme.of(context).cardColor,
             shadowColor: Theme.of(context).disabledColor.withAlpha((0.5 * 255).toInt()),
             elevation: 2,
-            actions: showCart || onVegFilterTap != null
+            actions: showCart || showModuleSwitcher || onVegFilterTap != null
                 ? [
+                    showModuleSwitcher
+                        ? const ModuleSwitcherWidget()
+                        : const SizedBox(),
                     showCart
                         ? IconButton(
                             onPressed: () =>

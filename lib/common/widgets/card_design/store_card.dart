@@ -23,9 +23,12 @@ import 'package:sixam_mart/common/widgets/new_tag.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
 
+import '../../../helper/store_schedule_checker.dart';
+
 class StoreCard extends StatelessWidget {
   final Store store;
   final bool? isTopOffers;
+
   const StoreCard({super.key, required this.store, this.isTopOffers = false});
 
   @override
@@ -43,7 +46,9 @@ class StoreCard extends StatelessWidget {
             'right';
     String currencySymbol =
         Get.find<SplashController>().configModel!.currencySymbol!;
-    bool isAvailable = store.open == 1 && store.active == 1;
+    bool isAvailable = ((isStoreOpen(store.schedules!)) &&
+        (store.active == 1) &&
+        (store.storeOpeningTime != "close"));
 
     return Stack(children: [
       Container(

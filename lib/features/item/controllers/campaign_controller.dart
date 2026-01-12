@@ -33,13 +33,23 @@ class CampaignController extends GetxController implements GetxService {
     _basicCampaignList = null;
   }
 
-  Future<void> getBasicCampaignList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
+  Future<void> getBasicCampaignList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool localOnly = false}) async {
     if(_basicCampaignList == null || reload || fromRecall) {
       List<BasicCampaignModel>? basicCampaignList;
       if(dataSource == DataSourceEnum.local) {
         basicCampaignList = await campaignServiceInterface.getBasicCampaignList(DataSourceEnum.local);
+        // If cache-only and there is no local cache, mark as "loaded but empty"
+        // so UI doesn't show endless shimmer.
+        if (basicCampaignList == null && localOnly) {
+          _basicCampaignList = <BasicCampaignModel>[];
+          update();
+          return;
+        }
         _prepareBasicCampaign(basicCampaignList);
-        getBasicCampaignList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getBasicCampaignList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         basicCampaignList = await campaignServiceInterface.getBasicCampaignList(DataSourceEnum.client);
         _prepareBasicCampaign(basicCampaignList);
@@ -65,13 +75,25 @@ class CampaignController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getItemCampaignList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
+  /// Get item campaign list
+  /// [localOnly] - If true, only loads from local cache without making API call
+  Future<void> getItemCampaignList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool localOnly = false}) async {
     if(_itemCampaignList == null || reload || fromRecall) {
       List<Item>? itemCampaignList;
       if(dataSource == DataSourceEnum.local) {
         itemCampaignList = await campaignServiceInterface.getItemCampaignList(DataSourceEnum.local);
+        // If cache-only and there is no local cache, mark as "loaded but empty"
+        // so UI doesn't show endless shimmer.
+        if (itemCampaignList == null && localOnly) {
+          _itemCampaignList = <Item>[];
+          update();
+          return;
+        }
         _prepareItemCampaign(itemCampaignList);
-        getItemCampaignList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getItemCampaignList(false, dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         itemCampaignList = await campaignServiceInterface.getItemCampaignList(DataSourceEnum.client);
         _prepareItemCampaign(itemCampaignList);

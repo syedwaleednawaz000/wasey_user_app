@@ -14,42 +14,42 @@ class PopularStoreView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
-      child: GetBuilder<StoreController>(builder: (storeController) {
-        List<Store>? storeList = storeController.popularStoreList;
+    return GetBuilder<StoreController>(builder: (storeController) {
+      List<Store>? storeList = storeController.popularStoreList;
 
-          return Column(children: [
-            Padding(
-              padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeDefault),
-              child: TitleWidget(
-                title: 'popular_stores'.tr,
-                onTap: () => Get.toNamed(RouteHelper.getAllStoreRoute('popular')),
-              ),
+      // Return empty widget if data is empty
+      return storeList != null ? storeList.isNotEmpty ? Padding(
+        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeDefault),
+            child: TitleWidget(
+              title: 'popular_stores'.tr,
+              onTap: () => Get.toNamed(RouteHelper.getAllStoreRoute('popular')),
             ),
+          ),
 
-            SizedBox(
-              height: 170,
-              child: storeList != null ? ListView.builder(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                itemCount: storeList.length,
-                padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeExtraSmall),
-                    child: PopularStoreCard(
-                      store: storeList[index],
-                    ),
-                  );
-                },
-              ) : const PopularStoreShimmer(),
+          SizedBox(
+            height: 170,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: storeList.length,
+              padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeExtraSmall),
+                  child: PopularStoreCard(
+                    store: storeList[index],
+                  ),
+                );
+              },
             ),
+          ),
 
-          ]);
-        }
-      ),
-    );
+        ]),
+      ) : const SizedBox() : const PopularStoreShimmer();
+    });
   }
 }
 

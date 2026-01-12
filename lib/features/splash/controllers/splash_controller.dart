@@ -30,6 +30,7 @@ import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/helper/splash_route_helper.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sixam_mart/features/market/controllers/market_controller.dart';
 
 class SplashController extends GetxController implements GetxService {
   final SplashServiceInterface splashServiceInterface;
@@ -94,8 +95,26 @@ class SplashController extends GetxController implements GetxService {
   }
 
   void loadData() async {
-    await getModules();
+    await ensureModulesLoaded();
     await getStoredModule();
+  }
+
+  /// Ensures module list is available.
+  /// Important: `getModules()` in local mode triggers remote fetch without awaiting it,
+  /// which can leave `_moduleList` null on first launch. This method awaits remote
+  /// only when local is empty.
+  Future<void> ensureModulesLoaded({Map<String, String>? headers}) async {
+    if (_moduleList != null && _moduleList!.isNotEmpty) {
+      return;
+    }
+
+    // Try local only first
+    await getModules(headers: headers, dataSource: DataSourceEnum.local, alsoFetchRemote: false);
+
+    // If local is empty, fetch remote and await
+    if (_moduleList == null || _moduleList!.isEmpty) {
+      await getModules(headers: headers, dataSource: DataSourceEnum.client, alsoFetchRemote: false);
+    }
   }
 
   Future<void> getConfigData(
@@ -129,18 +148,31 @@ class SplashController extends GetxController implements GetxService {
     SplashController splashController = Get.find();
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String? _storedModuleId =
-        sharedPreferences.getString("moduleId") ?? '2';
-
-    // If we have a stored module ID, automatically switch to that module
-    if (_storedModuleId != null) {
-      if (_storedModuleId == '1') {
-        splashController.switchModule(0, true);
-      } else {
-        splashController.switchModule(1, true);
-      }
+    String? _storedModuleId = sharedPreferences.getString("moduleId");
+    
+    // If no module is stored, set default to 2 (restaurant - first tab)
+    if (_storedModuleId == null || _storedModuleId.isEmpty) {
+      _storedModuleId = '2';
+      await sharedPreferences.setString("moduleId", "2");
+      debugPrint('getStoredModule: No module stored, setting default to 2 (restaurant)');
     }
-    debugPrint('getStoredModule:  _storedModuleId: $_storedModuleId');
+
+    // Ensure modules are loaded before switching
+    await ensureModulesLoaded();
+
+    final int desiredId = int.tryParse(_storedModuleId) ?? 2;
+    final int idx = _moduleList?.indexWhere((m) => m.id == desiredId) ?? -1;
+
+    if (idx >= 0) {
+      splashController.switchModule(idx, true);
+      debugPrint('getStoredModule: Switched to moduleId=$desiredId (index=$idx)');
+    } else if (_moduleList != null && _moduleList!.isNotEmpty) {
+      // Fallback: if desired module not found, use first available module
+      splashController.switchModule(0, true);
+      debugPrint('getStoredModule: Desired moduleId=$desiredId not found, switched to index=0');
+    } else {
+      debugPrint('getStoredModule: Module list is still empty; cannot switch module yet');
+    }
   }
 
   Future<void> _handleConfigResponse(
@@ -256,7 +288,10 @@ class SplashController extends GetxController implements GetxService {
     _firstTimeConnectionCheck = isChecked;
   }
 
-  Future<void> setModule(ModuleModel? module, {bool notify = true}) async {
+  /// Sets the current module.
+  /// [skipDataFetch] - If true, skips fetching cart, wishlist, and cashback data.
+  /// Use skipDataFetch=true when loading from cache to avoid unnecessary API calls.
+  Future<void> setModule(ModuleModel? module, {bool notify = true, bool skipDataFetch = false}) async {
     _module = module;
     splashServiceInterface.setModule(module);
     if (module != null) {
@@ -269,12 +304,16 @@ class SplashController extends GetxController implements GetxService {
             Module.fromJson(_data!['module_config'][module.moduleType]);
       }
       await splashServiceInterface.setCacheModule(module);
-      if ((AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) &&
+      
+      // Only fetch cart data if not skipping data fetch
+      if (!skipDataFetch && (AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) &&
           Get.find<SplashController>().cacheModule != null) {
         Get.find<CartController>().getCartDataOnline();
       }
     }
-    if (AuthHelper.isLoggedIn()) {
+    
+    // Only fetch user-specific data if not skipping data fetch
+    if (!skipDataFetch && AuthHelper.isLoggedIn()) {
       if (Get.find<SplashController>().module != null) {
         Get.find<HomeController>().getCashBackOfferList();
         Get.find<FavouriteController>().getFavouriteList();
@@ -302,14 +341,17 @@ class SplashController extends GetxController implements GetxService {
 
   Future<void> getModules(
       {Map<String, String>? headers,
-      DataSourceEnum dataSource = DataSourceEnum.local}) async {
+      DataSourceEnum dataSource = DataSourceEnum.local,
+      bool alsoFetchRemote = true}) async {
     _moduleIndex = 0;
     List<ModuleModel>? moduleList;
     if (dataSource == DataSourceEnum.local) {
       moduleList = await splashServiceInterface.getModules(
           headers: headers, source: DataSourceEnum.local);
       _prepareModuleList(moduleList);
-      getModules(headers: headers, dataSource: DataSourceEnum.client);
+      if (alsoFetchRemote) {
+        getModules(headers: headers, dataSource: DataSourceEnum.client, alsoFetchRemote: alsoFetchRemote);
+      }
     } else {
       moduleList = await splashServiceInterface.getModules(
           headers: headers, source: DataSourceEnum.client);
@@ -342,7 +384,7 @@ class SplashController extends GetxController implements GetxService {
     }
   }
 
-  void switchModule(int index, bool fromPhone) async {
+  void switchModule(int index, bool fromPhone, {bool forceReload = false}) async {
     log("inside SplashController switchModule method");
     
     if (_moduleList == null || index < 0 || index >= _moduleList!.length) {
@@ -350,23 +392,51 @@ class SplashController extends GetxController implements GetxService {
       return;
     }
     
-    log("Modules list is here: ${_moduleList![index].id}");
+    final targetModuleId = _moduleList![index].id;
+    log("Switching to module: $targetModuleId (index: $index)");
 
-    if (_module == null || _module!.id != _moduleList![index].id) {
-      log("Modules list is here: ${_moduleList![index].id}");
-      await Get.find<SplashController>().setModule(_moduleList![index]);
-      Get.find<CartController>().getCartDataOnline();
-      Get.find<ItemController>().clearItemLists();
-      Get.find<BannerController>().clearBanner();
-      Get.find<CategoryController>().clearCategoryList();
-      Get.find<CampaignController>().itemAndBasicCampaignNull();
+    // Check if we're actually switching to a different module
+    final bool isSameModule = _module != null && _module!.id == targetModuleId;
+    
+    if (!isSameModule || forceReload) {
+      log("Module switch required: current=${_module?.id}, target=$targetModuleId");
+      
+      // Save the target module ID to SharedPreferences FIRST
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      await sharedPreferences.setString("moduleId", targetModuleId.toString());
+      log("SplashController: Saved moduleId=$targetModuleId to SharedPreferences");
+      
+      // Set module with skipDataFetch=true because controllers will handle data loading with cache
+      await Get.find<SplashController>().setModule(_moduleList![index], skipDataFetch: true);
+      
+      // NOTE: Don't clear controller data here - it allows cache to work properly
+      // The controller data persists in memory and will be used when cache is valid
+      // Data will be refreshed when user pulls to refresh or cache expires
       Get.find<FlashSaleController>().setEmptyFlashSale(fromModule: true);
-
+      
+      // Use cache-aware loading based on target module
+      // Module ID 1 = Market/Supermarket, Module ID 2 = Restaurant
+      // The controllers will handle all API calls including user-specific data with cache support
+      if (targetModuleId == 1) {
+        // Load Market data with cache support
+        log("SplashController: Loading Market module data (cache-aware, forceReload=$forceReload)");
+        await Get.find<MarketController>().loadMarketData(forceReload);
+      } else if (targetModuleId == 2) {
+        // Load Restaurant data with cache support
+        log("SplashController: Loading Restaurant module data (cache-aware, forceReload=$forceReload)");
+        await Get.find<HomeController>().loadHomeData(forceReload, fromModule: true);
+      } else {
+        // For other modules, use the old approach (no cache support yet)
+        log("SplashController: Loading other module data (ID: $targetModuleId)");
+        HomeScreen.loadData(forceReload, fromModule: true);
+      }
+      
+      // Show interest page after data is loaded (if applicable)
       if (AuthHelper.isLoggedIn()) {
-        Get.find<HomeController>().getCashBackOfferList();
         await _showInterestPage();
       }
-      HomeScreen.loadData(true, fromModule: true);
+    } else {
+      log("Already on the same module ($targetModuleId), skipping switch");
     }
   }
 

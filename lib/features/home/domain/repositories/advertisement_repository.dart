@@ -16,7 +16,8 @@ class AdvertisementRepository implements AdvertisementRepositoryInterface {
   @override
   Future<List<AdvertisementModel>?> getList({int? offset, DataSourceEnum source = DataSourceEnum.client}) async {
     List<AdvertisementModel>? advertisementList;
-    String cacheId = '${AppConstants.advertisementListUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = '${AppConstants.advertisementListUri}-$moduleId';
 
     switch(source) {
       case DataSourceEnum.client:
@@ -37,13 +38,6 @@ class AdvertisementRepository implements AdvertisementRepositoryInterface {
             advertisementList?.add(AdvertisementModel.fromJson(data));
           });
         }
-    }
-    Response response = await apiClient.getData(AppConstants.advertisementListUri);
-    if(response.statusCode == 200) {
-      advertisementList = [];
-      response.body.forEach((data) {
-        advertisementList?.add(AdvertisementModel.fromJson(data));
-      });
     }
     return advertisementList;
   }

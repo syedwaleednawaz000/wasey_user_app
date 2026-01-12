@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/location/screens/pick_map_screen.dart';
 import 'package:sixam_mart/features/location/screens/web_landing_page.dart';
+import 'package:universal_html/js.dart';
 
 class AccessLocationScreen extends StatefulWidget {
   final bool fromSignUp;
@@ -251,11 +252,32 @@ class BottomButton extends StatelessWidget {
       middleText: "location_permission_message".tr,
       textConfirm: "location_permission_allow".tr,
       textCancel: "location_permission_cancel".tr,
-      onConfirm: () {
-        Get.back();
-        onContinue();
-      },
-      onCancel: () {},
+      // onConfirm: () {
+      //   Get.back();
+      //   onContinue();
+      // },
+      // onCancel: () {},
+      confirm: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+        onPressed: () {
+          Get.back();
+          onContinue();
+        },
+        child: Text("allow".tr),
+      ),
+      cancel: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.red,
+          side: const BorderSide(
+            color: Colors.red,
+          )
+        ),
+        onPressed: () => Get.back(),
+        child: Text("cancel".tr),
+      ),
     );
   }
 

@@ -10,6 +10,11 @@
 -keep class com.google.android.gms.location.** { *; }
 -keep class com.google.android.gms.tasks.** { *; }
 
+# Google Play Core (for Flutter deferred components)
+-keep class com.google.android.play.core.** { *; }
+-dontwarn com.google.android.play.core.**
+-keep interface com.google.android.play.core.** { *; }
+
 # Keep all native methods
 -keepclasseswithmembernames class * {
     native <methods>;

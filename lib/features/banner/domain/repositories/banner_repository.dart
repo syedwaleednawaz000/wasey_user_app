@@ -28,13 +28,14 @@ class BannerRepository implements BannerRepositoryInterface {
     } else if (isParcelOtherBanner) {
       return await _getParcelOtherBannerList();
     } else if (isPromotionalBanner) {
-      return await _getPromotionalBannerList();
+      return await _getPromotionalBannerList(source: source ?? DataSourceEnum.client);
     }
   }
 
   Future<BannerModel?> _getBannerList({required DataSourceEnum source}) async {
     BannerModel? bannerModel;
-    String cacheId = '${AppConstants.bannerUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString();
+    String cacheId = LocalClient.generateModuleCacheKey(AppConstants.bannerUri, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:
@@ -120,11 +121,24 @@ class BannerRepository implements BannerRepositoryInterface {
     return parcelOtherBannerModel;
   }
 
-  Future<PromotionalBanner?> _getPromotionalBannerList() async {
+  Future<PromotionalBanner?> _getPromotionalBannerList({required DataSourceEnum source}) async {
     PromotionalBanner? promotionalBanner;
-    Response response = await apiClient.getData(AppConstants.promotionalBannerUri);
-    if (response.statusCode == 200 && response.body is Map) {
-      promotionalBanner = PromotionalBanner.fromJson(response.body);
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = LocalClient.generateModuleCacheKey(AppConstants.promotionalBannerUri, moduleId);
+
+    switch(source) {
+      case DataSourceEnum.client:
+        Response response = await apiClient.getData(AppConstants.promotionalBannerUri);
+        if (response.statusCode == 200 && response.body is Map) {
+          promotionalBanner = PromotionalBanner.fromJson(response.body);
+          LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), apiClient.getHeader());
+        }
+
+      case DataSourceEnum.local:
+        String? cacheResponseData = await LocalClient.organize(DataSourceEnum.local, cacheId, null, null);
+        if(cacheResponseData != null) {
+          promotionalBanner = PromotionalBanner.fromJson(jsonDecode(cacheResponseData));
+        }
     }
     return promotionalBanner;
   }

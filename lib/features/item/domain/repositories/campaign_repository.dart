@@ -25,7 +25,8 @@ class CampaignRepository implements CampaignRepositoryInterface {
 
   Future<List<BasicCampaignModel>?> _getBasicCampaignList(DataSourceEnum source) async {
     List<BasicCampaignModel>? basicCampaignList;
-    String cacheId = '${AppConstants.basicCampaignUri}-banner-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = '${AppConstants.basicCampaignUri}-banner-$moduleId';
 
     switch(source) {
       case DataSourceEnum.client:
@@ -49,7 +50,8 @@ class CampaignRepository implements CampaignRepositoryInterface {
 
   Future<List<Item>?> _getItemCampaignList(DataSourceEnum source) async {
     List<Item>? itemCampaignList;
-    String cacheId = '${AppConstants.basicCampaignUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = '${AppConstants.basicCampaignUri}-$moduleId';
 
     switch(source) {
       case DataSourceEnum.client:

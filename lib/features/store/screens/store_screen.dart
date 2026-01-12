@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/rendering.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
@@ -40,6 +42,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/store/widgets/store_details_screen_shimmer_widget.dart';
 
+import '../../../helper/store_schedule_checker.dart';
 import '../widgets/bottom_cart_widget.dart';
 
 class StoreScreen extends StatefulWidget {
@@ -395,25 +398,32 @@ class _StoreScreenState extends State<StoreScreen> {
                                           ),
                                         ),
                                         const SizedBox(height: 3),
-                                        Align(
-                                          alignment: ltr
-                                              ? Alignment.topLeft
-                                              : Alignment.topRight,
-                                          child: Text(
-                                            ((store.open == 1) &&
-                                                    (store.active == 1))
-                                                ? 'status_open'.tr
-                                                : store.active == -1
-                                                    ? "temporarily_closed_label".tr
-                                                    : "closed_now".tr,
-                                            style: TextStyle(
-                                              color: ((store.open == 1) &&
-                                                      (store.active == 1))
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                              fontSize: 11,
+                                        Row(
+                                          children: [
+                                            Align(
+                                              alignment: ltr
+                                                  ? Alignment.topLeft
+                                                  : Alignment.topRight,
+                                              child: Text(
+                                                ((isStoreOpen(store
+                                                            .schedules!)) &&
+                                                        (store.active == 1))
+                                                    ? 'status_open'.tr
+                                                    : store.active == -1
+                                                        ? "temporarily_closed_label"
+                                                            .tr
+                                                        : "closed_now".tr,
+                                                style: TextStyle(
+                                                  color: ((isStoreOpen(store
+                                                              .schedules!)) &&
+                                                          (store.active == 1))
+                                                      ? Colors.green
+                                                      : Colors.red,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                         Divider(
                                           color: Theme.of(context).dividerColor,
@@ -2050,6 +2060,16 @@ class _StoreScreenState extends State<StoreScreen> {
                                                           const SizedBox(
                                                               height: 5),
                                                           StoreItemView(
+                                                            storeStatus: ((isStoreOpen(
+                                                                        store!
+                                                                            .schedules!)) &&
+                                                                    (store.active ==
+                                                                        1))
+                                                                ? 1
+                                                                : store.active ==
+                                                                        -1
+                                                                    ? -1
+                                                                    : 0,
                                                             categoryId: '0',
                                                             isStore: false,
                                                             stores: null,
@@ -2245,13 +2265,12 @@ class StoreCategoriesGrid extends StatelessWidget {
           } else {
             // This case is theoretically covered by the check before GridView.builder
             errorMessage = "error_loading_category_details".tr;
-            print(
-                "CategoryController's categoryList became null during build (should not happen).");
+            log("CategoryController's categoryList became null during build (should not happen).");
           }
         } else {
           errorMessage = "error_loading_category_details"
               .tr; // Or some index out of bounds error
-          print("Index out of bounds for store.categoryIds.");
+          log("Index out of bounds for store.categoryIds.");
         }
 
         if (category != null) {

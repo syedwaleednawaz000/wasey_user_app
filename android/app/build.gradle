@@ -36,8 +36,8 @@ if (keystorePropertiesFile.exists()) {
 
 
 android {
-    namespace "com.waseyuser.app"
-    compileSdk 35
+    namespace "com.waseyapp.user"
+    compileSdk 36
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -53,14 +53,15 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.waseyuser.app"
-        minSdkVersion 23 //flutter.minSdkVersion
+        applicationId "com.waseyapp.user"
+        minSdkVersion flutter.minSdkVersion //flutter.minSdkVersion
+//        minSdkVersion flutter.minSdkVersion //flutter.minSdkVersion
         targetSdkVersion 35
         versionCode 4
-        versionName "1.0.2"
+        versionName "1.0.4"
         multiDexEnabled true
     }
-    
+
 
 //    signingConfigs {
 //        release {
@@ -107,6 +108,10 @@ flutter {
     source '../..'
 }
 
+configurations.all {
+    exclude group: 'com.google.android.play', module: 'core-common'
+}
+
 dependencies {
     // Google Maps SDK for Android
     implementation 'com.google.android.gms:play-services-maps:17.0.0' // Ensure it's the correct version
@@ -114,6 +119,7 @@ dependencies {
 
     // Firebase Messaging SDK (ensure correct version)
     implementation 'com.google.firebase:firebase-messaging:23.4.1'
+
 
     // Facebook SDK (latest stable version)
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'

@@ -179,9 +179,12 @@ class ItemController extends GetxController implements GetxService {
     _recommendedItemList = null;
   }
 
+  /// Get popular item list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getPopularItemList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     _popularType = type;
     if (reload) {
       _popularItemList = null;
@@ -194,8 +197,11 @@ class ItemController extends GetxController implements GetxService {
       if (dataSource == DataSourceEnum.local) {
         items = await itemServiceInterface.getPopularItemList(type, dataSource);
         _preparePopularItems(items);
-        getPopularItemList(false, type, notify,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getPopularItemList(false, type, notify,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         items = await itemServiceInterface.getPopularItemList(type, dataSource);
         _preparePopularItems(items);
@@ -251,7 +257,8 @@ class ItemController extends GetxController implements GetxService {
 
   Future<void> getDiscountedItemList(bool reload, bool notify, String type,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+      bool fromRecall = false,
+      bool localOnly = false}) async {
     _discountedType = type;
     if (reload) {
       _discountedItemList = null;
@@ -270,8 +277,11 @@ class ItemController extends GetxController implements GetxService {
           _isLoading = false;
         }
         update();
-        getDiscountedItemList(false, notify, type,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getDiscountedItemList(false, notify, type,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         items =
             await itemServiceInterface.getDiscountedItemList(type, dataSource);
@@ -593,7 +603,9 @@ class ItemController extends GetxController implements GetxService {
 
   bool isAvailable(Item item) {
     return DateConverter.isAvailable(
-        item.availableTimeStarts, item.availableTimeEnds);
+      item.availableTimeStarts ?? "",
+      item.availableTimeEnds ?? "",
+    );
   }
 
   double? getDiscount(Item item) =>
@@ -602,8 +614,13 @@ class ItemController extends GetxController implements GetxService {
   String? getDiscountType(Item item) =>
       item.storeDiscount == 0 ? item.discountType : 'percent';
 
-  void navigateToItemPage(Item? item, BuildContext context,
-      {bool inStore = false, bool isCampaign = false}) {
+  void navigateToItemPage(
+    Item? item,
+    BuildContext context, {
+    bool inStore = false,
+    bool isCampaign = false,
+    int storeStatus = 1,
+  }) {
     if (Get.find<SplashController>()
             .configModel!
             .moduleConfig!
@@ -612,26 +629,42 @@ class ItemController extends GetxController implements GetxService {
         item!.moduleType == 'food') {
       log("I am in if...");
 
+      log("storeStatus: $storeStatus");
+
       ResponsiveHelper.isMobile(context)
           ? Get.bottomSheet(
               ItemBottomSheet(
-                  item: item, inStorePage: inStore, isCampaign: isCampaign),
+                item: item,
+                inStorePage: inStore,
+                isCampaign: isCampaign,
+                storeStatus: storeStatus,
+              ),
               backgroundColor: Colors.transparent,
               isScrollControlled: true,
             )
           : Get.dialog(
               Dialog(
-                  child: ItemBottomSheet(
-                      item: item,
-                      inStorePage: inStore,
-                      isCampaign: isCampaign)),
+                child: ItemBottomSheet(
+                  item: item,
+                  inStorePage: inStore,
+                  isCampaign: isCampaign,
+                  storeStatus: storeStatus,
+                ),
+              ),
             );
     } else {
       log("I am in else...");
-
-      Get.toNamed(RouteHelper.getItemDetailsRoute(item.id, inStore),
-          arguments: ItemDetailsScreen(
-              item: item, inStorePage: inStore, isCampaign: isCampaign));
+      log("I am in else...");
+      log(storeStatus.toString());
+      Get.toNamed(
+        RouteHelper.getItemDetailsRoute(item.id, inStore),
+        arguments: ItemDetailsScreen(
+          storeStatus: storeStatus,
+          item: item,
+          inStorePage: inStore,
+          isCampaign: isCampaign,
+        ),
+      );
     }
   }
 

@@ -163,13 +163,9 @@ class _MarketScreenState extends State<MarketScreen> {
     //   }
     // });
 
-    if (!ResponsiveHelper.isWeb()) {
-      Get.find<LocationController>().getZone(
-          AddressHelper.getUserAddressFromSharedPref()!.latitude,
-          AddressHelper.getUserAddressFromSharedPref()!.longitude,
-          false,
-          updateInAddress: true);
-    }
+    // Note: Zone data sync is handled by the controller and doesn't need to be called
+    // on every screen view. This prevents unnecessary API calls on module switch.
+    // Zone data is synced: on app start, on address change, and on force refresh.
 
     // _scrollController.addListener(() {
     //   if (_scrollController.position.userScrollDirection ==
@@ -246,10 +242,8 @@ class _MarketScreenState extends State<MarketScreen> {
   Widget build(BuildContext context) {
     return GetBuilder<MarketController>(builder: (marketController) {
       return GetBuilder<SplashController>(builder: (splashController) {
-        if (splashController.moduleList != null &&
-            splashController.moduleList!.length == 1) {
-          splashController.switchModule(0, true);
-        }
+        // Note: Removed automatic switchModule call here as it was causing unnecessary API calls
+        // on every rebuild. Module switching is handled by the controllers.
         bool showMobileModule = !ResponsiveHelper.isDesktop(context) &&
             splashController.module == null &&
             splashController.configModel!.module == null;
@@ -563,35 +557,31 @@ class _MarketScreenState extends State<MarketScreen> {
                     child: Center(
                         child: SizedBox(
                             width: Dimensions.webMaxWidth,
-                            child:
-                            // !showMobileModule ?
-                            Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  // Container(
-                                  //     height: 200,
-                                  //     width: double.infinity,
-                                  //     color: Colors.green,
-                                  //     child: ModuleWidget()),
-                                  isGrocery
-                                      ? const GroceryHomeScreen()
-                                      // ? const SizedBox()
-                                      : isPharmacy
-                                      ? const PharmacyHomeScreen()
-                                      : isFood
-                                      ? const FoodHomeScreen()
-                                      : isShop
-                                      ? const ShopHomeScreen()
-                                      : const SizedBox(),
-                                ])
-                          // : ModuleView(
-                          //     splashController: splashController,
-                          //   ),
+                            child: splashController.module != null
+                                ? Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      isGrocery
+                                          ? const GroceryHomeScreen()
+                                          : isPharmacy
+                                          ? const PharmacyHomeScreen()
+                                          : isFood
+                                          ? const FoodHomeScreen()
+                                          : isShop
+                                          ? const ShopHomeScreen()
+                                          : const SizedBox(),
+                                    ])
+                                : const Padding(
+                                    padding: EdgeInsets.all(100.0),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
                         )),
                   ),
 
-                  !showMobileModule
+                  splashController.module != null
                       ? SliverPersistentHeader(
                     key: _headerKey,
                     pinned: true,
@@ -606,7 +596,7 @@ class _MarketScreenState extends State<MarketScreen> {
                       : const SliverToBoxAdapter(),
 
                   SliverToBoxAdapter(
-                      child: !showMobileModule
+                      child: splashController.module != null
                           ? Center(
                         child: GetBuilder<StoreController>(
                           builder: (storeController) {

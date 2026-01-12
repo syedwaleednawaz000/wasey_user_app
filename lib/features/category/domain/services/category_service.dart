@@ -11,8 +11,8 @@ class CategoryService implements CategoryServiceInterface {
   CategoryService({required this.categoryRepositoryInterface});
 
   @override
-  Future<List<CategoryModel>?> getCategoryList(bool allCategory, {DataSourceEnum? source}) async {
-    return await categoryRepositoryInterface.getList(allCategory: allCategory, categoryList: true, source: source);
+  Future<List<CategoryModel>?> getCategoryList(bool allCategory, {DataSourceEnum? source, String? moduleId}) async {
+    return await categoryRepositoryInterface.getList(allCategory: allCategory, categoryList: true, source: source, moduleId: moduleId);
   }
 
   @override

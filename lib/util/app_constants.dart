@@ -17,11 +17,14 @@ class AppConstants {
   static const String fontFamilyIBMPlexSansArabic = 'IBMPlexSansArabic';
   static const String fontFamilyAlmarai = 'Almarai';
   static const String directPaymentSavedCards = 'saved_cards';
+  static const String categoriesWithStores = 'categories_with_stores';
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
+  // static const String webHostedUrl = 'http://192.168.1.17:8000';
   static const String webHostedUrl = 'https://waseyapp.com';
   // static const String webHostedUrl = 'https://latest.waseyapp.com';
   // static const String webHostedUrl = 'https://panel.jouanapp.com';
+  // static const String baseUrl = 'http://192.168.1.17:8000';
   static const String baseUrl = 'https://waseyapp.com';
   // static const String baseUrl = 'https://latest.waseyapp.com';
   // static const String baseUrl = 'https://panel.jouanapp.com';
@@ -241,6 +244,7 @@ class AppConstants {
   static const String zoneId = 'zoneId';
   static const String operationAreaId = 'operationAreaId';
   static const String moduleId = 'moduleId';
+  static const String cartModuleId = 'cart_module_Id';
   static const String superMarketModuleId = '1';
   static const String restaurantModuleId = '2';
   static const String cacheModuleId = 'cacheModuleId';

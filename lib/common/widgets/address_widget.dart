@@ -16,6 +16,7 @@ class AddressWidget extends StatelessWidget {
   final Function? onTap;
   final bool isSelected;
   final bool fromDashBoard;
+
   const AddressWidget(
       {super.key,
       required this.address,
@@ -70,9 +71,11 @@ class AddressWidget extends StatelessWidget {
                   ? 0
                   : Dimensions.radiusSmall,
           child: Padding(
-            padding: EdgeInsets.all(ResponsiveHelper.isDesktop(context)
-                ? Dimensions.paddingSizeDefault
-                : Dimensions.paddingSizeSmall),
+            padding: EdgeInsets.all(
+              ResponsiveHelper.isDesktop(context)
+                  ? Dimensions.paddingSizeDefault
+                  : Dimensions.paddingSizeExtraSmall,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [

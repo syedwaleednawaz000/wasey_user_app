@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:244302597623:android:b0e9e0a8e49beb76a432f2",
+        "mobilesdk_app_id": "1:244302597623:android:3288879e88ee13cba432f2",
         "android_client_info": {
-          "package_name": "com.waseyuser.app"
+          "package_name": "com.waseyapp.user"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB1MYFwj3Mbd8bqAMXxcOWSbUy6e6Rt9fM"
@@ -20,7 +25,127 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "244302597623-5j2p7p02nlanb3em5ea9laa6n1jbbsrl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.waseydelivery.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244302597623:android:0734d1498020d693a432f2",
+        "android_client_info": {
+          "package_name": "com.waseydelivery.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1MYFwj3Mbd8bqAMXxcOWSbUy6e6Rt9fM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "244302597623-5j2p7p02nlanb3em5ea9laa6n1jbbsrl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.waseydelivery.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244302597623:android:b0e9e0a8e49beb76a432f2",
+        "android_client_info": {
+          "package_name": "com.waseyuser.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1MYFwj3Mbd8bqAMXxcOWSbUy6e6Rt9fM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "244302597623-5j2p7p02nlanb3em5ea9laa6n1jbbsrl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.waseydelivery.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244302597623:android:b06e257036430bfda432f2",
+        "android_client_info": {
+          "package_name": "com.waseyvender.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1MYFwj3Mbd8bqAMXxcOWSbUy6e6Rt9fM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "244302597623-19pi6cljgmbig19rrcee0trbgniqj59o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "244302597623-5j2p7p02nlanb3em5ea9laa6n1jbbsrl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.waseydelivery.app"
+              }
+            }
+          ]
         }
       }
     }

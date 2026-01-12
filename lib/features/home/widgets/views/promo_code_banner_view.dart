@@ -26,8 +26,14 @@ class _PromoCodeBannerViewState extends State<PromoCodeBannerView> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<CouponController>(builder: (couponController) {
-      return couponController.couponList != null
-          ? couponController.couponList!.isNotEmpty
+      // Only show shimmer while coupon list is actively loading.
+      // If coupons are not fetched (e.g. cache-only flow) or empty, hide this section.
+      if (couponController.isCouponListLoading) {
+        return const PromoCodeShimmerView();
+      }
+
+      return (couponController.couponList != null &&
+              couponController.couponList!.isNotEmpty)
               ? Padding(
                   padding: const EdgeInsets.symmetric(
                       vertical: Dimensions.paddingSizeDefault,
@@ -197,8 +203,7 @@ class _PromoCodeBannerViewState extends State<PromoCodeBannerView> {
                     ),
                   ]),
                 )
-              : const SizedBox()
-          : const PromoCodeShimmerView();
+              : const SizedBox();
     });
   }
 }

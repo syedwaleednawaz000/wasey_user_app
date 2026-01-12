@@ -182,6 +182,7 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
             child: Ink(
               color:
                   Theme.of(context).primaryColor.withAlpha((0.1 * 255).toInt()),

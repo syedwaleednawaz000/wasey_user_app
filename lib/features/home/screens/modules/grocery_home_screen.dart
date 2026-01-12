@@ -26,29 +26,20 @@ class GroceryHomeScreen extends StatelessWidget {
     bool isLoggedIn = AuthHelper.isLoggedIn();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const CategoryView(),
-
-      Container(
-        width: MediaQuery.of(context).size.width,
-        color: Theme.of(context).disabledColor.withAlpha((0.1 * 255).toInt()),
-        child: const Column(
-          children: [
-            BadWeatherWidget(),
-            BannerView(isFeatured: false),
-            SizedBox(height: 12),
-          ],
-        ),
-      ),
-      isLoggedIn ? const VisitAgainView() : const SizedBox(),
+      const BadWeatherWidget(),
+      const BannerView(isFeatured: false),
+      const SizedBox(height: 12),
+      // isLoggedIn ? const VisitAgainView() : const SizedBox(), // Commented - visit again UI
       const SpecialOfferView(isFood: false, isShop: false),
       const HighlightWidget(),
-      const FlashSaleViewWidget(),
+      // const FlashSaleViewWidget(), // Commented - flash sale UI
       // const BestStoreNearbyView(),
       // const MostPopularItemView(isFood: false, isShop: false),
       const MiddleSectionBannerView(),
       // const BestReviewItemView(),
       const JustForYouView(),
       const TopOffersNearMe(),
-      const ItemThatYouLoveView(forShop: false),
+      // const ItemThatYouLoveView(forShop: false), // Commented - Item that you love UI
       isLoggedIn ? const PromoCodeBannerView() : const SizedBox(),
       // const NewOnMartView(isPharmacy: false, isShop: false),
       const PromotionalBannerView(),

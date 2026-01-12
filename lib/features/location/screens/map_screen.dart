@@ -81,6 +81,7 @@ class MapScreenState extends State<MapScreen> {
                   onEnter: (event) => onEntered(true),
                   onExit: (event) => onEntered(false),
                   child: GoogleMap(
+                    mapType: MapType.normal,
                     initialCameraPosition:
                         CameraPosition(target: _latLng, zoom: 16),
                     minMaxZoomPreference: const MinMaxZoomPreference(0, 16),

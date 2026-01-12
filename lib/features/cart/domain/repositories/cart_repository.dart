@@ -52,7 +52,7 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
       onlineCartList = [];
       response.body.forEach((cart) => onlineCartList!.add(OnlineCartModel.fromJson(cart)));
     }
-    onlineCartList!.forEach((cart)=> debugPrint('_addToCartOnline === onlineCartList: ${cart.toJson()}'),);
+    onlineCartList?.forEach((cart)=> debugPrint('_addToCartOnline === onlineCartList: ${cart.toJson()}'),);
 
     return onlineCartList;
   }

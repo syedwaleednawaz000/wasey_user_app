@@ -65,7 +65,9 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen> {
                           fontSize: Dimensions.fontSizeSmall)),
                 ),
                 const SizedBox(height: Dimensions.paddingSizeExtraLarge),
-                Expanded(
+                Container(
+                  color: Theme.of(context).disabledColor.withOpacity(.1),
+                  height: Get.height * .4,
                   child: SingleChildScrollView(
                     child: ListView.builder(
                       itemCount: localizationController.languages.length,
@@ -90,12 +92,13 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen> {
                       horizontal: Dimensions.paddingSizeExtraLarge),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withAlpha((0.3 * 255).toInt()),
-                          blurRadius: 10,
-                          spreadRadius: 0)
-                    ],
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //     color: Colors.grey.withAlpha((0.3 * 255).toInt()),
+                    //     blurRadius: 10,
+                    //     spreadRadius: 0,
+                    //   )
+                    // ],
                   ),
                   child: CustomButton(
                     buttonText: 'next'.tr,

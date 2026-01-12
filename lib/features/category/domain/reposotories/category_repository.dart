@@ -18,9 +18,9 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
   @override
   Future getList({int? offset, bool categoryList = false, bool subCategoryList = false, bool categoryItemList = false, bool categoryStoreList = false,
-    bool? allCategory, String? id, String? type, DataSourceEnum? source}) async {
+    bool? allCategory, String? id, String? type, DataSourceEnum? source, String? moduleId}) async {
     if (categoryList) {
-      return await _getCategoryList(allCategory!, source ?? DataSourceEnum.client);
+      return await _getCategoryList(allCategory!, source ?? DataSourceEnum.client, explicitModuleId: moduleId);
     } else if (subCategoryList) {
       return await _getSubCategoryList(id);
     } else if (categoryItemList) {
@@ -30,7 +30,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
     }
   }
 
-  Future<List<CategoryModel>?> _getCategoryList(bool allCategory, DataSourceEnum source) async {
+  Future<List<CategoryModel>?> _getCategoryList(bool allCategory, DataSourceEnum source, {String? explicitModuleId}) async {
     List<CategoryModel>? categoryList;
     Map<String, String>? header = allCategory ? {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -39,7 +39,9 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
     Map<String, String>? cacheHeader = header ?? apiClient.getHeader();
 
-    String cacheId = AppConstants.categoryUri + Get.find<SplashController>().module!.id!.toString();
+    // Use explicit module ID if provided, otherwise get from SplashController
+    final moduleId = explicitModuleId ?? Get.find<SplashController>().module?.id?.toString();
+    String cacheId = LocalClient.generateModuleCacheKey(AppConstants.categoryUri, moduleId);
 
     switch(source) {
       case DataSourceEnum.client:
@@ -87,9 +89,33 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
   Future<StoreModel?> _getCategoryStoreList(String? categoryID, int offset, String type) async {
     StoreModel? categoryStore;
-    Response response = await apiClient.getData('${AppConstants.categoryStoreUri}$categoryID?limit=10&offset=$offset&type=$type');
+    String endpoint;
+    
+    if (offset > 1) {
+      // New endpoint for pagination - only limit and offset needed
+      endpoint = '/api/v1/categories/$categoryID/details-with-stores?limit=15&offset=$offset';
+    } else {
+      // Existing endpoint for initial load
+      endpoint = '${AppConstants.categoryStoreUri}$categoryID?limit=10&offset=$offset&type=$type';
+    }
+    
+    Response response = await apiClient.getData(endpoint);
     if (response.statusCode == 200) {
-      categoryStore = StoreModel.fromJson(response.body);
+      Map<String, dynamic> jsonData = response.body;
+      
+      // Handle new endpoint response structure
+      if (jsonData.containsKey('category')) {
+        // New endpoint: extract stores from root level
+        categoryStore = StoreModel(
+          totalSize: jsonData['total_size'],
+          limit: jsonData['limit']?.toString() ?? '15',
+          offset: jsonData['offset'],
+          stores: (jsonData['stores'] as List?)?.map((v) => Store.fromJson(v)).toList(),
+        );
+      } else {
+        // Old endpoint: use existing parsing
+        categoryStore = StoreModel.fromJson(jsonData);
+      }
     }
     return categoryStore;
   }

@@ -151,8 +151,9 @@ class _PaymentMethodSelectionSectionState
                       isSelected: isSelected,
                       onTap: () {
                         checkoutController.setPaymentMethod(2);
-                        // log("paymentMethod.getWay!: ");
-                        // log(paymentMethod.getWayImageFullUrl!);
+                        log("paymentMethod.getWay!: ${paymentMethod.getWay!}");
+                        log("paymentMethod.getWay!: ${paymentMethod.getWayTitle!}");
+                        log(paymentMethod.getWayImageFullUrl!);
                         checkoutController
                             .changeDigitalPaymentName(paymentMethod.getWay!);
                       },

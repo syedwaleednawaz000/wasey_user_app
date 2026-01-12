@@ -27,24 +27,12 @@ class FoodHomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        // 🔥 تم إزالة الخلفية هنا
-
-
         const CategoryView(),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          decoration: null, // لا خلفية - لا صورة - لا تأثير 3D
-          child:  Column(
-            children: [
-              BadWeatherWidget(),
-              BannerView(isFeatured: false),
-              SizedBox(height: 12),
-            ],
-          ),
-        ),
+        const BadWeatherWidget(),
+        const BannerView(isFeatured: false),
+        const SizedBox(height: 12),
         const SpecialOfferView(isFood: true, isShop: false),
-        const ItemThatYouLoveView(forShop: false),
+        // const ItemThatYouLoveView(forShop: false), // Commented - Item that you love UI
         // const MostPopularItemView(isFood: true, isShop: false),
       ],
     );

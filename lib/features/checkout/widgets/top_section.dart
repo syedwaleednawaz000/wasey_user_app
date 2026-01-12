@@ -30,6 +30,7 @@ import 'package:sixam_mart/features/checkout/widgets/note_prescription_section.d
 
 import '../../../helper/price_converter.dart';
 import '../domain/models/delivery_charges_data_model.dart';
+import 'city_selector_widget.dart';
 
 class TopSection extends StatelessWidget {
   final CheckoutController checkoutController;
@@ -339,10 +340,11 @@ class TopSection extends StatelessWidget {
                       width: double.infinity,
                       child: Row(children: [
                         ((Get.find<SplashController>()
-                                        .configModel!
-                                        .homeDeliveryStatus ==
-                                    1 &&
-                                checkoutController.store!.delivery!) && isDeliveryActive)
+                                            .configModel!
+                                            .homeDeliveryStatus ==
+                                        1 &&
+                                    checkoutController.store!.delivery!) &&
+                                isDeliveryActive)
                             ? Expanded(
                                 child: DeliveryOptionButtonWidget(
                                   value: 'delivery',
@@ -493,18 +495,40 @@ class TopSection extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: Dimensions.paddingSizeSmall),
+
+        // City Selector - Horizontal Scrolling
+        checkoutController.cityWiseChargeStatus.value != null
+            ? (checkoutController.cityWiseChargeStatus.value!.status)
+                ? Column(
+                    children: [
+                      CitySelectorWidget(
+                          checkoutController: checkoutController),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                    ],
+                  )
+                : const SizedBox.shrink()
+            : const SizedBox.shrink(),
 
         //Delivery_fee
-        !takeAway && !isGuestLoggedIn ? Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text('${'delivery_charge'.tr}: '),
-          Text(
-            checkoutController.store!.freeDelivery! ? 'free'.tr
-                : checkoutController.distance != -1 ? PriceConverter.convertPrice(charge) : 'calculating'.tr,
-            textDirection: TextDirection.ltr,
-          ),
-        ])) : const SizedBox(),
-        SizedBox(height: !takeAway && !isGuestLoggedIn ? Dimensions.paddingSizeLarge : 0),
+        !takeAway && !isGuestLoggedIn
+            ? Center(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('${'delivery_charge'.tr}: '),
+                Text(
+                  checkoutController.store!.freeDelivery!
+                      ? 'free'.tr
+                      : checkoutController.distance != -1
+                          ? PriceConverter.convertPrice(charge)
+                          : 'calculating'.tr,
+                  textDirection: TextDirection.ltr,
+                ),
+              ]))
+            : const SizedBox(),
+        SizedBox(
+            height: !takeAway && !isGuestLoggedIn
+                ? Dimensions.paddingSizeLarge
+                : 0),
 
         ///delivery section
         DeliverySection(

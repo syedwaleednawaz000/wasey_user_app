@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
+
 // import 'package:sixam_mart/helper/route_helper.dart'; // For navigating on success
 import 'dart:developer';
 
 import 'package:sixam_mart/util/app_constants.dart';
+
+import '../../../helper/route_helper.dart';
 
 class TranzilaWebPaymentScreen extends StatefulWidget {
   final String orderID;
@@ -15,7 +19,8 @@ class TranzilaWebPaymentScreen extends StatefulWidget {
   });
 
   @override
-  State<TranzilaWebPaymentScreen> createState() => _TranzilaWebPaymentScreenState();
+  State<TranzilaWebPaymentScreen> createState() =>
+      _TranzilaWebPaymentScreenState();
 }
 
 class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
@@ -26,82 +31,152 @@ class _TranzilaWebPaymentScreenState extends State<TranzilaWebPaymentScreen> {
   @override
   void initState() {
     super.initState();
-    _paymentUrl = Uri.parse('${AppConstants.baseUrl}/payment/tranzila/pay?order_id=${widget.orderID}');
+    _paymentUrl = Uri.parse(
+        '${AppConstants.baseUrl}/payment/tranzila/pay?order_id=${widget.orderID}');
     log('Payment URL: $_paymentUrl');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Complete Payment'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Optional: Show a confirmation dialog before canceling payment
-            Get.back();
-          },
-        ),
-      ),
-      body: Stack(
-        children: [
-          InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri.uri(_paymentUrl)),
-            initialSettings: InAppWebViewSettings(
-              useShouldOverrideUrlLoading: true, // This is key for intercepting navigation
-              javaScriptEnabled: true,
+    void handleBackNavigation() {
+      log("Back navigation action initiated. Showing confirmation dialog.");
+
+      Get.dialog(
+        Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "are_you_sure_you_want_to_go_back".tr,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Get.back(); // Just closes the dialog
+                      },
+                      child: Text(
+                        "cancel".tr,
+                        style:
+                            TextStyle(color: Theme.of(context).disabledColor),
+                      ),
+                    ),
+
+                    // The "Back to Home" button
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        log("User confirmed. Redirecting to initial route.");
+                        // This is your original navigation logic
+                        Get.offAllNamed(RouteHelper.getInitialRoute());
+                      },
+                      child: Text(
+                        "back_to_home".tr,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            onWebViewCreated: (controller) {
-              _webViewController = controller;
-            },
-            onLoadStart: (controller, url) {
-              log('WebView: Page started loading: $url');
-              setState(() {
-                _progress = 0;
-              });
-
-              // 2. Listen for the success or failure URL to navigate away
-              // IMPORTANT: Adjust these URLs to match what Tranzila redirects to
-              final String successUrlIdentifier = '/payment/tranzila/success'; // Example
-              final String failureUrlIdentifier = '/payment/tranzila/fail';     // Example
-
-              if (url.toString().contains(successUrlIdentifier)) {
-                log('Payment Successful, redirecting to Order Success Screen.');
-                // Use offNamed to prevent user from going back to the payment page
-                // Get.offNamed(RouteHelper.getOrderSuccessRoute(widget.orderID));
-
-                // Stop the webview from actually loading the success page
-                controller.stopLoading();
-              } else if (url.toString().contains(failureUrlIdentifier)) {
-                log('Payment Failed, navigating back.');
-                Get.back(); // Go back to the checkout screen
-                // You might want to show a "Payment Failed" snackbar or dialog here
-
-                // Stop the webview from actually loading the failure page
-                controller.stopLoading();
-              }
-            },
-            onProgressChanged: (controller, progress) {
-              setState(() {
-                _progress = progress / 100;
-              });
-            },
-            onLoadStop: (controller, url) {
-              log('WebView: Page finished loading: $url');
-            },
-            onLoadError: (controller, url, code, message) {
-              log('WebView: Error loading $url, Error: $message');
-              // Optionally show an error message to the user
-            },
           ),
+        ),
+        barrierDismissible: true, // User can tap outside the dialog to cancel
+      );
+    }
 
-          // Show a progress indicator at the top
-          if (_progress < 1.0)
-            Positioned(
-              top: 0, left: 0, right: 0,
-              child: LinearProgressIndicator(value: _progress),
+    return WillPopScope(
+      onWillPop: () async {
+        handleBackNavigation();
+        return false;
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(
+          title: "complete_payment".tr,
+          backButton: true,
+          onBackPressed: handleBackNavigation,
+        ),
+        body: Stack(
+          children: [
+            InAppWebView(
+              initialUrlRequest: URLRequest(url: WebUri.uri(_paymentUrl)),
+              initialSettings: InAppWebViewSettings(
+                useShouldOverrideUrlLoading: true,
+                // This is key for intercepting navigation
+                javaScriptEnabled: true,
+              ),
+              onWebViewCreated: (controller) {
+                _webViewController = controller;
+              },
+              onLoadStart: (controller, url) {
+                log('WebView: Page started loading: $url');
+                setState(() {
+                  _progress = 0;
+                });
+
+                // 2. Listen for the success or failure URL to navigate away
+                // IMPORTANT: Adjust these URLs to match what Tranzila redirects to
+                const String successUrlIdentifier =
+                    '/payment/tranzila/success'; // Example
+                const String failureUrlIdentifier =
+                    '/payment/tranzila/fail'; // Example
+
+                if (url.toString().contains(successUrlIdentifier)) {
+                  log('Payment Successful, redirecting to Order Success Screen.');
+                  // Use offNamed to prevent user from going back to the payment page
+                  // Get.offNamed(RouteHelper.getOrderSuccessRoute(widget.orderID));
+
+                  // Stop the webview from actually loading the success page
+                  controller.stopLoading();
+                } else if (url.toString().contains(failureUrlIdentifier)) {
+                  log('Payment Failed, navigating back.');
+                  Get.back(); // Go back to the checkout screen
+                  // You might want to show a "Payment Failed" snackbar or dialog here
+
+                  // Stop the webview from actually loading the failure page
+                  controller.stopLoading();
+                }
+              },
+              onProgressChanged: (controller, progress) {
+                setState(() {
+                  _progress = progress / 100;
+                });
+              },
+              onLoadStop: (controller, url) {
+                log('WebView: Page finished loading: $url');
+              },
+              onLoadError: (controller, url, code, message) {
+                log('WebView: Error loading $url, Error: $message');
+                // Optionally show an error message to the user
+              },
             ),
-        ],
+
+            // Show a progress indicator at the top
+            if (_progress < 1.0)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: LinearProgressIndicator(value: _progress),
+              ),
+          ],
+        ),
       ),
     );
   }

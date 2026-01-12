@@ -31,6 +31,7 @@ class CartController extends GetxController implements GetxService {
 
   List<Item> get suggestedItems => _suggestedItems;
 
+
   // Loading state specifically for the suggested items.
   bool _isSuggestLoading = false;
 
@@ -104,6 +105,14 @@ class CartController extends GetxController implements GetxService {
   int? _directAddCartItemIndex = -1;
 
   int? get directAddCartItemIndex => _directAddCartItemIndex;
+
+  bool _isCartAddLoading = false;
+  bool get isCartAddLoading => _isCartAddLoading;
+  void toggleCartAddLoading() {
+    _isCartAddLoading = !_isCartAddLoading;
+    log("isCartAddLoading updated to: $isCartAddLoading");
+    update();
+  }
 
   // --- START: NEW FUNCTION TO ADD ---
   /// Fetches and populates the list of suggested items based on the items currently in the cart.

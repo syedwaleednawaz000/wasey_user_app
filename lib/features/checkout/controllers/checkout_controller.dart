@@ -185,6 +185,7 @@ class CheckoutController extends GetxController implements GetxService {
 
   // --- Properties for Delivery Charges ---
   var deliveryChargesList = <DeliveryChargeData>[].obs;
+  var cityWiseChargeStatus = Rxn<CityWiseChargeStatus>();
   var isLoadingDeliveryCharges = false.obs;
   var currentActiveModuleId =
       Rxn<int>(); // To hold and react to module ID changes
@@ -206,7 +207,7 @@ class CheckoutController extends GetxController implements GetxService {
     // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     log("gettingModuleIdFromShares");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String moduleIdString = '1'; // Default value if not found or error
+    String moduleIdString = '2'; // Default value if not found or error
 
     try {
       // Attempt to get the stored module ID string
@@ -275,8 +276,14 @@ class CheckoutController extends GetxController implements GetxService {
           // deliveryChargesList.assignAll(deliveryChargesResponse.data);
           List<DeliveryChargeData> filteredData = deliveryChargesResponse.data
               .where((chargeData) =>
-                  chargeData.moduleId == int.parse(moduleIdString!))
+                  chargeData.moduleId == int.parse(moduleIdString))
               .toList();
+          // CityWiseChargeStatus cityChargeStatus = deliveryChargesResponse
+          //     .cityWiseChargeEnabled
+          //     .firstWhere((c) => c.moduleId == int.parse(moduleIdString));
+          // if (cityChargeStatus.status) {
+          //   cityWiseChargeStatus = cityChargeStatus;
+          // }
           if (deliveryChargesResponse.data.isNotEmpty &&
               filteredData.isNotEmpty) {
             // currentSelectedDeliveryChargesData.value =
@@ -285,26 +292,67 @@ class CheckoutController extends GetxController implements GetxService {
             // Optionally, set the first item of the filtered list as selected
             currentSelectedDeliveryChargesData.value = filteredData[0];
           } else {
-            print(
-                "CheckoutController: No delivery charges found for module ID: $moduleIdString");
+            log("CheckoutController: No delivery charges found for module ID: $moduleIdString");
             // Optionally: Get.snackbar('Info', 'No delivery charges available for this selection.');
           }
+          // Safely find the charge status for the current module
+          // try {
+          //   CityWiseChargeStatus? cityChargeStatus = deliveryChargesResponse
+          //       .cityWiseChargeEnabled
+          //       .firstWhereOrNull((c) => c.moduleId == int.parse(moduleIdString));
+          //
+          //   // Check if a status was found and if that status is true
+          //   if (cityChargeStatus != null) {
+          //     // Assign the found status to the reactive variable
+          //     cityWiseChargeStatus.value = cityChargeStatus;
+          //   } else {
+          //     // If not found or status is false, clear the old value
+          //     cityWiseChargeStatus.value = null;
+          //   }
+          // } catch (e) {
+          //   log("Error finding city-wise charge status: $e. Clearing status.");
+          //   cityWiseChargeStatus.value = null;
+          // }
+          // Safely find the charge status for the current module
+          try {
+            // Use firstWhereOrNull to safely find the item or get null
+            CityWiseChargeStatus? cityChargeStatus = deliveryChargesResponse
+                .cityWiseChargeEnabled
+                .firstWhereOrNull((c) => c.moduleId == int.parse(moduleIdString));
+            log("currentModule: $moduleIdString");
+
+            // Now, update the reactive variable's .value based on the result
+            if (cityChargeStatus != null) {
+              // A status was found, assign it to the value of our Rxn.
+              cityWiseChargeStatus.value = cityChargeStatus;
+              log("Found CityWiseChargeStatus for module $moduleIdString: status is ${cityChargeStatus.status}");
+            } else {
+              // No status was found for this module, explicitly set the value to null.
+              // This is crucial for clearing old state when switching modules.
+              cityWiseChargeStatus.value = null;
+              log("No CityWiseChargeStatus found for module $moduleIdString.");
+            }
+          } catch (e) {
+            log("Error processing city-wise charge status: $e");
+            // In case of any unexpected error, ensure the state is reset.
+            cityWiseChargeStatus.value = null;
+          }
+
+
         } else {
           // API call was successful (200) but the 'success' flag in response is false
           String errorMessage =
               response.body['message'] ?? 'Fetching delivery charges failed.';
-          print("CheckoutController: API indicated failure: $errorMessage");
+          log("CheckoutController: API indicated failure: $errorMessage");
           Get.snackbar('Error', errorMessage);
         }
       } else {
         // HTTP error (statusCode not 200)
-        print(
-            "CheckoutController: Failed to fetch delivery charges. Status: ${response.statusCode}, Message: ${response.statusText}");
+        log("CheckoutController: Failed to fetch delivery charges. Status: ${response.statusCode}, Message: ${response.statusText}");
         Get.snackbar('Error', 'Server error: Could not load delivery charges.');
       }
     } catch (e) {
-      print(
-          "CheckoutController: Exception while fetching delivery charges: $e");
+      log("CheckoutController: Exception while fetching delivery charges: $e");
       Get.snackbar('Error', 'An unexpected error occurred. Please try again.');
     } finally {
       isLoadingDeliveryCharges.value = false;
@@ -762,24 +810,24 @@ class CheckoutController extends GetxController implements GetxService {
       //   }
       // }
       if (paymentMethodIndex == 2) {
-        // if (digitalPaymentName != null && digitalPaymentName!.isNotEmpty) {
-        //   if (digitalPaymentName!.toLowerCase() == 'tranzila') {
-        //     log("Digital payment is Tranzila, navigating to WebView screen.");
-        //     Get.to(() => TranzilaWebPaymentScreen(orderID: orderID));
-        //   }
-        // } else {
-          Get.to(() => DirectPaymentScreen(
-                orderId: orderID,
-                customerID: Get.find<ProfileController>().userInfoModel?.id ??
-                    (userID.isNotEmpty ? int.parse(userID) : 0),
-                orderType: orderType,
-                amount: amount,
-                isCashOnDeliveryActive: isCashOnDeliveryActive,
-                paymentMethod: digitalPaymentName,
-                guestID: userID.isNotEmpty ? userID : AuthHelper.getGuestId(),
-                contactNumber: contactNumber,
-              ));
-        // }
+        if (digitalPaymentName != null && digitalPaymentName!.isNotEmpty) {
+          if (digitalPaymentName!.toLowerCase() == 'tranzila') {
+            log("Digital payment is Tranzila, navigating to WebView screen.");
+            Get.to(() => TranzilaWebPaymentScreen(orderID: orderID));
+          }
+        } else {
+        Get.to(() => DirectPaymentScreen(
+              orderId: orderID,
+              customerID: Get.find<ProfileController>().userInfoModel?.id ??
+                  (userID.isNotEmpty ? int.parse(userID) : 0),
+              orderType: orderType,
+              amount: amount,
+              isCashOnDeliveryActive: isCashOnDeliveryActive,
+              paymentMethod: digitalPaymentName,
+              guestID: userID.isNotEmpty ? userID : AuthHelper.getGuestId(),
+              contactNumber: contactNumber,
+            ));
+        }
       } else {
         double total = ((amount / 100) *
             Get.find<SplashController>()

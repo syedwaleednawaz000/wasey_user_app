@@ -5,6 +5,7 @@ import 'package:sixam_mart/common/widgets/card_design/store_item_card.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart/features/home/widgets/web/widgets/store_card_widget.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -13,6 +14,8 @@ import 'package:sixam_mart/common/widgets/item_shimmer.dart';
 import 'package:sixam_mart/common/widgets/item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../features/store/domain/models/category_with_stores.dart';
 
 class ItemsView extends StatefulWidget {
   final List<Item?>? items;
@@ -23,6 +26,7 @@ class ItemsView extends StatefulWidget {
   final int shimmerLength;
   final String? noDataText;
   final String? categoryId;
+  final int? categoryIdInt; // For home screen category pagination
   final bool isCampaign;
   final bool inStorePage;
   final bool isFeatured;
@@ -42,13 +46,54 @@ class ItemsView extends StatefulWidget {
     this.isFeatured = false,
     this.isFromHome = false,
     this.isFoodOrGrocery = true,
-    this.categoryId});
+    this.categoryId,
+    this.categoryIdInt});
 
   @override
   State<ItemsView> createState() => _ItemsViewState();
 }
 
 class _ItemsViewState extends State<ItemsView> {
+  final ScrollController _horizontalScrollController = ScrollController();
+  
+  @override
+  void initState() {
+    super.initState();
+    // Add scroll listener for horizontal pagination when isFromHome is true
+    if (widget.isFromHome && widget.isStore && widget.categoryIdInt != null) {
+      _horizontalScrollController.addListener(_onHorizontalScroll);
+    }
+  }
+  
+  @override
+  void dispose() {
+    _horizontalScrollController.removeListener(_onHorizontalScroll);
+    _horizontalScrollController.dispose();
+    super.dispose();
+  }
+  
+  void _onHorizontalScroll() {
+    if (!_horizontalScrollController.hasClients) {
+      return;
+    }
+    
+    try {
+      final double pixels = _horizontalScrollController.position.pixels;
+      final double maxScroll = _horizontalScrollController.position.maxScrollExtent;
+      
+      // Check if scrolled to the end (within 150px of the end)
+      // Also check if maxScroll is greater than 0 (meaning there's scrollable content)
+      if (maxScroll > 0 && pixels >= maxScroll - 150) {
+        // Load more stores for this category
+        if (widget.categoryIdInt != null) {
+          Get.find<StoreController>().loadMoreStoresForCategory(widget.categoryIdInt!);
+        }
+      }
+    } catch (e) {
+      // Silent error handling
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     bool isNull = true;
@@ -84,8 +129,6 @@ class _ItemsViewState extends State<ItemsView> {
             itemBuilder: (context, index) {
               if (widget.categoryId ==
                   widget.items![index]?.categoryId.toString()) {
-                log("argument cID : ${widget.categoryId} category: ${widget
-                    .items![index]?.categoryId.toString()}");
               }
               return (widget.categoryId ==
                   widget.items![index]?.categoryId.toString())
@@ -107,28 +150,60 @@ class _ItemsViewState extends State<ItemsView> {
             }),
       )
           : widget.isFromHome
-          ? Container(
-        // color: Colors.green,
-        height: 165,
-        width: double.infinity,
-        child: ListView.builder(
-            physics: const BouncingScrollPhysics(),
-            itemCount: length,
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            // shrinkWrap: false,
-            // padding: EdgeInsets.symmetric(horizontal: 12),
-            itemBuilder: (context, index) {
-              return Container(
-                width: 200,
-                // color: Colors.red,
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                child: StoreCardWidget(
-                  store: widget.stores![index],
-                ),
-              );
-            }),
-      )
+          ? GetBuilder<StoreController>(
+              builder: (storeController) {
+                // Get updated stores list for this category
+                List<Store?>? updatedStores = widget.stores;
+                if (widget.categoryIdInt != null) {
+                  CategoryWithStores? category = storeController.categoryWithStoreList?.firstWhereOrNull(
+                    (cat) => cat.cId == widget.categoryIdInt,
+                  );
+                  if (category != null && category.stores != null) {
+                    updatedStores = category.stores;
+                  }
+                }
+                
+                final int itemCount = (updatedStores?.length ?? 0) + 
+                    (storeController.isCategoryLoading(widget.categoryIdInt ?? 0) ? 1 : 0);
+                
+                return Container(
+                  // color: Colors.green,
+                  height: 165,
+                  width: double.infinity,
+                  child: ListView.builder(
+                      controller: _horizontalScrollController,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: itemCount,
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      // shrinkWrap: false,
+                      // padding: EdgeInsets.symmetric(horizontal: 12),
+                      itemBuilder: (context, index) {
+                        // Show loading indicator at the end
+                        if (index >= (updatedStores?.length ?? 0)) {
+                          return const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                          );
+                        }
+                        return Container(
+                          width: 200,
+                          // color: Colors.red,
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                          child: StoreCardWidget(
+                            store: updatedStores![index],
+                          ),
+                        );
+                      }),
+                );
+              },
+            )
           :
       // widget.stores != null ? Text(widget.stores!.length.toString()): Text("data")
       GridView.builder(

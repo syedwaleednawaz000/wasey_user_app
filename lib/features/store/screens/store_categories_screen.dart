@@ -17,6 +17,7 @@ import '../../../common/models/module_model.dart';
 import '../../../common/widgets/custom_image.dart';
 import '../../../helper/price_converter.dart';
 import '../../../helper/route_helper.dart';
+import '../../../helper/store_schedule_checker.dart';
 import '../../../util/app_constants.dart';
 import '../../../util/dimensions.dart';
 import '../../../util/styles.dart';
@@ -44,7 +45,6 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
   final Map<int, GlobalKey> _subCategoryKeys = {};
   final _currentSubCategoryIndex = 0.obs;
 
-
   // --- START: NEW REACTIVE INITIALIZATION ---
 
   Worker? _itemModelWorker;
@@ -54,7 +54,6 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
     _currentSubCategoryIndex.value = 0;
     _scrollController = ScrollController();
     super.initState();
-
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -86,15 +85,16 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
       // Always update subcategory during scrolling, not just when isScrolling is true
       _updateCurrentSubCategory();
     });
-
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
       Get.find<StoreController>().loadNextItems();
     }
     _updateCurrentSubCategory();
   }
+
   @override
   // void initState() {
   //   super.initState();
@@ -154,13 +154,16 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
     final storeController = Get.find<StoreController>();
 
     // The 'ever' worker for when data is NOT initially ready. This is correct.
-    _itemModelWorker = ever(storeController.rxStoreItemModel, (ItemNewApiModel? model) {
+    _itemModelWorker =
+        ever(storeController.rxStoreItemModel, (ItemNewApiModel? model) {
       log("StoreItemModel Worker fired. Model is ${model == null ? 'null' : 'not null'}.");
       if (model != null && !_isDataInitialized) {
         log("StoreItemModel is ready. Initializing the screen logic now.");
         _isDataInitialized = true;
-        if (widget.store!.categoryIds != null && widget.store!.categoryIds!.isNotEmpty) {
-          storeController.getSubCategoriesWithItems(widget.store!.categoryIds![0]);
+        if (widget.store!.categoryIds != null &&
+            widget.store!.categoryIds!.isNotEmpty) {
+          storeController
+              .getSubCategoriesWithItems(widget.store!.categoryIds![0]);
         }
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -181,8 +184,10 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
         if (mounted) {
           log("Post-frame callback executing for pre-loaded data.");
           _isDataInitialized = true;
-          if (widget.store!.categoryIds != null && widget.store!.categoryIds!.isNotEmpty) {
-            storeController.getSubCategoriesWithItems(widget.store!.categoryIds![0]);
+          if (widget.store!.categoryIds != null &&
+              widget.store!.categoryIds!.isNotEmpty) {
+            storeController
+                .getSubCategoriesWithItems(widget.store!.categoryIds![0]);
           }
           _updateCurrentSubCategory();
         }
@@ -344,8 +349,7 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                           Get.toNamed(
                               RouteHelper.getSearchStoreItemRoute(store!.id!));
                         } else {
-                          log(
-                              "Error: Store ID is null, cannot navigate to search.");
+                          log("Error: Store ID is null, cannot navigate to search.");
                         }
                       },
                       child: Container(
@@ -802,7 +806,17 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                                   .navigateToItemPage(
                                                       item, context,
                                                       inStore: true,
-                                                      isCampaign: false);
+                                                      isCampaign: false,
+                                                      storeStatus: ((isStoreOpen(
+                                                                  store!
+                                                                      .schedules!)) &&
+                                                              (store.active ==
+                                                                  1))
+                                                          ? 1
+                                                          : store.active == -1
+                                                              ? -1
+                                                              : 0
+                                              );
                                             },
                                             child: Container(
                                               margin: const EdgeInsets.only(
@@ -910,36 +924,54 @@ class _StoreCategoriesScreenState extends State<StoreCategoriesScreen> {
                                                               ],
                                                             ),
                                                             Center(
-                                                              child:
-                                                                  CartCountView(
-                                                                item: item,
-                                                                index: index,
-                                                                child:
-                                                                    Container(
-                                                                  height: 30,
-                                                                  width: double
-                                                                      .infinity,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .primaryColor,
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(
-                                                                      Dimensions
-                                                                          .radiusDefault,
-                                                                    ),
-                                                                  ),
-                                                                  child: Icon(
-                                                                    Icons.add,
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .cardColor,
-                                                                    size: 20,
-                                                                  ),
-                                                                ),
-                                                              ),
+                                                              child: ((isStoreOpen(
+                                                                          store!
+                                                                              .schedules!)) &&
+                                                                      (store.active ==
+                                                                          1))
+                                                                  ? CartCountView(
+                                                                      item:
+                                                                          item,
+                                                                      index:
+                                                                          index,
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            30,
+                                                                        width: double
+                                                                            .infinity,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color:
+                                                                              Theme.of(context).primaryColor,
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(
+                                                                            Dimensions.radiusDefault,
+                                                                          ),
+                                                                        ),
+                                                                        child:
+                                                                            Icon(
+                                                                          Icons
+                                                                              .add,
+                                                                          color:
+                                                                              Theme.of(context).cardColor,
+                                                                          size:
+                                                                              20,
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  : store.active ==
+                                                                          -1
+                                                                      ? Text(
+                                                                          "temporarily_closed_label"
+                                                                              .tr)
+                                                                      : Text(
+                                                                          "closed_now"
+                                                                              .tr,
+                                                                          style: STCRegular.copyWith(
+                                                                              backgroundColor: Theme.of(context).disabledColor.withOpacity(.3),
+                                                                              fontSize: Dimensions.fontSizeSmall),
+                                                                        ),
                                                             ),
                                                             // InkWell(
                                                             //   onTap: () {

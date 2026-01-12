@@ -17,7 +17,8 @@ class BrandsRepository implements BrandsRepositoryInterface{
   @override
   Future<List<BrandModel>?> getBrandList({required DataSourceEnum source}) async {
     List<BrandModel>? brandList;
-    String cacheId = '${AppConstants.brandListUri}-${Get.find<SplashController>().module!.id!}';
+    final moduleId = Get.find<SplashController>().module?.id?.toString() ?? '';
+    String cacheId = '${AppConstants.brandListUri}-$moduleId';
 
     switch(source) {
       case DataSourceEnum.client:

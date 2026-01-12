@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/common/enums/data_source_enum.dart';
 import 'package:sixam_mart/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
@@ -32,8 +33,29 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import '../../../api/api_checker.dart';
 import '../../../api/api_client.dart';
+import '../../../helper/store_schedule_checker.dart';
+import '../../splash/controllers/splash_controller.dart';
 import '../domain/models/category_with_stores.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+
+
+// List<CategoryWithStores> _parseCategories(String jsonString) {
+//   // This code will run in a separate Isolate, not blocking the UI.
+//   final List<dynamic> decodedList = jsonDecode(jsonString);
+//   if (decodedList.isEmpty) {
+//     return [];
+//   }
+// This is the heavy lifting: creating thousands of objects from the JSON map.
+//   return decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+// }
+
+/// TOP-LEVEL FUNCTION FOR BACKGROUND PARSING of the new paginated response.
+PaginatedCategoryWithStores _parsePaginatedCategories(String jsonString) {
+  // This runs in a background Isolate, preventing UI freezes.
+  final Map<String, dynamic> decodedMap = jsonDecode(jsonString);
+  return PaginatedCategoryWithStores.fromJson(decodedMap);
+}
 
 class StoreController extends GetxController implements GetxService {
   final StoreServiceInterface storeServiceInterface;
@@ -41,6 +63,7 @@ class StoreController extends GetxController implements GetxService {
   StoreController({required this.storeServiceInterface});
 
   StoreRepository? storeRepo;
+
   StoreModel? _storeModel;
 
   StoreModel? get storeModel => _storeModel;
@@ -74,6 +97,7 @@ class StoreController extends GetxController implements GetxService {
   // ItemNewApiModel? get storeItemModel => _storeItemModel;
   // REPLACE them with this reactive version:
   final Rx<ItemNewApiModel?> rxStoreItemModel = Rx(null);
+
   ItemNewApiModel? get storeItemModel => rxStoreItemModel.value;
 
   ItemModel? _storeSearchItemModel;
@@ -165,51 +189,711 @@ class StoreController extends GetxController implements GetxService {
 
   StoreCategories? get selectedSubCategory => _selectedSubCategory;
 
-  List<CategoryWithStores>? _categoryWithStoreList;
-
-  List<CategoryWithStores>? get categoryWithStoreList => _categoryWithStoreList;
-
-  bool _isLoadingCategoriesWithStores = false;
+  //
+  bool _isLoadingCategoriesWithStores = true;
 
   bool get isLoadingCategoriesWithStores => _isLoadingCategoriesWithStores;
+// ... inside your StoreController class, after _selectedSubCategory getter ...
 
-  Future<void> getCategoriesWithStoreList({required bool reload}) async {
-    if (_categoryWithStoreList == null || reload) {
+  // === REFINED & CORRECTED VARIABLES FOR PAGINATION START ===
+
+  /// Holds the list of categories displayed on the screen.
+  List<CategoryWithStores>? _categoryWithStoreList;
+  List<CategoryWithStores>? get categoryWithStoreList => _categoryWithStoreList;
+
+  /// Tracks the current page offset for fetching the next page.
+  int _categoryOffset = 1;
+  int get categoryOffset => _categoryOffset;
+  
+  // Track pagination state per category: Map<categoryId, Map{'offset': int, 'totalSize': int}>
+  Map<int, Map<String, int>> _categoryPaginationState = {};
+  
+  // Track loading state per category
+  Map<int, bool> _categoryLoadingState = {};
+  
+  // Track categories that returned 0 stores (no more stores available)
+  Set<int> _categoriesWithNoMoreStores = {};
+  
+  bool isCategoryLoading(int categoryId) => _categoryLoadingState[categoryId] ?? false;
+  
+  bool hasNoMoreStores(int categoryId) => _categoriesWithNoMoreStores.contains(categoryId);
+
+  /// Total number of categories available on the server (from the API).
+  int? _totalCategories;
+  int? get totalCategories => _totalCategories;
+
+  /// Loading state for the initial page load (shows a full-screen spinner).
+  /// This replaces the old `_isLoadingCategoriesWithStores`.
+  // bool _isLoading = true;
+  // @override
+  // bool get isLoading => _isLoading; // The getter now uses the correct variable.
+
+  /// Loading state for fetching subsequent pages (shows a small spinner at the bottom).
+  bool _isPaginating = false;
+  bool get isPaginating => _isPaginating;
+
+  // === REFINED & CORRECTED VARIABLES FOR PAGINATION END ===
+
+
+  /// Get categories with store list
+  /// [localOnly] - If true, only loads from local cache (SharedPreferences) without making API call
+  Future<bool> getCategoriesWithStoreList(int offset, {required bool reload, bool localOnly = false}) async {
+    // If reloading, reset all state to their initial values.
+    if (reload) {
+      _categoryOffset = 1;
+      _categoryWithStoreList = null;
+      _totalCategories = null;
       _isLoadingCategoriesWithStores = true;
+      _isPaginating = false;
       update();
+      log("ACTION: Manual refresh initiated. Resetting all category data.");
+    }
 
-      ApiClient apiClient = Get.find<ApiClient>();
-
-      String uri =
-          '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
-
-      log("Verifying Correct API Call: ${apiClient.appBaseUrl}$uri");
-
-      try {
-        Response response = await apiClient.getData(uri);
-
-        if (response.statusCode == 200) {
-          _categoryWithStoreList = [];
-          response.body.forEach((categoryJson) {
-            _categoryWithStoreList!
-                .add(CategoryWithStores.fromJson(categoryJson));
-          });
-          log("SUCCESS: Fetched and parsed categories with stores.");
-        } else {
-          _categoryWithStoreList = [];
-          log("API CALL FAILED: The server responded with an error.");
-          ApiChecker.checkApi(response);
-        }
-      } catch (e) {
-        _categoryWithStoreList = [];
-        log("EXCEPTION CAUGHT: $e");
-        // showCustomSnackBar(e.toString());
-      }
-
+    // If we're only allowed to load local cache, never paginate.
+    if (localOnly && offset != 1) {
       _isLoadingCategoriesWithStores = false;
+      _isPaginating = false;
+      update();
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
+    }
+
+    // Don't proceed if there are no more items to load.
+    bool hasMoreData = _totalCategories == null || (_categoryWithStoreList == null || _categoryWithStoreList!.length < _totalCategories!);
+    if(!hasMoreData) {
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
+    }
+
+    // Set the appropriate loading indicator.
+    if (offset == 1) {
+      _isLoadingCategoriesWithStores = true;
+    } else {
+      _isPaginating = true;
+    }
+    update();
+
+    final SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+    final String? moduleId = Get.find<SplashController>().module?.id?.toString();
+    final String cacheId = 'categories_with_stores_${moduleId ?? 'no_module'}';
+
+    // --- Step 1: Attempt to load the FIRST PAGE from cache for an instant UI ---
+    if (offset == 1 && _categoryWithStoreList == null) {
+      final String? cachedData = sharedPreferences.getString(cacheId);
+      if (cachedData != null && cachedData.isNotEmpty) {
+        log("CACHE: Found data for first page. Starting background parsing...");
+        try {
+          // Use compute() to parse the massive cache data without freezing the UI
+          final PaginatedCategoryWithStores paginatedData = await compute(_parsePaginatedCategories, cachedData);
+
+          if (paginatedData.categories.isNotEmpty) {
+            _categoryWithStoreList = paginatedData.categories;
+            _totalCategories = paginatedData.totalCategories;
+            _categoryOffset = 2; // Set the next offset to 2
+            log("CACHE: Background parsing complete. Updating UI instantly.");
+            
+            // No need to initialize pagination state - we always use offset=1
+          } else {
+            log("CACHE: Parsed cache, but the list is empty.");
+          }
+        } catch (e) {
+          log("CACHE_ERROR: Could not parse cached data. Error: $e");
+        }
+      } else {
+        log("CACHE: No data found in local storage.");
+      }
+    }
+
+    // If localOnly is enabled, do not call API.
+    if (localOnly) {
+      _isLoadingCategoriesWithStores = false;
+      _isPaginating = false;
+      update();
+      return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
+    }
+
+    // --- Step 2: Fetch data from the network ---
+    try {
+      log("NETWORK: Starting API call for offset $offset...");
+      final ApiClient apiClient = Get.find<ApiClient>();
+      // The URI now dynamically includes the offset.
+      final String uri = '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=$offset&type=all';
+      final Response response = await apiClient.getData(uri);
+
+      if (response.statusCode == 200 && response.bodyString != null) {
+        log("NETWORK: SUCCESS for offset $offset! Starting background parsing...");
+        final PaginatedCategoryWithStores paginatedData = await compute(_parsePaginatedCategories, response.bodyString!);
+
+        if (offset == 1) {
+          // First page: Replace the list and save to cache.
+          _categoryWithStoreList = paginatedData.categories;
+          await sharedPreferences.setString(cacheId, response.bodyString!);
+          log("NETWORK: Parsed first page. Cache updated.");
+          
+          // No need to initialize pagination state - we always use offset=1
+        } else {
+          // Subsequent pages: Append to the existing list.
+          _categoryWithStoreList?.addAll(paginatedData.categories);
+          log("NETWORK: Appended data for page with offset $offset.");
+          
+          // No need to initialize pagination state - we always use offset=1
+        }
+
+        _totalCategories = paginatedData.totalCategories;
+        _categoryOffset++; // Increment the offset for the next call.
+      } else {
+        log("NETWORK: FAILED for offset $offset with status ${response.statusCode}.");
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      log("NETWORK: EXCEPTION during API call. Error: $e");
+    } finally {
+      // --- Step 3: Final UI update ---
+      log("UI_STATE: Final update. Turning off loading indicators.");
+      _isLoadingCategoriesWithStores = false;
+      _isPaginating = false;
       update();
     }
+
+    return _categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty;
   }
+
+  /// Load more stores for a specific category using the new endpoint
+  /// Returns true if more stores were loaded, false otherwise
+  Future<bool> loadMoreStoresForCategory(int categoryId) async {
+    // Check if already loading
+    if (_categoryLoadingState[categoryId] == true) {
+      return false;
+    }
+
+    // Check if this category already returned 0 stores (no more stores available)
+    if (_categoriesWithNoMoreStores.contains(categoryId)) {
+      return false;
+    }
+
+    // Check if category exists
+    CategoryWithStores? category = _categoryWithStoreList?.firstWhereOrNull(
+      (cat) => cat.cId == categoryId,
+    );
+    if (category == null) {
+      return false;
+    }
+
+    int currentStoreCount = category.stores?.length ?? 0;
+    
+    // If category has less than 4 stores, don't call API
+    if (currentStoreCount < 4) {
+      return false;
+    }
+
+    // Always use offset=1 for pagination
+    const int offset = 1;
+    
+    // Set loading state
+    _categoryLoadingState[categoryId] = true;
+    update();
+
+    try {
+      final ApiClient apiClient = Get.find<ApiClient>();
+      final String uri = '/api/v1/categories/$categoryId/details-with-stores?limit=34&offset=$offset';
+      final Response response = await apiClient.getData(uri);
+
+      if (response.statusCode == 200 && response.body != null) {
+        Map<String, dynamic> jsonData = response.body;
+        
+        // Extract stores from response
+        if (jsonData.containsKey('stores') && jsonData['stores'] != null) {
+          List<Store> allStoresFromApi = (jsonData['stores'] as List)
+              .map((v) => Store.fromJson(v))
+              .toList();
+
+          // Find and update the category
+          int categoryIndex = _categoryWithStoreList?.indexWhere(
+            (cat) => cat.cId == categoryId,
+          ) ?? -1;
+
+          if (categoryIndex >= 0 && _categoryWithStoreList != null) {
+            // Append new stores to existing list
+            if (_categoryWithStoreList![categoryIndex].stores == null) {
+              _categoryWithStoreList![categoryIndex].stores = [];
+            }
+            
+            // Get current store IDs to avoid duplicates
+            Set<int> existingStoreIds = _categoryWithStoreList![categoryIndex].stores
+                ?.map((store) => store.id ?? 0)
+                .where((id) => id != 0)
+                .toSet() ?? {};
+            
+            // Filter out stores that already exist (by ID)
+            List<Store> newStores = allStoresFromApi
+                .where((store) => store.id != null && !existingStoreIds.contains(store.id))
+                .toList();
+            
+            if (newStores.isNotEmpty) {
+              _categoryWithStoreList![categoryIndex].stores?.addAll(newStores);
+              
+              // Create a new list reference to trigger GetBuilder update
+              _categoryWithStoreList = List<CategoryWithStores>.from(_categoryWithStoreList!);
+              
+              // If API returned less than 34 stores, mark as no more stores (but still add the stores we got)
+              if (allStoresFromApi.length < 34) {
+                _categoriesWithNoMoreStores.add(categoryId);
+              }
+              
+              // Update UI after adding stores
+              update();
+              return true;
+            } else {
+              // If no new stores (all were duplicates), mark as no more stores
+              _categoriesWithNoMoreStores.add(categoryId);
+              update();
+              return false; // No stores loaded
+            }
+          }
+        }
+      } else {
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      // Silent error handling
+    } finally {
+      _categoryLoadingState[categoryId] = false;
+      update();
+    }
+
+    return false;
+  }
+
+
+// ... rest of the controller
+
+  // Future<void> getCategoriesWithStoreList({required bool reload}) async {
+  //   // If we are not forcing a reload and data is already in memory, do nothing.
+  //   // This is for navigating between screens without closing the app.
+  //   if (_categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty && !reload) {
+  //     log("_categoryWithStoreList.isNotEmpty from storeController");
+  //     return;
+  //   }
+  //
+  //   // If this is a forced refresh (e.g., pull-to-refresh), show the loading spinner.
+  //   // if (reload) {
+  //   //   _isLoadingCategoriesWithStores = true;
+  //   //   update();
+  //   // }
+  //
+  //   SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  //   // int? moduleId = ModuleHelper.getCacheModule()?.id;
+  //   String cacheId = AppConstants.categoriesWithStores ?? "categories_with_stores";
+  //
+  //   // --- Step 1: INSTANTLY LOAD FROM CACHE (if available) ---
+  //   // This happens only if the data isn't already in memory.
+  //   if (_categoryWithStoreList == null || _categoryWithStoreList!.isEmpty) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //     String? cachedData = sharedPreferences.getString(cacheId);
+  //     if (cachedData != "" && cachedData !=null && cachedData.isNotEmpty) {
+  //       log("CACHE: is not null...");
+  //       log("CACHE: $cachedData");
+  //       try {
+  //         List<dynamic> decodedList = jsonDecode(cachedData);
+  //         _categoryWithStoreList = decodedList
+  //             .map((json) => CategoryWithStores.fromJson(json))
+  //             .toList();
+  //         if (_categoryWithStoreList != null &&
+  //             _categoryWithStoreList!.isNotEmpty) {
+  //           _isLoadingCategoriesWithStores = false;
+  //         }
+  //         log("CACHE: Loaded categories from local storage.");
+  //         // We call update() here so the user sees data immediately.
+  //         // The loading indicator won't show if we found cache.
+  //
+  //         update();
+  //       } catch (e) {
+  //         log("CACHE_ERROR: Could not parse cached data. $e");
+  //       }
+  //     }
+  //   }
+  //
+  //   // --- Step 2: ALWAYS FETCH FROM NETWORK IN THE BACKGROUND ---
+  //   // This part runs regardless of whether cache was found or not.
+  //   // It ensures data is always kept fresh.
+  //
+  //   // If, after checking cache, we still have no data, show a loading indicator.
+  //   // This only happens on the very first launch.
+  //   if (_categoryWithStoreList == null) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //
+  //   try {
+  //     ApiClient apiClient = Get.find<ApiClient>();
+  //     String uri =
+  //         '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+  //     Response response = await apiClient.getData(uri);
+  //
+  //     if (response.statusCode == 200) {
+  //       List<dynamic> decodedList = response.body;
+  //       List<CategoryWithStores> freshList = decodedList
+  //           .map((json) => CategoryWithStores.fromJson(json))
+  //           .toList();
+  //
+  //       // Overwrite the in-memory list and save to cache
+  //       _categoryWithStoreList = freshList;
+  //       _isLoadingCategoriesWithStores = false;
+  //       update();
+  //       // _categoryWithStoreList = decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+  //       await sharedPreferences.setString(cacheId, jsonEncode(decodedList));
+  //       log("NETWORK: Fetched fresh data and updated cache.");
+  //     } else {
+  //       // If the API fails, we don't throw an error. We just log it
+  //       // and continue using the old (stale) data if we have it.
+  //       log("NETWORK_ERROR: API call failed with status ${response.statusCode}");
+  //       ApiChecker.checkApi(response);
+  //     }
+  //   } catch (e) {
+  //     log("NETWORK_EXCEPTION: $e");
+  //   } finally {
+  //     // --- Step 3: FINAL UI UPDATE ---
+  //     // This turns off any loading indicators and displays the latest data
+  //     // (either fresh from the network or the original cached data if network failed).
+  //     _isLoadingCategoriesWithStores = false;
+  //     update();
+  //   }
+  // }
+
+  // Future<void> getCategoriesWithStoreList({required bool reload}) async {
+  //   // === Condition 1: Handle reload and in-memory data ===
+  //   if (reload) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     _categoryWithStoreList = null; // Clear list on manual refresh
+  //     update();
+  //     log("ACTION: Manual refresh initiated. Clearing data and showing loader.");
+  //   } else if (_categoryWithStoreList != null &&
+  //       _categoryWithStoreList!.isNotEmpty) {
+  //     log("ACTION: Data already in memory. No action needed.");
+  //     return;
+  //   }
+  //
+  //   final SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  //   const String cacheId =
+  //       AppConstants.categoriesWithStores ?? "categories_with_stores";
+  //
+  //   // === Condition 2: Attempt to load from cache for an instant UI update ===
+  //   if (_categoryWithStoreList == null) {
+  //     final String? cachedData = sharedPreferences.getString(cacheId);
+  //     if (cachedData != null) {
+  //       log("CACHE: Found data in SharedPreferences. Content: $cachedData");
+  //       try {
+  //         final List<dynamic> decodedList = jsonDecode(cachedData);
+  //         if (decodedList.isNotEmpty) {
+  //           _categoryWithStoreList = decodedList
+  //               .map((json) => CategoryWithStores.fromJson(json))
+  //               .toList();
+  //           log("CACHE: Successfully parsed non-empty list. Updating UI instantly.");
+  //           if(_categoryWithStoreList != null){
+  //             _isLoadingCategoriesWithStores = false;
+  //             update(); // Show cached data IMMEDIATELY.
+  //              }
+  //         } else {
+  //           log("CACHE: Cache contains an empty list '[]'. Will proceed to network fetch.");
+  //         }
+  //       } catch (e) {
+  //         log("CACHE_ERROR: Could not parse cached data. It will be overwritten. Error: $e");
+  //       }
+  //     } else {
+  //       log("CACHE: No data found in local storage.");
+  //     }
+  //   }
+  //
+  //   // === Condition 3: Show a loading indicator ONLY if there's no data to show yet ===
+  //   if (_categoryWithStoreList == null) {
+  //     log("UI_STATE: No data in memory or cache. Showing loading indicator.");
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //
+  //   // === Condition 4: ALWAYS fetch fresh data from the network (This is the corrected part) ===
+  //   try {
+  //     log("NETWORK: Starting API call to get fresh data...");
+  //     final ApiClient apiClient = Get.find<ApiClient>();
+  //     const String uri =
+  //         '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+  //     final Response response = await apiClient.getData(uri);
+  //
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> freshDecodedList = response.body;
+  //       _categoryWithStoreList = freshDecodedList
+  //           .map((json) => CategoryWithStores.fromJson(json))
+  //           .toList();
+  //       if (_categoryWithStoreList != null) {
+  //         _isLoadingCategoriesWithStores = false;
+  //         update();
+  //       }
+  //       await sharedPreferences.setString(
+  //           cacheId, jsonEncode(freshDecodedList));
+  //       log("NETWORK: SUCCESS! Fetched fresh data and updated the cache.");
+  //     } else {
+  //       log("NETWORK: FAILED with status ${response.statusCode}. Will rely on existing cached data if available.");
+  //       ApiChecker.checkApi(response);
+  //     }
+  //   } catch (e) {
+  //     log("NETWORK: EXCEPTION caught during API call. Error: $e");
+  //   } finally {
+  //     // === Condition 5: Final update to turn off loading and show final data ===
+  //     log("UI_STATE: Final update. Turning off loading indicator.");
+  //     _isLoadingCategoriesWithStores = false;
+  //     update();
+  //   }
+  // }
+
+// ... your StoreController class ...
+
+  // Future<void> getCategoriesWithStoreList({required bool reload}) async {
+  //
+  //   if (_categoryWithStoreList == null || _categoryWithStoreList!.isEmpty) {
+  //     log("UI_STATE: No data to show yet. Showing loading indicator.");
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //   // === Condition 1: Handle reload and in-memory data ===
+  //   if (reload) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     // _categoryWithStoreList = null;
+  //     update();
+  //     log("ACTION: Manual refresh initiated. Clearing data and showing loader.");
+  //   } else if (_categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty) {
+  //     log("ACTION: Data already in memory. No action needed.");
+  //     _isLoadingCategoriesWithStores = false;
+  //     update();
+  //     return;
+  //   }
+  //
+  //   final SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  //   const String cacheId = AppConstants.categoriesWithStores ?? "categories_with_stores";
+  //
+  //   // === Condition 2: Attempt to load from cache in the background ===
+  //   if (_categoryWithStoreList == null) {
+  //     final String? cachedData = sharedPreferences.getString(cacheId);
+  //     if (cachedData != null && cachedData.isNotEmpty) {
+  //       log("CACHE: Found data. Starting background parsing...");
+  //       // Use compute() to parse the massive cache data without freezing the UI
+  //       _categoryWithStoreList = await compute(_parseCategories, cachedData);
+  //
+  //       if (_categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty) {
+  //         log("CACHE: Background parsing complete. Updating UI instantly.");
+  //         _isLoadingCategoriesWithStores = false;
+  //         update(); // Show cached data IMMEDIATELY
+  //       } else {
+  //         log("CACHE: Parsed cache, but the list is empty.");
+  //       }
+  //     } else {
+  //       log("CACHE: No data found in local storage.");
+  //     }
+  //   }
+  //
+  //   // === Condition 3: Show loading indicator if nothing is visible yet ===
+  //   if (_categoryWithStoreList == null) {
+  //     log("UI_STATE: No data to show yet. Showing loading indicator.");
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //
+  //   // === Condition 4: Fetch and parse fresh network data in the background ===
+  //   try {
+  //     log("NETWORK: Starting API call...");
+  //     final ApiClient apiClient = Get.find<ApiClient>();
+  //     const String uri = '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+  //     final Response response = await apiClient.getData(uri);
+  //
+  //     if (response.statusCode == 200) {
+  //       log("NETWORK: SUCCESS! Starting background parsing of fresh data...");
+  //       // Use compute() to parse the massive network response without freezing the UI
+  //       final List<CategoryWithStores> freshList = await compute(_parseCategories, response.bodyString!);
+  //
+  //       _categoryWithStoreList = freshList;
+  //
+  //       if (_categoryWithStoreList != null && _categoryWithStoreList!.isNotEmpty) {
+  //         _isLoadingCategoriesWithStores = false;
+  //         update();
+  //       }
+  //       // Save the raw string to cache, avoiding re-encoding.
+  //       await sharedPreferences.setString(cacheId, response.bodyString!);
+  //       log("NETWORK: Background parsing complete. Cache updated.");
+  //     } else {
+  //       log("NETWORK: FAILED with status ${response.statusCode}.");
+  //       ApiChecker.checkApi(response);
+  //     }
+  //   } catch (e) {
+  //     log("NETWORK: EXCEPTION during API call. Error: $e");
+  //   } finally {
+  //     // === Condition 5: Final UI update ===
+  //     log("UI_STATE: Final update. Turning off loader.");
+  //     _isLoadingCategoriesWithStores = false;
+  //     update();
+  //   }
+  // }
+
+
+  // Future<void> getCategoriesWithStoreList({required bool reload}) async {
+  //   // 1. Exit early if we have data and don't need to reload.
+  //   if (_categoryWithStoreList != null && !reload) {
+  //     return;
+  //   }
+  //
+  //   SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  //   int? moduleId = ModuleHelper.getCacheModule()?.id;
+  //   String cacheId = 'categories_with_stores_$moduleId';
+  //
+  //   // 2. If reloading, we should show a loading indicator.
+  //   if (reload) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //
+  //   // 3. Try to load from cache first to show data instantly.
+  //   if (_categoryWithStoreList == null) {
+  //     String? cachedData = sharedPreferences.getString(cacheId);
+  //     if (cachedData != null && cachedData.isNotEmpty) {
+  //       try {
+  //         List<dynamic> decodedList = jsonDecode(cachedData);
+  //         _categoryWithStoreList =
+  //             decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+  //         log("SUCCESS: Loaded categories from cache.");
+  //         update(); // Show cached data immediately.
+  //       } catch (e) {
+  //         log("Cache parsing error: $e");
+  //       }
+  //     }
+  //   }
+  //
+  //   // 4. If there's still no data, it's the very first load. Show indicator.
+  //   if (_categoryWithStoreList == null) {
+  //     _isLoadingCategoriesWithStores = true;
+  //     update();
+  //   }
+  //
+  //   // 5. Fetch fresh data from the network.
+  //   try {
+  //     ApiClient apiClient = Get.find<ApiClient>();
+  //     String uri = '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+  //     Response response = await apiClient.getData(uri);
+  //
+  //     if (response.statusCode == 200) {
+  //       // Parse the new data
+  //       List<dynamic> decodedList = response.body;
+  //       List<CategoryWithStores> freshList =
+  //       decodedList.map((json) => CategoryWithStores.fromJson(json)).toList();
+  //
+  //       // Overwrite the in-memory list and save to cache
+  //       _categoryWithStoreList = freshList;
+  //       await sharedPreferences.setString(cacheId, jsonEncode(decodedList));
+  //       log("SUCCESS: Fetched fresh categories from API and updated cache.");
+  //     } else {
+  //       // On API failure, we keep the old cached data if it exists.
+  //       log("API CALL FAILED: Server responded with status ${response.statusCode}");
+  //       if (_categoryWithStoreList == null) {
+  //         // If we have neither cache nor network, show an error state.
+  //         _categoryWithStoreList = [];
+  //       }
+  //       ApiChecker.checkApi(response);
+  //     }
+  //   } catch (e) {
+  //     log("EXCEPTION CAUGHT during network call: $e");
+  //     if (_categoryWithStoreList == null) {
+  //       // If an exception occurs and we have no data, set to empty.
+  //       _categoryWithStoreList = [];
+  //     }
+  //   } finally {
+  //     // 6. Final UI update.
+  //     // This ensures the loading indicator is always turned off and the UI shows the latest data (fresh or cached).
+  //     _isLoadingCategoriesWithStores = false;
+  //     update();
+  //   }
+  // }
+
+  // Future<void> getCategoriesWithStoreList({required bool reload}) async {
+  //   if (_categoryWithStoreList == null || reload) {
+  //     SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  //     int? moduleId = ModuleHelper.getCacheModule()?.id;
+  //     String cacheId = 'categories_with_stores_$moduleId';
+  //
+  //     if (_categoryWithStoreList == null) {
+  //       String? cache = sharedPreferences.getString(cacheId);
+  //       if (cache != null && cache.isNotEmpty) {
+  //         try {
+  //           _categoryWithStoreList = [];
+  //           jsonDecode(cache).forEach((categoryJson) {
+  //             _categoryWithStoreList!
+  //                 .add(CategoryWithStores.fromJson(categoryJson));
+  //           });
+  //           log("stores parsed from cache...");
+  //           update();
+  //         } catch (e) {
+  //           log("Cache parsing error: $e");
+  //         }
+  //       }
+  //     }
+  //
+  //     if (_categoryWithStoreList == null) {
+  //       _isLoadingCategoriesWithStores = true;
+  //       update();
+  //     }
+  //
+  //     ApiClient apiClient = Get.find<ApiClient>();
+  //
+  //     String uri =
+  //         '${AppConstants.CATEGORY_WITH_STORE_URI}?limit=10&offset=1&type=all';
+  //
+  //     log("Verifying Correct API Call: ${apiClient.appBaseUrl}$uri");
+  //
+  //     try {
+  //       Response response = await apiClient.getData(uri);
+  //
+  //       if (response.statusCode == 200) {
+  //         log("Stores API Response: ${response.body}");
+  //         // _categoryWithStoreList = [];
+  //
+  //         // Parse the new data
+  //         List<dynamic> decodedList = response.body;
+  //         List<CategoryWithStores> freshList = decodedList
+  //             .map((json) => CategoryWithStores.fromJson(json))
+  //             .toList();
+  //
+  //         // Overwrite the in-memory list and save to cache
+  //         _categoryWithStoreList?.clear();
+  //         _categoryWithStoreList = freshList;
+  //         // response.body.forEach((categoryJson) {
+  //         //   _categoryWithStoreList!
+  //         //       .add(CategoryWithStores.fromJson(categoryJson));
+  //         // });
+  //
+  //         if (_categoryWithStoreList != null) {
+  //           sharedPreferences.setString(
+  //               cacheId,
+  //               jsonEncode(
+  //                   _categoryWithStoreList!.map((e) => e.toJson()).toList()));
+  //         }
+  //         log("SUCCESS: Fetched and parsed categories with stores.");
+  //       } else {
+  //         // Only clear if we don't have cached data, OR if we want to enforce consistency.
+  //         // But clearing it on error leaves the user with nothing if they had cache.
+  //         // Let's NOT clear _categoryWithStoreList on error if we have data.
+  //         if (_categoryWithStoreList == null) {
+  //           _categoryWithStoreList = [];
+  //         }
+  //         log("API CALL FAILED: The server responded with an error.");
+  //         ApiChecker.checkApi(response);
+  //       }
+  //     } catch (e) {
+  //       if (_categoryWithStoreList == null) {
+  //         _categoryWithStoreList = [];
+  //       }
+  //       log("EXCEPTION CAUGHT: $e");
+  //       // showCustomSnackBar(e.toString());
+  //     } finally {
+  //       _isLoadingCategoriesWithStores = false;
+  //       update();
+  //     }
+  //   }
+  // }
 
   getSubCatWithItems() async {
     if (store?.categoryIds != null) {
@@ -271,7 +955,7 @@ class StoreController extends GetxController implements GetxService {
       var filteredCategories = storeItemModel!.categories!.where((category) {
         bool matchesSelectedId = (category.parentId == _selectedCategoryId);
         bool isRootOrNullParent =
-            (category.parentId == 0 || category.parentId == null);
+        (category.parentId == 0 || category.parentId == null);
         return matchesSelectedId || isRootOrNullParent;
       }).toList();
       _selectedStoreSubCategories?.addAll(filteredCategories);
@@ -297,12 +981,12 @@ class StoreController extends GetxController implements GetxService {
   double getRestaurantDistance(LatLng storeLatLng) {
     double distance = 0;
     distance = Geolocator.distanceBetween(
-            storeLatLng.latitude,
-            storeLatLng.longitude,
-            double.parse(
-                AddressHelper.getUserAddressFromSharedPref()!.latitude!),
-            double.parse(
-                AddressHelper.getUserAddressFromSharedPref()!.longitude!)) /
+        storeLatLng.latitude,
+        storeLatLng.longitude,
+        double.parse(
+            AddressHelper.getUserAddressFromSharedPref()!.latitude!),
+        double.parse(
+            AddressHelper.getUserAddressFromSharedPref()!.longitude!)) /
         1000;
     return distance;
   }
@@ -354,7 +1038,7 @@ class StoreController extends GetxController implements GetxService {
       update();
     }
     RecommendedItemModel? recommendedItemModel =
-        await storeServiceInterface.getStoreRecommendedItemList(storeId);
+    await storeServiceInterface.getStoreRecommendedItemList(storeId);
     if (recommendedItemModel != null) {
       _recommendedItemModel = recommendedItemModel;
     }
@@ -363,12 +1047,12 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getCartStoreSuggestedItemList(int? storeId) async {
     CartSuggestItemModel? cartSuggestItemModel =
-        await storeServiceInterface.getCartStoreSuggestedItemList(
-            storeId,
-            Get.find<LocalizationController>().locale.languageCode,
-            ModuleHelper.getModule(),
-            ModuleHelper.getCacheModule()?.id,
-            ModuleHelper.getModule()?.id);
+    await storeServiceInterface.getCartStoreSuggestedItemList(
+        storeId,
+        Get.find<LocalizationController>().locale.languageCode,
+        ModuleHelper.getModule(),
+        ModuleHelper.getCacheModule()?.id,
+        ModuleHelper.getModule()?.id);
     if (cartSuggestItemModel != null) {
       _cartSuggestItemModel = cartSuggestItemModel;
     }
@@ -377,7 +1061,7 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getStoreBannerList(int? storeId) async {
     List<StoreBannerModel>? storeBanners =
-        await storeServiceInterface.getStoreBannerList(storeId);
+    await storeServiceInterface.getStoreBannerList(storeId);
     if (storeBanners != null) {
       _storeBanners = [];
       _storeBanners!.addAll(storeBanners);
@@ -385,8 +1069,10 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
+  /// Get store list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getStoreList(int offset, bool reload,
-      {DataSourceEnum source = DataSourceEnum.local}) async {
+      {DataSourceEnum source = DataSourceEnum.local, bool localOnly = false}) async {
     if (reload) {
       _storeModel = null;
       update();
@@ -397,7 +1083,10 @@ class StoreController extends GetxController implements GetxService {
           offset, _filterType, _storeType,
           source: DataSourceEnum.local);
       _prepareStoreModel(storeModel, offset);
-      getStoreList(offset, false, source: DataSourceEnum.client);
+      // Only fetch from API if not localOnly
+      if (!localOnly) {
+        getStoreList(offset, false, source: DataSourceEnum.client);
+      }
     } else {
       storeModel = await storeServiceInterface.getStoreList(
           offset, _filterType, _storeType,
@@ -434,9 +1123,12 @@ class StoreController extends GetxController implements GetxService {
     _storeType = 'all';
   }
 
+  /// Get popular store list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getPopularStoreList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+        bool fromRecall = false,
+        bool localOnly = false}) async {
     _type = type;
     if (reload) {
       _popularStoreList = null;
@@ -454,8 +1146,11 @@ class StoreController extends GetxController implements GetxService {
           _popularStoreList!.addAll(popularStoreList);
         }
         update();
-        getPopularStoreList(false, type, notify,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getPopularStoreList(false, type, notify,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         popularStoreList = await storeServiceInterface.getPopularStoreList(type,
             source: DataSourceEnum.client);
@@ -468,9 +1163,12 @@ class StoreController extends GetxController implements GetxService {
     }
   }
 
+  /// Get latest store list
+  /// [localOnly] - If true, only loads from local cache without making API call
   Future<void> getLatestStoreList(bool reload, String type, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+        bool fromRecall = false,
+        bool localOnly = false}) async {
     _type = type;
     if (reload) {
       _latestStoreList = null;
@@ -488,8 +1186,11 @@ class StoreController extends GetxController implements GetxService {
           _latestStoreList!.addAll(latestStoreList);
         }
         update();
-        getLatestStoreList(false, type, notify,
-            fromRecall: true, dataSource: DataSourceEnum.client);
+        // Only fetch from API if not localOnly
+        if (!localOnly) {
+          getLatestStoreList(false, type, notify,
+              fromRecall: true, dataSource: DataSourceEnum.client);
+        }
       } else {
         latestStoreList = await storeServiceInterface.getLatestStoreList(type,
             source: DataSourceEnum.client);
@@ -504,7 +1205,8 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getTopOfferStoreList(bool reload, bool notify,
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+        bool fromRecall = false,
+        bool localOnly = false}) async {
     if (reload) {
       _topOfferStoreList = null;
     }
@@ -521,8 +1223,11 @@ class StoreController extends GetxController implements GetxService {
           _topOfferStoreList!.addAll(latestStoreList);
         }
         update();
-        getTopOfferStoreList(false, notify,
-            dataSource: DataSourceEnum.client, fromRecall: true);
+        // Only call API if not localOnly
+        if (!localOnly) {
+          getTopOfferStoreList(false, notify,
+              dataSource: DataSourceEnum.client, fromRecall: true);
+        }
       } else {
         latestStoreList = await storeServiceInterface.getTopOfferStoreList(
             source: DataSourceEnum.client);
@@ -540,12 +1245,12 @@ class StoreController extends GetxController implements GetxService {
     List<Store>? stores;
     if (dataSource == DataSourceEnum.local) {
       stores =
-          await storeServiceInterface.getFeaturedStoreList(source: dataSource);
+      await storeServiceInterface.getFeaturedStoreList(source: dataSource);
       _prepareFeaturedStore(stores);
       getFeaturedStoreList(dataSource: DataSourceEnum.client);
     } else {
       stores =
-          await storeServiceInterface.getFeaturedStoreList(source: dataSource);
+      await storeServiceInterface.getFeaturedStoreList(source: dataSource);
       _prepareFeaturedStore(stores);
     }
   }
@@ -570,8 +1275,8 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getVisitAgainStoreList(
       {bool fromModule = false,
-      DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+        DataSourceEnum dataSource = DataSourceEnum.local,
+        bool fromRecall = false}) async {
     if (fromModule && !fromRecall) {
       _visitAgainStoreList = null;
     }
@@ -672,8 +1377,8 @@ class StoreController extends GetxController implements GetxService {
       Get.find<CheckoutController>().setOrderType(
         _store != null
             ? _store!.delivery!
-                ? 'delivery'
-                : 'take_away'
+            ? 'delivery'
+            : 'take_away'
             : 'delivery',
         notify: false,
       );
@@ -685,7 +1390,7 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> getRecommendedStoreList(
       {DataSourceEnum dataSource = DataSourceEnum.local,
-      bool fromRecall = false}) async {
+        bool fromRecall = false}) async {
     if (!fromRecall) {
       _recommendedStoreList = null;
     }
@@ -710,8 +1415,11 @@ class StoreController extends GetxController implements GetxService {
     }
     update();
   }
-  Future<void> getStoreItemList(int? storeID, int offset, String type, bool notify) async {
-    if (offset == 1 || rxStoreItemModel.value == null) { // Use reactive variable here
+
+  Future<void> getStoreItemList(
+      int? storeID, int offset, String type, bool notify) async {
+    if (offset == 1 || rxStoreItemModel.value == null) {
+      // Use reactive variable here
       _type = type;
       rxStoreItemModel.value = null; // Use .value to assign
       if (notify) {
@@ -719,7 +1427,8 @@ class StoreController extends GetxController implements GetxService {
       }
     }
 
-    ItemNewApiModel? storeItemModelResult = await storeServiceInterface.getStoreItemListNewAPI(storeID, offset);
+    ItemNewApiModel? storeItemModelResult =
+    await storeServiceInterface.getStoreItemListNewAPI(storeID, offset);
 
     if (storeItemModelResult != null) {
       if (offset == 1) {
@@ -732,14 +1441,14 @@ class StoreController extends GetxController implements GetxService {
     } else {
       // If the API fails, make sure to set it to a non-null but empty model if needed, or handle null state in UI
       if (offset == 1) {
-        rxStoreItemModel.value = ItemNewApiModel(categories: []); // Ensures it's not null
+        rxStoreItemModel.value =
+            ItemNewApiModel(categories: []); // Ensures it's not null
       }
     }
 
     // The 'update()' call is no longer strictly necessary for reactive variables, but good to keep for GetBuilders
     update();
   }
-
 
   // Future<void> getStoreItemList(
   //     int? storeID, int offset, String type, bool notify) async {
@@ -781,16 +1490,16 @@ class StoreController extends GetxController implements GetxService {
         update();
       }
       ItemModel? storeSearchItemModel =
-          await storeServiceInterface.getStoreSearchItemList(
-              searchText,
-              storeID,
-              offset,
-              type,
-              (_store != null &&
-                      _store!.categoryIds!.isNotEmpty &&
-                      _categoryIndex != 0)
-                  ? _categoryList![_categoryIndex].id
-                  : 0);
+      await storeServiceInterface.getStoreSearchItemList(
+          searchText,
+          storeID,
+          offset,
+          type,
+          (_store != null &&
+              _store!.categoryIds!.isNotEmpty &&
+              _categoryIndex != 0)
+              ? _categoryList![_categoryIndex].id
+              : 0);
       if (storeSearchItemModel != null) {
         if (offset == 1) {
           _storeSearchItemModel = storeSearchItemModel;
@@ -866,7 +1575,10 @@ class StoreController extends GetxController implements GetxService {
     return false;
   }
 
-  bool isOpenNow(Store store) => store.open == 1 && store.active == 1;
+  // bool isOpenNow(Store store) => store.open == 1 && store.active == 1;
+  bool isOpenNow(Store store) => ((isStoreOpen(store.schedules!)) &&
+      (store.active == 1) &&
+      (store.storeOpeningTime != "close"));
 
   double? getDiscount(Store store) =>
       store.discount != null ? store.discount!.discount : 0;
@@ -952,7 +1664,7 @@ class StoreController extends GetxController implements GetxService {
 
   Future<void> _loadNextSubCategory() async {
     final nextSubCategory =
-        _selectedStoreSubCategories![_currentSubCategoryIndex];
+    _selectedStoreSubCategories![_currentSubCategoryIndex];
     await getSubCatItems(nextSubCategory.id);
 
     // Add the new items to our combined list
@@ -1073,7 +1785,7 @@ class StoreController extends GetxController implements GetxService {
   String getCategoryNameById(int categoryId) {
     if (_categoryList == null) return '';
     final category =
-        _categoryList!.firstWhereOrNull((cat) => cat.id == categoryId);
+    _categoryList!.firstWhereOrNull((cat) => cat.id == categoryId);
     return category?.name ?? '';
   }
 }

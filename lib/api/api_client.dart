@@ -25,7 +25,7 @@ class ApiClient extends GetxService {
   ApiClient({required this.appBaseUrl, required this.sharedPreferences}) {
     token = sharedPreferences.getString(AppConstants.token);
     if (kDebugMode) {
-      print('Token: $token');
+      log('Token: $token');
     }
     AddressModel? addressModel;
     try {
@@ -73,12 +73,18 @@ class ApiClient extends GetxService {
         AppConstants.moduleId:
             '${moduleID ?? ModuleModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.cacheModuleId)!)).id}'
       });
+    } else {
+      // If module ID is empty or null, set default to 2 (restaurant - first tab)
+      log("moduleID is empty/null, setting default to 2 (restaurant)");
+      header.addAll({AppConstants.moduleId: '2'});
     }
+
     header.addAll({
       'Content-Type': 'application/json; charset=UTF-8',
       // AppConstants.zoneId: zoneIDs != null ? jsonEncode([3, 2]) : '',
-      // AppConstants.zoneId: jsonEncode([2]) ,//zoneIDs != null ? jsonEncode([3]) : '',
+      // AppConstants.zoneId: jsonEncode([6]) ,//zoneIDs != null ? jsonEncode([3]) : '',
       AppConstants.zoneId: zoneIDs != null ? jsonEncode(zoneIDs) : '',
+
       ///this will add in ride module
       // AppConstants.operationAreaId: operationIds != null ? jsonEncode(operationIds) : '',
       AppConstants.localizationKey:
@@ -101,7 +107,7 @@ class ApiClient extends GetxService {
       bool handleError = true}) async {
     try {
       if (kDebugMode) {
-        print('====> API Call: $appBaseUrl :: $uri\nHeader: ${headers ?? _mainHeaders}');
+        log('====> API Call: $appBaseUrl :: $uri\nHeader: ${headers ?? _mainHeaders}');
       }
       http.Response response = await http
           .get(
@@ -112,7 +118,7 @@ class ApiClient extends GetxService {
       return handleResponse(response, uri, handleError);
     } catch (e) {
       if (kDebugMode) {
-        print('------------${e.toString()}');
+        log('------------${e.toString()}');
       }
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
@@ -124,8 +130,8 @@ class ApiClient extends GetxService {
       bool handleError = true}) async {
     try {
       if (kDebugMode) {
-        print('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
-        print('====> API Body: $body');
+        log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        log('====> API Body: $body');
       }
       http.Response response = await http
           .post(
@@ -145,8 +151,8 @@ class ApiClient extends GetxService {
       {Map<String, String>? headers, bool handleError = true}) async {
     try {
       if (kDebugMode) {
-        print('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
-        print('====> API Body: $body with ${multipartBody.length} picture');
+        log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        log('====> API Body: $body with ${multipartBody.length} picture');
       }
       http.MultipartRequest request =
           http.MultipartRequest('POST', Uri.parse(appBaseUrl + uri));
@@ -175,8 +181,8 @@ class ApiClient extends GetxService {
       {Map<String, String>? headers, bool handleError = true}) async {
     try {
       if (kDebugMode) {
-        print('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
-        print('====> API Body: $body');
+        log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        log('====> API Body: $body');
       }
       http.Response response = await http
           .put(
@@ -195,7 +201,7 @@ class ApiClient extends GetxService {
       {Map<String, String>? headers, bool handleError = true}) async {
     try {
       if (kDebugMode) {
-        print('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
       }
       http.Response response = await http
           .delete(
@@ -245,9 +251,9 @@ class ApiClient extends GetxService {
       response0 = Response(statusCode: 0, statusText: noInternetMessage);
     }
     if (kDebugMode) {
-      print('====> API Response: [${response0.statusCode}] $uri');
+      log('====> API Response: [${response0.statusCode}] $uri');
       if (!ResponsiveHelper.isWeb() || response.statusCode != 500) {
-        print('${response0.body}');
+        log('${response0.body}');
       }
     }
     if (handleError) {
