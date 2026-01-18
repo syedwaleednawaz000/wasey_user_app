@@ -1,5 +1,7 @@
 {
-  "are_you_sure_you_want_to_go_back": "هل أنت متأكد من رغبتك في العودة؟",
+  "failed_to_load_payment_page": "فشل تحميل صفحة الدفع",
+  "loading_payment_page": "جاري تحميل صفحة الدفع...",
+"are_you_sure_you_want_to_go_back": "هل أنت متأكد من رغبتك في العودة؟",
   "complete_payment": "إتمام الدفع",
   "restaurant_is_currently_closed": "المطعم مغلق حاليًا، يرجى المحاولة مرة أخرى لاحقًا.",
   "store_is_currently_closed": "المتجر مغلق حاليًا، يرجى المحاولة مرة أخرى لاحقًا.",

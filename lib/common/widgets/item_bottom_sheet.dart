@@ -380,7 +380,9 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                                         '${endingPrice != null ? ' - ${PriceConverter.convertPrice(endingPrice, discount: initialDiscount, discountType: discountType)}' : ''}',
                                                         style: STCMedium.copyWith(
                                                             fontSize: Dimensions
-                                                                .fontSizeLarge),
+                                                                .fontSizeLarge,
+                                                            color:
+                                                                Colors.black),
                                                         textDirection:
                                                             TextDirection.ltr,
                                                       ),
@@ -446,6 +448,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                                         itemController.quantity
                                                             .toString(),
                                                         style: STCMedium.copyWith(
+                                                            color: Colors.black,
                                                             fontSize: Dimensions
                                                                 .fontSizeLarge),
                                                       ),
@@ -1087,7 +1090,6 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                               ? Theme.of(context).primaryColor
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(100),
-
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 3),
                         child: ElevatedButton(
@@ -2234,16 +2236,18 @@ class NewVariationView extends StatelessWidget {
                       scrollDirection: Axis.vertical,
                       physics: const BouncingScrollPhysics(),
                       // padding: EdgeInsets.zero,
-                      itemCount: itemController.collapseVariation[index]
-                          ? item!.foodVariations![index].variationValues!
-                                      .length >
-                                  4
-                              ? 5
-                              : item!.foodVariations![index].variationValues!
-                                  .length
-                          : item!
-                              .foodVariations![index].variationValues!.length,
+                      itemCount:
+                          // itemController.collapseVariation[index]
+                          //     ? item!.foodVariations![index].variationValues!
+                          //                 .length >
+                          //             4
+                          //         ? 5
+                          //         : item!.foodVariations![index].variationValues!
+                          //             .length
+                          //     :
+                          item!.foodVariations![index].variationValues!.length,
                       itemBuilder: (context, i) {
+                        log("variationLength: ${item!.foodVariations![index].variationValues!.length}");
                         return Padding(
                           padding: EdgeInsets.symmetric(
                               vertical: ResponsiveHelper.isDesktop(context)

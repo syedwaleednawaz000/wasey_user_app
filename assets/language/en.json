@@ -1,5 +1,7 @@
 {
-  "are_you_sure_you_want_to_go_back": "Are you sure you want to go back?",
+  "failed_to_load_payment_page": "Failed to load payment page",
+  "loading_payment_page": "Loading payment page...",
+"are_you_sure_you_want_to_go_back": "Are you sure you want to go back?",
   "complete_payment": "Complete Payment",
   "restaurant_is_currently_closed": "Restaurant is currently closed, please try again later.",
   "store_is_currently_closed": "Store is currently closed, please try again later.",
